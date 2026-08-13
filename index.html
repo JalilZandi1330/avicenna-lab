@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title id="pageTitle">جئوجبرا پلاس | GeoGebra Plus</title>
+  <title id="pageTitle">جئوجبرا پلاس پرو | GeoGebra Plus Pro</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -21,23 +21,19 @@
       color: var(--text-color);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
-      padding: 8px;
+      padding: 0;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      box-sizing: border-box;
       overflow: hidden;
     }
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 4px 8px;
+      padding: 8px 12px;
     }
-    h2 {
-      margin: 0;
-      font-size: 1rem;
-    }
+    h2 { margin: 0; font-size: 1rem; }
     .lang-btn {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -47,141 +43,158 @@
       cursor: pointer;
       font-size: 0.75rem;
     }
-    .main-container {
-      display: flex;
-      flex-direction: column;
+    .canvas-container {
       flex: 1;
-      gap: 8px;
-      overflow: hidden;
-    }
-    .canvas-box {
-      flex: 1;
-      background: #11111b;
-      border-radius: 10px;
       position: relative;
+      background: #11111b;
       overflow: hidden;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
       touch-action: none;
     }
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
+    canvas { width: 100%; height: 100%; display: block; }
+    .coords-overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(17, 17, 27, 0.8);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      pointer-events: none;
+      color: var(--button-color);
+      border: 1px solid rgba(255,255,255,0.1);
     }
-    .controls-card {
+    .bottom-panel {
       background: var(--card-bg);
+      border-top: 1px solid rgba(255,255,255,0.1);
       padding: 10px;
-      border-radius: 10px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
     .input-row {
       display: flex;
       align-items: center;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 6px;
-      padding: 0 8px;
+      border-radius: 8px;
+      padding: 0 10px;
     }
-    .prefix {
-      font-family: monospace;
-      font-size: 0.95rem;
-      color: var(--hint-color);
-    }
-    input[type="text"] {
+    .input-row.focused { border-color: var(--button-color); }
+    .prefix { font-family: monospace; color: var(--hint-color); margin-right: 8px; }
+    input {
       background: transparent;
       border: none;
       color: var(--text-color);
-      padding: 8px 4px;
-      font-size: 0.95rem;
+      padding: 10px 0;
+      font-size: 1rem;
       width: 100%;
       outline: none;
       font-family: monospace;
       direction: ltr;
-      text-align: left;
     }
-    .slider-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.8rem;
+    .math-keyboard {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .kb-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-color);
+      border-radius: 4px;
+      padding: 8px 0;
+      font-size: 0.85rem;
+      cursor: pointer;
       font-family: monospace;
+      text-align: center;
     }
-    input[type="range"] {
-      flex: 1;
-      accent-color: var(--button-color);
-    }
-    .toolbar {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-    }
+    .kb-btn:active { background: var(--button-color); color: var(--button-text); }
+    .toolbar { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; }
     .tool-btn {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 6px 12px;
       font-size: 0.75rem;
       color: var(--text-color);
       cursor: pointer;
       white-space: nowrap;
     }
-    .tool-btn.active {
-      background: var(--button-color);
-      color: var(--button-text);
-      border-color: transparent;
-    }
-    .coords-overlay {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(17, 17, 27, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 0.75rem;
-      pointer-events: none;
-      color: #89b4fa;
-    }
+    .tool-btn.active { background: var(--button-color); color: var(--button-text); border-color: transparent; }
   </style>
 </head>
 <body>
   <div class="header">
-    <h2 id="appTitle">📐 جئوجبرا پلاس | GeoGebra Plus</h2>
-    <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">EN / فارسی</button>
+    <h2 id="appTitle">📐 جئوجبرا پلاس پرو | GeoGebra Plus Pro</h2>
+    <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">English</button>
   </div>
-  
-  <div class="main-container">
-    <div class="canvas-box" id="canvasBox">
-      <div class="coords-overlay" id="coordsOverlay">x: 0.00, y: 0.00</div>
-      <canvas id="geoCanvas"></canvas>
+
+  <div class="canvas-container" id="canvasBox">
+    <div class="coords-overlay" id="coordsOverlay">x: 0.00, y: 0.00</div>
+    <canvas id="geoCanvas"></canvas>
+  </div>
+
+  <div class="bottom-panel">
+    <div class="toolbar">
+      <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
+      <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
+      <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
+      <div style="flex:1"></div>
+      <div id="aValDisplay" style="font-size: 0.75rem; font-family: monospace; color: var(--button-color)">a = 1.0</div>
+    </div>
+    
+    <div class="input-section">
+      <div class="input-row" id="row1">
+        <span class="prefix">f(x)=</span>
+        <input type="text" id="eq1" value="xx - 4" onfocus="setActiveInput('eq1')" oninput="draw()" readonly>
+      </div>
+      <div class="input-row" id="row2">
+        <span class="prefix">g(x)=</span>
+        <input type="text" id="eq2" value="2x" onfocus="setActiveInput('eq2')" oninput="draw()" readonly>
+      </div>
     </div>
 
-    <div class="controls-card">
-      <div class="input-row">
-        <span class="prefix">f(x) =</span>
-        <input type="text" id="eq1" value="a*xx - 4" oninput="draw()" placeholder="a*xx - 4">
-      </div>
-      <div class="input-row">
-        <span class="prefix">g(x) =</span>
-        <input type="text" id="eq2" value="2x" oninput="draw()" placeholder="2x">
-      </div>
+    <!-- Custom Math Keyboard -->
+    <div class="math-keyboard">
+      <button class="kb-btn" onclick="kbInsert('x')">x</button>
+      <button class="kb-btn" onclick="kbInsert('xx')">x²</button>
+      <button class="kb-btn" onclick="kbInsert('^')">^</button>
+      <button class="kb-btn" onclick="kbInsert('|')">| |</button>
+      <button class="kb-btn" onclick="kbInsert('√(')">√</button>
+      <button class="kb-btn" onclick="kbInsert('/')">/</button>
+      
+      <button class="kb-btn" onclick="kbInsert('sin(')">sin</button>
+      <button class="kb-btn" onclick="kbInsert('cos(')">cos</button>
+      <button class="kb-btn" onclick="kbInsert('tan(')">tan</button>
+      <button class="kb-btn" onclick="kbInsert('(')">(</button>
+      <button class="kb-btn" onclick="kbInsert(')')">)</button>
+      <button class="kb-btn" style="color:#f38ba8" onclick="kbBackspace()">⌫</button>
+      
+      <button class="kb-btn" onclick="kbInsert('7')">7</button>
+      <button class="kb-btn" onclick="kbInsert('8')">8</button>
+      <button class="kb-btn" onclick="kbInsert('9')">9</button>
+      <button class="kb-btn" onclick="kbInsert('+')">+</button>
+      <button class="kb-btn" onclick="kbInsert('-')">-</button>
+      <button class="kb-btn" onclick="kbInsert('*')">×</button>
+      
+      <button class="kb-btn" onclick="kbInsert('4')">4</button>
+      <button class="kb-btn" onclick="kbInsert('5')">5</button>
+      <button class="kb-btn" onclick="kbInsert('6')">6</button>
+      <button class="kb-btn" onclick="kbInsert('1')">1</button>
+      <button class="kb-btn" onclick="kbInsert('2')">2</button>
+      <button class="kb-btn" onclick="kbInsert('3')">3</button>
 
-      <div class="slider-row">
-        <span id="sliderLabel">a = <span id="aVal">1.0</span></span>
-        <input type="range" id="paramA" min="-5" max="5" step="0.5" value="1" oninput="updateA(this.value)">
-      </div>
-
-      <div class="toolbar">
-        <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه (Grid)</button>
-        <button class="tool-btn active" id="btnDeriv" onclick="toggleTool('deriv')">مشتق f'</button>
-        <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها</button>
-        <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز (0,0)</button>
-      </div>
+      <button class="kb-btn" onclick="kbInsert('0')">0</button>
+      <button class="kb-btn" onclick="kbInsert('.')">.</button>
+      <button class="kb-btn" style="grid-column: span 2; background: var(--button-color); color: var(--button-text)" onclick="draw()">OK</button>
+      <button class="kb-btn" style="grid-column: span 2; color:#f38ba8" onclick="kbClear()">CLR</button>
     </div>
   </div>
 
@@ -193,15 +206,12 @@
 
     let currentLang = 'fa';
     let showGrid = true;
-    let showDeriv = true;
     let showRoots = true;
-    let paramA = 1;
+    let activeInputId = 'eq1';
 
-    // Viewport coordinates
-    let scale = 30; // pixels per unit
-    let offsetX = 0; // pixel offset from center
+    let scale = 40;
+    let offsetX = 0;
     let offsetY = 0;
-
     let isDragging = false;
     let startX, startY;
 
@@ -211,20 +221,20 @@
 
     const translations = {
       fa: {
-        title: "📐 جئوجبرا پلاس | GeoGebra Plus",
+        title: "📐 جئوجبرا پلاس پرو | GeoGebra Plus Pro",
         langBtn: "English",
-        grid: "شبکه (Grid)",
-        deriv: "مشتق f'",
+        grid: "شبکه",
         roots: "ریشه‌ها",
-        reset: "مرکز (0,0)"
+        reset: "مرکز",
+        error: "فرمول نامعتبر!"
       },
       en: {
-        title: "📐 GeoGebra Plus",
+        title: "📐 GeoGebra Plus Pro",
         langBtn: "فارسی",
         grid: "Grid",
-        deriv: "Derivative f'",
-        roots: "Roots",
-        reset: "Center (0,0)"
+        roots: "Analysis",
+        reset: "Reset",
+        error: "Invalid!"
       }
     };
 
@@ -233,19 +243,34 @@
       const t = translations[currentLang];
       document.getElementById('htmlRoot').setAttribute('lang', currentLang);
       document.getElementById('htmlRoot').setAttribute('dir', currentLang === 'fa' ? 'rtl' : 'ltr');
-      document.getElementById('pageTitle').textContent = t.title;
       document.getElementById('appTitle').textContent = t.title;
       document.getElementById('langBtn').textContent = t.langBtn;
       document.getElementById('btnGrid').textContent = t.grid;
-      document.getElementById('btnDeriv').textContent = t.deriv;
       document.getElementById('btnRoots').textContent = t.roots;
       document.getElementById('btnReset').textContent = t.reset;
       draw();
     }
 
-    function updateA(val) {
-      paramA = parseFloat(val);
-      document.getElementById('aVal').textContent = paramA;
+    function setActiveInput(id) {
+      activeInputId = id;
+      document.getElementById('row1').classList.toggle('focused', id === 'eq1');
+      document.getElementById('row2').classList.toggle('focused', id === 'eq2');
+    }
+
+    function kbInsert(val) {
+      const el = document.getElementById(activeInputId);
+      el.value += val;
+      draw();
+    }
+
+    function kbBackspace() {
+      const el = document.getElementById(activeInputId);
+      el.value = el.value.slice(0, -1);
+      draw();
+    }
+
+    function kbClear() {
+      document.getElementById(activeInputId).value = "";
       draw();
     }
 
@@ -253,9 +278,6 @@
       if (tool === 'grid') {
         showGrid = !showGrid;
         document.getElementById('btnGrid').classList.toggle('active', showGrid);
-      } else if (tool === 'deriv') {
-        showDeriv = !showDeriv;
-        document.getElementById('btnDeriv').classList.toggle('active', showDeriv);
       } else if (tool === 'roots') {
         showRoots = !showRoots;
         document.getElementById('btnRoots').classList.toggle('active', showRoots);
@@ -264,9 +286,7 @@
     }
 
     function resetZoom() {
-      scale = 30;
-      offsetX = 0;
-      offsetY = 0;
+      scale = 40; offsetX = 0; offsetY = 0;
       draw();
     }
 
@@ -278,7 +298,6 @@
 
     window.addEventListener('resize', resizeCanvas);
 
-    // Mouse / Touch Drag and Zoom
     canvas.addEventListener('mousedown', (e) => {
       isDragging = true;
       startX = e.clientX - offsetX;
@@ -286,256 +305,153 @@
     });
 
     window.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const cx = canvas.width/2 + offsetX;
+      const cy = canvas.height/2 + offsetY;
+      const mx = (px - cx) / scale;
+      const my = (cy - py) / scale;
+      document.getElementById('coordsOverlay').textContent = `x: ${mx.toFixed(2)}, y: ${my.toFixed(2)}`;
+
       if (isDragging) {
         offsetX = e.clientX - startX;
         offsetY = e.clientY - startY;
         draw();
       }
-      // Update coords overlay
-      const rect = canvas.getBoundingClientRect();
-      const px = e.clientX - rect.left;
-      const py = e.clientY - rect.top;
-      const cx = canvas.width / 2 + offsetX;
-      const cy = canvas.height / 2 + offsetY;
-      const mathX = (px - cx) / scale;
-      const mathY = (cy - py) / scale;
-      document.getElementById('coordsOverlay').textContent = `x: ${mathX.toFixed(2)}, y: ${mathY.toFixed(2)}`;
     });
 
-    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('mouseup', () => isDragging = false);
 
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const zoomIntensity = 1.1;
-      if (e.deltaY < 0) {
-        scale *= zoomIntensity;
-      } else {
-        scale /= zoomIntensity;
-      }
-      scale = Math.max(10, Math.min(200, scale));
+      const factor = e.deltaY < 0 ? 1.1 : 0.9;
+      scale = Math.max(10, Math.min(300, scale * factor));
       draw();
-    }, { passive: false });
+    }, {passive: false});
 
-    // Touch support for pinch/pan
-    let touchStartX = 0, touchStartY = 0;
+    // Touch Support
     canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length === 1) {
         isDragging = true;
-        touchStartX = e.touches[0].clientX - offsetX;
-        touchStartY = e.touches[0].clientY - offsetY;
+        startX = e.touches[0].clientX - offsetX;
+        startY = e.touches[0].clientY - offsetY;
       }
     });
     canvas.addEventListener('touchmove', (e) => {
       if (isDragging && e.touches.length === 1) {
-        offsetX = e.touches[0].clientX - touchStartX;
-        offsetY = e.touches[0].clientY - touchStartY;
+        offsetX = e.touches[0].clientX - startX;
+        offsetY = e.touches[0].clientY - startY;
         draw();
       }
     });
-    canvas.addEventListener('touchend', () => { isDragging = false; });
+    canvas.addEventListener('touchend', () => isDragging = false);
 
     function preprocess(expr) {
       if (!expr || !expr.trim()) return null;
       return expr.toLowerCase()
         .replace(/xx/g, 'x**2')
         .replace(/\^/g, '**')
+        .replace(/√\(([^)]+)\)/g, 'Math.sqrt($1)')
+        .replace(/√(\w+)/g, 'Math.sqrt($1)')
+        .replace(/\|([^|]+)\|/g, 'Math.abs($1)')
         .replace(/sin/g, 'Math.sin')
         .replace(/cos/g, 'Math.cos')
         .replace(/tan/g, 'Math.tan')
-        .replace(/sqrt/g, 'Math.sqrt')
-        .replace(/abs/g, 'Math.abs')
-        .replace(/pi/g, 'Math.PI')
-        .replace(/e/g, 'Math.E')
-        .replace(/(\d)([a-z\(])/g, '$1*$2')
+        .replace(/(\d)([a-z\(|])/g, '$1*$2')
         .replace(/([x\)])(\d)/g, '$1*$2');
     }
 
-    function evalFn(expr, x, a) {
+    function evalFn(expr, x) {
       const p = preprocess(expr);
       if (!p) return null;
       try {
-        const fn = new Function('x', 'a', `try { return ${p}; } catch(e) { return NaN; }`);
-        let v = fn(x, a);
-        return isNaN(v) ? null : v;
+        const fn = new Function('x', `return ${p};`);
+        let v = fn(x);
+        return isFinite(v) ? v : null;
       } catch(e) { return null; }
-    }
-
-    function derivative(expr, x, a) {
-      const h = 0.001;
-      let y1 = evalFn(expr, x + h, a);
-      let y2 = evalFn(expr, x - h, a);
-      if (y1 === null || y2 === null) return null;
-      return (y1 - y2) / (2 * h);
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cx = canvas.width/2 + offsetX;
+      const cy = canvas.height/2 + offsetY;
 
-      const cx = canvas.width / 2 + offsetX;
-      const cy = canvas.height / 2 + offsetY;
-
-      // 1. Draw Grid
+      // 1. Grid
       if (showGrid) {
-        ctx.strokeStyle = 'rgba(88, 91, 112, 0.2)';
+        ctx.strokeStyle = 'rgba(88, 91, 112, 0.15)';
         ctx.lineWidth = 1;
         ctx.fillStyle = '#6c7086';
         ctx.font = '10px monospace';
 
-        // Vertical grid lines
         let startX = cx % scale;
         for (let x = startX; x < canvas.width; x += scale) {
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, canvas.height);
-          ctx.stroke();
-
-          let mathX = Math.round((x - cx) / scale);
-          if (mathX !== 0) {
-            ctx.fillText(mathX, x - 6, cy + 12 > canvas.height - 5 ? canvas.height - 5 : (cy + 12 < 15 ? 15 : cy + 12));
-          }
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+          let mx = Math.round((x - cx) / scale);
+          if (mx !== 0) ctx.fillText(mx, x - 6, cy + 12);
         }
 
-        // Horizontal grid lines
         let startY = cy % scale;
         for (let y = startY; y < canvas.height; y += scale) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(canvas.width, y);
-          ctx.stroke();
-
-          let mathY = Math.round((cy - y) / scale);
-          if (mathY !== 0) {
-            ctx.fillText(mathY, cx + 6 > canvas.width - 20 ? canvas.width - 20 : (cx + 6 < 5 ? 5 : cx + 6), y + 4);
-          }
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+          let my = Math.round((cy - y) / scale);
+          if (my !== 0) ctx.fillText(my, cx + 6, y + 4);
         }
       }
 
-      // 2. Draw Axes
+      // 2. Axes
       ctx.strokeStyle = '#a6adc8';
       ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
 
-      // X Axis
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(canvas.width, cy);
-      ctx.stroke();
-
-      // Y Axis
-      ctx.beginPath();
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, canvas.height);
-      ctx.stroke();
-
-      // Origin label
-      ctx.fillStyle = '#a6adc8';
-      ctx.font = '12px monospace';
-      ctx.fillText("0", cx - 12, cy + 14);
-
-      // 3. Plot Functions
+      // 3. Curves
       const eq1 = document.getElementById('eq1').value;
       const eq2 = document.getElementById('eq2').value;
 
-      function plotCurve(expr, color, isDash = false) {
+      function plot(expr, color) {
         if (!expr.trim()) return;
         ctx.strokeStyle = color;
-        ctx.lineWidth = 2.5;
-        ctx.setLineDash(isDash ? [4, 4] : []);
-        ctx.beginPath();
-
-        let first = true;
-        for (let px = 0; px <= canvas.width; px += 2) {
-          let mathX = (px - cx) / scale;
-          let mathY = evalFn(expr, mathX, paramA);
-          if (mathY === null || isNaN(mathY) || !isFinite(mathY)) {
-            first = true;
-            continue;
-          }
-          let py = cy - mathY * scale;
-
-          if (first) {
-            ctx.moveTo(px, py);
-            first = false;
-          } else {
-            ctx.lineTo(px, py);
-          }
-        }
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-
-      // Plot f(x)
-      plotCurve(eq1, '#89b4fa');
-      // Plot g(x)
-      plotCurve(eq2, '#f38ba8');
-
-      // Plot Derivative f'(x)
-      if (showDeriv) {
-        plotCurve((x, a) => {}, '#fab387', true); // custom deriv plot loop below
-        ctx.strokeStyle = '#fab387';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 3;
         ctx.beginPath();
         let first = true;
-        for (let px = 0; px <= canvas.width; px += 2) {
-          let mathX = (px - cx) / scale;
-          let dVal = derivative(eq1, mathX, paramA);
-          if (dVal === null || isNaN(dVal) || !isFinite(dVal)) {
-            first = true;
-            continue;
-          }
-          let py = cy - dVal * scale;
+        for (let px = 0; px <= canvas.width; px += 1) {
+          let mx = (px - cx) / scale;
+          let my = evalFn(expr, mx);
+          if (my === null) { first = true; continue; }
+          let py = cy - my * scale;
           if (first) { ctx.moveTo(px, py); first = false; }
-          else { ctx.lineTo(px, py); }
+          else ctx.lineTo(px, py);
         }
         ctx.stroke();
-        ctx.setLineDash([]);
       }
 
-      // 4. Plot Roots & Intersections
-      if (showRoots) {
-        const roots = [];
-        const intersections = [];
-        for (let px = 0; px <= canvas.width; px += 2) {
-          let mathX = (px - cx) / scale;
-          let y1 = evalFn(eq1, mathX, paramA);
-          let y2 = evalFn(eq2, mathX, paramA);
+      plot(eq1, '#89b4fa');
+      plot(eq2, '#f38ba8');
 
-          if (y1 !== null && Math.abs(y1) < 0.15) {
-            roots.push(mathX);
+      // 4. Analysis (Roots & Intersections)
+      if (showRoots) {
+        const step = 0.1;
+        for (let mx = -canvas.width/(2*scale)-offsetX/scale; mx <= canvas.width/(2*scale)-offsetX/scale; mx += step) {
+          let y1 = evalFn(eq1, mx);
+          let y2 = evalFn(eq2, mx);
+
+          // Root of f(x)
+          if (y1 !== null && Math.abs(y1) < 0.1) {
+            ctx.fillStyle = '#a6e3a1';
+            ctx.beginPath(); ctx.arc(cx + mx * scale, cy, 5, 0, 7); ctx.fill();
           }
-          if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.2) {
-            intersections.push(mathX);
+          // Intersection
+          if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.15) {
+            ctx.fillStyle = '#cba6f7';
+            ctx.beginPath(); ctx.arc(cx + mx * scale, cy - y1 * scale, 6, 0, 7); ctx.fill();
           }
         }
-
-        // Draw roots (Green dots)
-        ctx.fillStyle = '#a6e3a1';
-        roots.forEach(rx => {
-          let px = cx + rx * scale;
-          let py = cy; // y = 0
-          ctx.beginPath();
-          ctx.arc(px, py, 5, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        // Draw intersections (Purple dots)
-        ctx.fillStyle = '#cba6f7';
-        intersections.forEach(ix => {
-          let mathY = evalFn(eq1, ix, paramA);
-          if (mathY !== null) {
-            let px = cx + ix * scale;
-            let py = cy - mathY * scale;
-            ctx.beginPath();
-            ctx.arc(px, py, 6, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        });
       }
     }
 
-    window.onload = () => {
-      resizeCanvas();
-    };
+    setActiveInput('eq1');
+    window.onload = resizeCanvas;
   </script>
 </body>
 </html>
