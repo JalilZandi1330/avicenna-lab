@@ -31,9 +31,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
+      padding: 6px 12px;
     }
-    h2 { margin: 0; font-size: 1rem; }
+    h2 { margin: 0; font-size: 0.95rem; }
     .lang-btn {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -55,23 +55,37 @@
       position: absolute;
       top: 10px;
       left: 10px;
-      background: rgba(17, 17, 27, 0.8);
-      padding: 4px 8px;
-      border-radius: 4px;
+      background: rgba(17, 17, 27, 0.85);
+      padding: 6px 10px;
+      border-radius: 6px;
       font-family: monospace;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       pointer-events: none;
-      color: var(--button-color);
-      border: 1px solid rgba(255,255,255,0.1);
+      color: #a6e3a1;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
     .bottom-panel {
       background: var(--card-bg);
       border-top: 1px solid rgba(255,255,255,0.1);
-      padding: 10px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
+    .toolbar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+    .tool-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      color: var(--text-color);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tool-btn.active { background: var(--button-color); color: var(--button-text); border-color: transparent; }
+    
     .input-section {
       display: flex;
       flex-direction: column;
@@ -82,52 +96,49 @@
       align-items: center;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 0 10px;
+      border-radius: 6px;
+      padding: 0 8px;
     }
     .input-row.focused { border-color: var(--button-color); }
-    .prefix { font-family: monospace; color: var(--hint-color); margin-right: 8px; }
+    .prefix { font-family: monospace; color: var(--hint-color); margin-right: 6px; }
     input {
       background: transparent;
       border: none;
       color: var(--text-color);
-      padding: 10px 0;
-      font-size: 1rem;
+      padding: 8px 0;
+      font-size: 0.95rem;
       width: 100%;
       outline: none;
       font-family: monospace;
       direction: ltr;
     }
+
+    /* Math Keyboard (Standard Phone Layout: 123 on right, symbols on left) */
     .math-keyboard {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 4px;
-      margin-top: 4px;
+      background: #181825;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.2s;
     }
+    .math-keyboard.hidden { display: none; }
     .kb-btn {
       background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.08);
       color: var(--text-color);
       border-radius: 4px;
       padding: 8px 0;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       cursor: pointer;
       font-family: monospace;
       text-align: center;
     }
     .kb-btn:active { background: var(--button-color); color: var(--button-text); }
-    .toolbar { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; }
-    .tool-btn {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 0.75rem;
-      color: var(--text-color);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .tool-btn.active { background: var(--button-color); color: var(--button-text); border-color: transparent; }
+    .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
+    .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
   </style>
 </head>
 <body>
@@ -145,9 +156,8 @@
     <div class="toolbar">
       <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
       <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
+      <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ صفحه کلید</button>
       <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
-      <div style="flex:1"></div>
-      <div id="aValDisplay" style="font-size: 0.75rem; font-family: monospace; color: var(--button-color)">a = 1.0</div>
     </div>
     
     <div class="input-section">
@@ -161,40 +171,42 @@
       </div>
     </div>
 
-    <!-- Custom Math Keyboard -->
-    <div class="math-keyboard">
-      <button class="kb-btn" onclick="kbInsert('x')">x</button>
-      <button class="kb-btn" onclick="kbInsert('xx')">x²</button>
-      <button class="kb-btn" onclick="kbInsert('^')">^</button>
-      <button class="kb-btn" onclick="kbInsert('|')">| |</button>
-      <button class="kb-btn" onclick="kbInsert('√(')">√</button>
-      <button class="kb-btn" onclick="kbInsert('/')">/</button>
-      
-      <button class="kb-btn" onclick="kbInsert('sin(')">sin</button>
-      <button class="kb-btn" onclick="kbInsert('cos(')">cos</button>
-      <button class="kb-btn" onclick="kbInsert('tan(')">tan</button>
-      <button class="kb-btn" onclick="kbInsert('(')">(</button>
-      <button class="kb-btn" onclick="kbInsert(')')">)</button>
-      <button class="kb-btn" style="color:#f38ba8" onclick="kbBackspace()">⌫</button>
-      
-      <button class="kb-btn" onclick="kbInsert('7')">7</button>
-      <button class="kb-btn" onclick="kbInsert('8')">8</button>
-      <button class="kb-btn" onclick="kbInsert('9')">9</button>
-      <button class="kb-btn" onclick="kbInsert('+')">+</button>
-      <button class="kb-btn" onclick="kbInsert('-')">-</button>
-      <button class="kb-btn" onclick="kbInsert('*')">×</button>
-      
-      <button class="kb-btn" onclick="kbInsert('4')">4</button>
-      <button class="kb-btn" onclick="kbInsert('5')">5</button>
-      <button class="kb-btn" onclick="kbInsert('6')">6</button>
-      <button class="kb-btn" onclick="kbInsert('1')">1</button>
-      <button class="kb-btn" onclick="kbInsert('2')">2</button>
-      <button class="kb-btn" onclick="kbInsert('3')">3</button>
+    <!-- Sorted & Clean Math Keyboard -->
+    <div class="math-keyboard" id="mathKeyboard">
+      <!-- Row 1 -->
+      <button class="kb-btn action" onclick="kbInsert('x')">x</button>
+      <button class="kb-btn action" onclick="kbInsert('xx')">x²</button>
+      <button class="kb-btn num" onclick="kbInsert('7')">7</button>
+      <button class="kb-btn num" onclick="kbInsert('8')">8</button>
+      <button class="kb-btn num" onclick="kbInsert('9')">9</button>
 
-      <button class="kb-btn" onclick="kbInsert('0')">0</button>
-      <button class="kb-btn" onclick="kbInsert('.')">.</button>
-      <button class="kb-btn" style="grid-column: span 2; background: var(--button-color); color: var(--button-text)" onclick="draw()">OK</button>
-      <button class="kb-btn" style="grid-column: span 2; color:#f38ba8" onclick="kbClear()">CLR</button>
+      <!-- Row 2 -->
+      <button class="kb-btn action" onclick="kbInsert('|')">| |</button>
+      <button class="kb-btn action" onclick="kbInsert('√(')">√</button>
+      <button class="kb-btn num" onclick="kbInsert('4')">4</button>
+      <button class="kb-btn num" onclick="kbInsert('5')">5</button>
+      <button class="kb-btn num" onclick="kbInsert('6')">6</button>
+
+      <!-- Row 3 -->
+      <button class="kb-btn action" onclick="kbInsert('sin(')">sin</button>
+      <button class="kb-btn action" onclick="kbInsert('cos(')">cos</button>
+      <button class="kb-btn num" onclick="kbInsert('1')">1</button>
+      <button class="kb-btn num" onclick="kbInsert('2')">2</button>
+      <button class="kb-btn num" onclick="kbInsert('3')">3</button>
+
+      <!-- Row 4 -->
+      <button class="kb-btn action" onclick="kbInsert('+')">+</button>
+      <button class="kb-btn action" onclick="kbInsert('-')">-</button>
+      <button class="kb-btn num" onclick="kbInsert('0')">0</button>
+      <button class="kb-btn num" onclick="kbInsert('.')">.</button>
+      <button class="kb-btn action" onclick="kbInsert('*')">×</button>
+
+      <!-- Row 5 -->
+      <button class="kb-btn action" onclick="kbInsert('/')">/</button>
+      <button class="kb-btn action" onclick="kbInsert('^')">^</button>
+      <button class="kb-btn action" onclick="kbInsert('(')">(</button>
+      <button class="kb-btn action" onclick="kbInsert(')')">)</button>
+      <button class="kb-btn" style="color:#f38ba8; background:rgba(243,139,168,0.15)" onclick="kbBackspace()">⌫</button>
     </div>
   </div>
 
@@ -207,6 +219,7 @@
     let currentLang = 'fa';
     let showGrid = true;
     let showRoots = true;
+    let isKeyboardOpen = true;
     let activeInputId = 'eq1';
 
     let scale = 40;
@@ -214,6 +227,7 @@
     let offsetY = 0;
     let isDragging = false;
     let startX, startY;
+    let hoverPoint = null; // for tracking nearest point on curve
 
     const canvas = document.getElementById('geoCanvas');
     const ctx = canvas.getContext('2d');
@@ -225,16 +239,16 @@
         langBtn: "English",
         grid: "شبکه",
         roots: "ریشه‌ها",
-        reset: "مرکز",
-        error: "فرمول نامعتبر!"
+        keyboard: "⌨️ صفحه کلید",
+        reset: "مرکز"
       },
       en: {
         title: "📐 GeoGebra Plus Pro",
         langBtn: "فارسی",
         grid: "Grid",
         roots: "Analysis",
-        reset: "Reset",
-        error: "Invalid!"
+        keyboard: "⌨️ Keyboard",
+        reset: "Reset"
       }
     };
 
@@ -247,8 +261,16 @@
       document.getElementById('langBtn').textContent = t.langBtn;
       document.getElementById('btnGrid').textContent = t.grid;
       document.getElementById('btnRoots').textContent = t.roots;
+      document.getElementById('btnKeyboard').textContent = t.keyboard;
       document.getElementById('btnReset').textContent = t.reset;
       draw();
+    }
+
+    function toggleKeyboard() {
+      isKeyboardOpen = !isKeyboardOpen;
+      const kb = document.getElementById('mathKeyboard');
+      kb.classList.toggle('hidden', !isKeyboardOpen);
+      resizeCanvas();
     }
 
     function setActiveInput(id) {
@@ -266,11 +288,6 @@
     function kbBackspace() {
       const el = document.getElementById(activeInputId);
       el.value = el.value.slice(0, -1);
-      draw();
-    }
-
-    function kbClear() {
-      document.getElementById(activeInputId).value = "";
       draw();
     }
 
@@ -298,13 +315,8 @@
 
     window.addEventListener('resize', resizeCanvas);
 
-    canvas.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX - offsetX;
-      startY = e.clientY - offsetY;
-    });
-
-    window.addEventListener('mousemove', (e) => {
+    // Mouse / Touch Move for Hover Coordinates on Curve
+    canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       const px = e.clientX - rect.left;
       const py = e.clientY - rect.top;
@@ -312,13 +324,30 @@
       const cy = canvas.height/2 + offsetY;
       const mx = (px - cx) / scale;
       const my = (cy - py) / scale;
+
       document.getElementById('coordsOverlay').textContent = `x: ${mx.toFixed(2)}, y: ${my.toFixed(2)}`;
+
+      // Find nearest curve point
+      const eq1 = document.getElementById('eq1').value;
+      const y1 = evalFn(eq1, mx);
+      if (y1 !== null) {
+        hoverPoint = { x: mx, y: y1 };
+      } else {
+        hoverPoint = null;
+      }
+      draw();
 
       if (isDragging) {
         offsetX = e.clientX - startX;
         offsetY = e.clientY - startY;
         draw();
       }
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - offsetX;
+      startY = e.clientY - offsetY;
     });
 
     window.addEventListener('mouseup', () => isDragging = false);
@@ -330,7 +359,6 @@
       draw();
     }, {passive: false});
 
-    // Touch Support
     canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length === 1) {
         isDragging = true;
@@ -436,17 +464,37 @@
           let y1 = evalFn(eq1, mx);
           let y2 = evalFn(eq2, mx);
 
-          // Root of f(x)
           if (y1 !== null && Math.abs(y1) < 0.1) {
             ctx.fillStyle = '#a6e3a1';
             ctx.beginPath(); ctx.arc(cx + mx * scale, cy, 5, 0, 7); ctx.fill();
           }
-          // Intersection
           if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.15) {
             ctx.fillStyle = '#cba6f7';
             ctx.beginPath(); ctx.arc(cx + mx * scale, cy - y1 * scale, 6, 0, 7); ctx.fill();
           }
         }
+      }
+
+      // 5. Hover point on curve showing (x, y)
+      if (hoverPoint) {
+        let px = cx + hoverPoint.x * scale;
+        let py = cy - hoverPoint.y * scale;
+
+        ctx.fillStyle = '#fab387';
+        ctx.beginPath(); ctx.arc(px, py, 6, 0, 7); ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw coordinate popup label
+        ctx.fillStyle = 'rgba(17, 17, 27, 0.9)';
+        ctx.fillRect(px + 10, py - 25, 90, 22);
+        ctx.strokeStyle = '#fab387';
+        ctx.strokeRect(px + 10, py - 25, 90, 22);
+
+        ctx.fillStyle = '#fab387';
+        ctx.font = 'bold 11px monospace';
+        ctx.fillText(`(${hoverPoint.x.toFixed(2)}, ${hoverPoint.y.toFixed(2)})`, px + 14, py - 10);
       }
     }
 
