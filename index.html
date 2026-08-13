@@ -2,59 +2,80 @@
 <html lang="fa" dir="rtl" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">مینی جئوجبرا پیشرفته | GeoGebra Mini Pro</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title id="pageTitle">جئوجبرا پلاس | GeoGebra Plus</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg-color: var(--tg-theme-bg-color, #17212b);
-      --text-color: var(--tg-theme-text-color, #ffffff);
-      --button-color: var(--tg-theme-button-color, #5288c1);
-      --button-text: var(--tg-theme-button-text-color, #ffffff);
-      --card-bg: var(--tg-theme-secondary-bg-color, #232e3c);
-      --hint-color: var(--tg-theme-hint-color, #708499);
+      --bg-color: var(--tg-theme-bg-color, #1e1e2e);
+      --text-color: var(--tg-theme-text-color, #cdd6f4);
+      --button-color: var(--tg-theme-button-color, #89b4fa);
+      --button-text: var(--tg-theme-button-text-color, #11111b);
+      --card-bg: var(--tg-theme-secondary-bg-color, #313244);
+      --hint-color: var(--tg-theme-hint-color, #6c7086);
+      --axis-color: #585b70;
+      --grid-color: rgba(88, 91, 112, 0.15);
     }
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
-      padding: 12px;
+      padding: 8px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      height: 100vh;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 4px 8px;
     }
     h2 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
     .lang-btn {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: var(--text-color);
-      padding: 4px 10px;
+      padding: 4px 8px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
     }
-    .card {
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 8px;
+      overflow: hidden;
+    }
+    .canvas-box {
+      flex: 1;
+      background: #11111b;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .controls-card {
       background: var(--card-bg);
       padding: 10px;
       border-radius: 10px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    label {
-      font-size: 0.85rem;
-      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
     .input-row {
       display: flex;
@@ -66,145 +87,102 @@
     }
     .prefix {
       font-family: monospace;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--hint-color);
-      margin-left: 4px;
-      margin-right: 4px;
     }
     input[type="text"] {
       background: transparent;
       border: none;
       color: var(--text-color);
-      padding: 8px 0;
-      font-size: 1rem;
+      padding: 8px 4px;
+      font-size: 0.95rem;
       width: 100%;
       outline: none;
       font-family: monospace;
       direction: ltr;
       text-align: left;
     }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--button-color);
-    }
-    .slider-box {
+    .slider-row {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
-      background: rgba(0,0,0,0.15);
-      padding: 8px;
-      border-radius: 6px;
-    }
-    .slider-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
       font-family: monospace;
     }
-    button.action-btn {
-      background: var(--button-color);
-      color: var(--button-text);
-      border: none;
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 0.95rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: opacity 0.2s;
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--button-color);
     }
-    button.action-btn:active {
-      opacity: 0.8;
-    }
-    .chart-container {
-      background: var(--card-bg);
-      padding: 8px;
-      border-radius: 10px;
-      position: relative;
-      height: 320px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .error-msg {
-      color: #ff6b6b;
-      font-size: 0.8rem;
-      text-align: center;
-      min-height: 16px;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .toolbar {
+      display: flex;
       gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
     }
-    .feature-toggle {
+    .tool-btn {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 6px;
-      padding: 6px;
-      font-size: 0.8rem;
+      padding: 6px 10px;
+      font-size: 0.75rem;
       color: var(--text-color);
       cursor: pointer;
-      text-align: center;
+      white-space: nowrap;
     }
-    .feature-toggle.active {
+    .tool-btn.active {
       background: var(--button-color);
+      color: var(--button-text);
       border-color: transparent;
     }
-    .stats-panel {
-      font-size: 0.75rem;
-      color: var(--hint-color);
-      background: rgba(0,0,0,0.2);
-      padding: 6px;
-      border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
+    .coords-overlay {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(17, 17, 27, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 4px 8px;
+      border-radius: 4px;
       font-family: monospace;
+      font-size: 0.75rem;
+      pointer-events: none;
+      color: #89b4fa;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h2 id="appTitle">📐 مینی جئوجبرا پیشرفته | GeoGebra Mini Pro</h2>
+    <h2 id="appTitle">📐 جئوجبرا پلاس | GeoGebra Plus</h2>
     <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">EN / فارسی</button>
   </div>
   
-  <div class="card">
-    <label id="labelEq1" for="equation1">تابع اول f(x):</label>
-    <div class="input-row">
-      <span class="prefix">f(x) =</span>
-      <input type="text" id="equation1" value="a*xx - 4" placeholder="a*xx - 4">
+  <div class="main-container">
+    <div class="canvas-box" id="canvasBox">
+      <div class="coords-overlay" id="coordsOverlay">x: 0.00, y: 0.00</div>
+      <canvas id="geoCanvas"></canvas>
     </div>
 
-    <div class="slider-box">
-      <div class="slider-header">
-        <span id="sliderALabel">پارامتر a:</span>
-        <span id="sliderAVal">1.0</span>
+    <div class="controls-card">
+      <div class="input-row">
+        <span class="prefix">f(x) =</span>
+        <input type="text" id="eq1" value="a*xx - 4" oninput="draw()" placeholder="a*xx - 4">
       </div>
-      <input type="range" id="paramA" min="-5" max="5" step="0.5" value="1" oninput="updateSlider(this.value)">
+      <div class="input-row">
+        <span class="prefix">g(x) =</span>
+        <input type="text" id="eq2" value="2x" oninput="draw()" placeholder="2x">
+      </div>
+
+      <div class="slider-row">
+        <span id="sliderLabel">a = <span id="aVal">1.0</span></span>
+        <input type="range" id="paramA" min="-5" max="5" step="0.5" value="1" oninput="updateA(this.value)">
+      </div>
+
+      <div class="toolbar">
+        <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه (Grid)</button>
+        <button class="tool-btn active" id="btnDeriv" onclick="toggleTool('deriv')">مشتق f'</button>
+        <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها</button>
+        <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز (0,0)</button>
+      </div>
     </div>
-
-    <label id="labelEq2" for="equation2">تابع دوم g(x) (اختیاری):</label>
-    <div class="input-row">
-      <span class="prefix">g(x) =</span>
-      <input type="text" id="equation2" value="2x" placeholder="2x">
-    </div>
-
-    <div class="features-grid">
-      <button class="feature-toggle active" id="btnDeriv" onclick="toggleFeature('deriv')">مشتق f'(x)</button>
-      <button class="feature-toggle" id="btnIntegral" onclick="toggleFeature('integral')">انتگرال (مساحت)</button>
-      <button class="feature-toggle" id="btnExtrema" onclick="toggleFeature('extrema')">مینیمم / ماکزیمم</button>
-      <button class="feature-toggle active" id="btnRoots" onclick="toggleFeature('roots')">ریشه‌ها و تقاطع</button>
-    </div>
-
-    <div class="error-msg" id="errorMsg"></div>
-    <button class="action-btn" id="plotBtn" onclick="plot()">به‌روزرسانی نمودار</button>
-  </div>
-
-  <div class="chart-container">
-    <canvas id="mathChart"></canvas>
-  </div>
-
-  <div class="stats-panel" id="statsPanel">
-    <span id="statRoots">Roots: -</span>
-    <span id="statIntersections">Intersections: -</span>
   </div>
 
   <script>
@@ -214,332 +192,349 @@
     }
 
     let currentLang = 'fa';
+    let showGrid = true;
     let showDeriv = true;
-    let showIntegral = false;
-    let showExtrema = false;
     let showRoots = true;
     let paramA = 1;
 
+    // Viewport coordinates
+    let scale = 30; // pixels per unit
+    let offsetX = 0; // pixel offset from center
+    let offsetY = 0;
+
+    let isDragging = false;
+    let startX, startY;
+
+    const canvas = document.getElementById('geoCanvas');
+    const ctx = canvas.getContext('2d');
+    const box = document.getElementById('canvasBox');
+
     const translations = {
       fa: {
-        title: "📐 مینی جئوجبرا پیشرفته | GeoGebra Mini Pro",
-        labelEq1: "تابع اول f(x):",
-        labelEq2: "تابع دوم g(x) (اختیاری):",
-        sliderALabel: "پارامتر a:",
-        plotBtn: "به‌روزرسانی نمودار",
+        title: "📐 جئوجبرا پلاس | GeoGebra Plus",
         langBtn: "English",
-        axisX: "محور X",
-        axisY: "محور Y",
-        btnDeriv: "مشتق f'(x)",
-        btnIntegral: "انتگرال (مساحت)",
-        btnExtrema: "مینیمم / ماکزیمم",
-        btnRoots: "ریشه‌ها و تقاطع",
-        rootLabel: "ریشه f(x)",
-        intersectLabel: "نقطه برخورد",
-        extremaLabel: "اکسترمم (قله/دره)",
-        derivLabel: "مشتق f'(x)",
-        integralLabel: "انتگرال ∫ f(x)",
-        error: "خطا در فرمول! لطفاً عبارت درستی وارد کنید."
+        grid: "شبکه (Grid)",
+        deriv: "مشتق f'",
+        roots: "ریشه‌ها",
+        reset: "مرکز (0,0)"
       },
       en: {
-        title: "📐 GeoGebra Mini Pro",
-        labelEq1: "First Function f(x):",
-        labelEq2: "Second Function g(x) (Optional):",
-        sliderALabel: "Parameter a:",
-        plotBtn: "Update Plot",
+        title: "📐 GeoGebra Plus",
         langBtn: "فارسی",
-        axisX: "X Axis",
-        axisY: "Y Axis",
-        btnDeriv: "Derivative f'(x)",
-        btnIntegral: "Integral (Area)",
-        btnExtrema: "Extrema (Min/Max)",
-        btnRoots: "Roots & Intersections",
-        rootLabel: "Root of f(x)",
-        intersectLabel: "Intersection",
-        extremaLabel: "Extrema",
-        derivLabel: "Derivative f'(x)",
-        integralLabel: "Integral ∫ f(x)",
-        error: "Invalid formula! Please enter a valid expression."
+        grid: "Grid",
+        deriv: "Derivative f'",
+        roots: "Roots",
+        reset: "Center (0,0)"
       }
     };
 
     function toggleLanguage() {
       currentLang = currentLang === 'fa' ? 'en' : 'fa';
       const t = translations[currentLang];
-      
       document.getElementById('htmlRoot').setAttribute('lang', currentLang);
       document.getElementById('htmlRoot').setAttribute('dir', currentLang === 'fa' ? 'rtl' : 'ltr');
       document.getElementById('pageTitle').textContent = t.title;
       document.getElementById('appTitle').textContent = t.title;
-      document.getElementById('labelEq1').textContent = t.labelEq1;
-      document.getElementById('labelEq2').textContent = t.labelEq2;
-      document.getElementById('sliderALabel').textContent = t.sliderALabel;
-      document.getElementById('plotBtn').textContent = t.plotBtn;
       document.getElementById('langBtn').textContent = t.langBtn;
-      document.getElementById('btnDeriv').textContent = t.btnDeriv;
-      document.getElementById('btnIntegral').textContent = t.btnIntegral;
-      document.getElementById('btnExtrema').textContent = t.btnExtrema;
-      document.getElementById('btnRoots').textContent = t.btnRoots;
-      
-      plot();
+      document.getElementById('btnGrid').textContent = t.grid;
+      document.getElementById('btnDeriv').textContent = t.deriv;
+      document.getElementById('btnRoots').textContent = t.roots;
+      document.getElementById('btnReset').textContent = t.reset;
+      draw();
     }
 
-    function updateSlider(val) {
+    function updateA(val) {
       paramA = parseFloat(val);
-      document.getElementById('sliderAVal').textContent = paramA;
-      plot();
+      document.getElementById('aVal').textContent = paramA;
+      draw();
     }
 
-    function toggleFeature(feat) {
-      if (feat === 'deriv') {
+    function toggleTool(tool) {
+      if (tool === 'grid') {
+        showGrid = !showGrid;
+        document.getElementById('btnGrid').classList.toggle('active', showGrid);
+      } else if (tool === 'deriv') {
         showDeriv = !showDeriv;
         document.getElementById('btnDeriv').classList.toggle('active', showDeriv);
-      } else if (feat === 'integral') {
-        showIntegral = !showIntegral;
-        document.getElementById('btnIntegral').classList.toggle('active', showIntegral);
-      } else if (feat === 'extrema') {
-        showExtrema = !showExtrema;
-        document.getElementById('btnExtrema').classList.toggle('active', showExtrema);
-      } else if (feat === 'roots') {
+      } else if (tool === 'roots') {
         showRoots = !showRoots;
         document.getElementById('btnRoots').classList.toggle('active', showRoots);
       }
-      plot();
+      draw();
     }
 
-    let chart = null;
+    function resetZoom() {
+      scale = 30;
+      offsetX = 0;
+      offsetY = 0;
+      draw();
+    }
 
-    function preprocessExpression(expr) {
+    function resizeCanvas() {
+      canvas.width = box.clientWidth;
+      canvas.height = box.clientHeight;
+      draw();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // Mouse / Touch Drag and Zoom
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - offsetX;
+      startY = e.clientY - offsetY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        offsetX = e.clientX - startX;
+        offsetY = e.clientY - startY;
+        draw();
+      }
+      // Update coords overlay
+      const rect = canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const cx = canvas.width / 2 + offsetX;
+      const cy = canvas.height / 2 + offsetY;
+      const mathX = (px - cx) / scale;
+      const mathY = (cy - py) / scale;
+      document.getElementById('coordsOverlay').textContent = `x: ${mathX.toFixed(2)}, y: ${mathY.toFixed(2)}`;
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomIntensity = 1.1;
+      if (e.deltaY < 0) {
+        scale *= zoomIntensity;
+      } else {
+        scale /= zoomIntensity;
+      }
+      scale = Math.max(10, Math.min(200, scale));
+      draw();
+    }, { passive: false });
+
+    // Touch support for pinch/pan
+    let touchStartX = 0, touchStartY = 0;
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        touchStartX = e.touches[0].clientX - offsetX;
+        touchStartY = e.touches[0].clientY - offsetY;
+      }
+    });
+    canvas.addEventListener('touchmove', (e) => {
+      if (isDragging && e.touches.length === 1) {
+        offsetX = e.touches[0].clientX - touchStartX;
+        offsetY = e.touches[0].clientY - touchStartY;
+        draw();
+      }
+    });
+    canvas.addEventListener('touchend', () => { isDragging = false; });
+
+    function preprocess(expr) {
       if (!expr || !expr.trim()) return null;
-      let jsExpr = expr
-        .toLowerCase()
+      return expr.toLowerCase()
         .replace(/xx/g, 'x**2')
         .replace(/\^/g, '**')
         .replace(/sin/g, 'Math.sin')
         .replace(/cos/g, 'Math.cos')
         .replace(/tan/g, 'Math.tan')
-        .replace(/log/g, 'Math.log')
         .replace(/sqrt/g, 'Math.sqrt')
         .replace(/abs/g, 'Math.abs')
         .replace(/pi/g, 'Math.PI')
         .replace(/e/g, 'Math.E')
         .replace(/(\d)([a-z\(])/g, '$1*$2')
         .replace(/([x\)])(\d)/g, '$1*$2');
-      return jsExpr;
     }
 
-    function evaluateFunction(rawExpr, x, a) {
-      const processed = preprocessExpression(rawExpr);
-      if (!processed) return null;
+    function evalFn(expr, x, a) {
+      const p = preprocess(expr);
+      if (!p) return null;
       try {
-        const fn = new Function('x', 'a', `try { return ${processed}; } catch(e) { return NaN; }`);
-        let val = fn(x, a);
-        return isNaN(val) ? null : val;
-      } catch (e) {
-        return null;
-      }
+        const fn = new Function('x', 'a', `try { return ${p}; } catch(e) { return NaN; }`);
+        let v = fn(x, a);
+        return isNaN(v) ? null : v;
+      } catch(e) { return null; }
     }
 
-    function derivative(rawExpr, x, a) {
+    function derivative(expr, x, a) {
       const h = 0.001;
-      let y1 = evaluateFunction(rawExpr, x + h, a);
-      let y2 = evaluateFunction(rawExpr, x - h, a);
+      let y1 = evalFn(expr, x + h, a);
+      let y2 = evalFn(expr, x - h, a);
       if (y1 === null || y2 === null) return null;
       return (y1 - y2) / (2 * h);
     }
 
-    function plot() {
-      const eq1Str = document.getElementById('equation1').value;
-      const eq2Str = document.getElementById('equation2').value;
-      const errorEl = document.getElementById('errorMsg');
-      errorEl.textContent = '';
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const xValues = [];
-      const y1Values = [];
-      const y2Values = [];
-      const derivValues = [];
-      const integralValues = [];
-      
-      const roots1 = [];
-      const intersections = [];
-      const extremas = [];
+      const cx = canvas.width / 2 + offsetX;
+      const cy = canvas.height / 2 + offsetY;
 
-      try {
-        let prevY = null;
-        let prevDeriv = null;
+      // 1. Draw Grid
+      if (showGrid) {
+        ctx.strokeStyle = 'rgba(88, 91, 112, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#6c7086';
+        ctx.font = '10px monospace';
 
-        for (let x = -10; x <= 10; x += 0.25) {
-          xValues.push(x);
-          
-          let y1 = evaluateFunction(eq1Str, x, paramA);
-          let y2 = evaluateFunction(eq2Str, x, paramA);
-          let d1 = showDeriv ? derivative(eq1Str, x, paramA) : null;
-          
-          y1Values.push(y1);
-          y2Values.push(y2);
-          derivValues.push(d1);
-          
-          if (showIntegral && y1 !== null) {
-            integralValues.push(y1);
-          } else {
-            integralValues.push(null);
+        // Vertical grid lines
+        let startX = cx % scale;
+        for (let x = startX; x < canvas.width; x += scale) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+
+          let mathX = Math.round((x - cx) / scale);
+          if (mathX !== 0) {
+            ctx.fillText(mathX, x - 6, cy + 12 > canvas.height - 5 ? canvas.height - 5 : (cy + 12 < 15 ? 15 : cy + 12));
           }
-
-          // Roots
-          if (showRoots && y1 !== null && Math.abs(y1) < 0.2) {
-            roots1.push({x: Number(x.toFixed(2)), y: y1});
-          }
-
-          // Intersections
-          if (showRoots && y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.25) {
-            intersections.push({x: Number(x.toFixed(2)), y: (y1 + y2) / 2});
-          }
-
-          // Extrema (where derivative crosses zero)
-          if (showExtrema && prevDeriv !== null && d1 !== null) {
-            if (prevDeriv * d1 <= 0) {
-              extremas.push({x: Number(x.toFixed(2)), y: y1});
-            }
-          }
-          prevDeriv = d1;
         }
 
-        // Update stats panel
-        const t = translations[currentLang];
-        document.getElementById('statRoots').textContent = `Roots: ${roots1.map(r => r.x).join(', ') || 'None'}`;
-        document.getElementById('statIntersections').textContent = `Intersections: ${intersections.map(i => '('+i.x+','+i.y.toFixed(1)+')').join(', ') || 'None'}`;
+        // Horizontal grid lines
+        let startY = cy % scale;
+        for (let y = startY; y < canvas.height; y += scale) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
 
-        if (chart) chart.destroy();
+          let mathY = Math.round((cy - y) / scale);
+          if (mathY !== 0) {
+            ctx.fillText(mathY, cx + 6 > canvas.width - 20 ? canvas.width - 20 : (cx + 6 < 5 ? 5 : cx + 6), y + 4);
+          }
+        }
+      }
 
-        const ctx = document.getElementById('mathChart').getContext('2d');
-        
-        chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: xValues,
-            datasets: [
-              {
-                label: `f(x) = ${eq1Str} (a=${paramA})`,
-                data: y1Values,
-                borderColor: '#5288c1',
-                backgroundColor: 'rgba(82, 136, 193, 0.1)',
-                borderWidth: 3,
-                pointRadius: 1,
-                fill: false,
-                tension: 0.2
-              },
-              eq2Str.trim() ? {
-                label: `g(x) = ${eq2Str}`,
-                data: y2Values,
-                borderColor: '#e06c75',
-                backgroundColor: 'rgba(224, 108, 117, 0.1)',
-                borderWidth: 2.5,
-                pointRadius: 1,
-                fill: false,
-                tension: 0.2
-              } : null,
-              showDeriv ? {
-                label: t.derivLabel,
-                data: derivValues,
-                borderColor: '#e5c07b',
-                borderWidth: 2,
-                borderDash: [4, 4],
-                pointRadius: 0,
-                fill: false,
-                tension: 0.2
-              } : null,
-              showIntegral ? {
-                label: t.integralLabel,
-                data: integralValues,
-                backgroundColor: 'rgba(152, 195, 121, 0.25)',
-                borderColor: 'transparent',
-                borderWidth: 0,
-                fill: true,
-                pointRadius: 0,
-                tension: 0.2
-              } : null,
-              showRoots ? {
-                label: t.rootLabel,
-                data: xValues.map(x => {
-                  let match = roots1.find(r => Math.abs(r.x - x) < 0.2);
-                  return match ? match.y : null;
-                }),
-                borderColor: '#98c379',
-                backgroundColor: '#98c379',
-                pointRadius: 6,
-                pointStyle: 'circle',
-                showLine: false
-              } : null,
-              showRoots && eq2Str.trim() ? {
-                label: t.intersectLabel,
-                data: xValues.map(x => {
-                  let match = intersections.find(i => Math.abs(i.x - x) < 0.2);
-                  return match ? match.y : null;
-                }),
-                borderColor: '#c678dd',
-                backgroundColor: '#c678dd',
-                pointRadius: 7,
-                pointStyle: 'rectRot',
-                showLine: false
-              } : null,
-              showExtrema ? {
-                label: t.extremaLabel,
-                data: xValues.map(x => {
-                  let match = extremas.find(e => Math.abs(e.x - x) < 0.2);
-                  return match ? match.y : null;
-                }),
-                borderColor: '#d19a66',
-                backgroundColor: '#d19a66',
-                pointRadius: 7,
-                pointStyle: 'triangle',
-                showLine: false
-              } : null
-            ].filter(Boolean)
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    let label = context.dataset.label || '';
-                    if (label) label += ': ';
-                    if (context.parsed.y !== null) {
-                      label += `(${context.label}, ${context.parsed.y.toFixed(2)})`;
-                    }
-                    return label;
-                  }
-                }
-              }
-            },
-            scales: {
-              x: {
-                title: { display: true, text: t.axisX, color: '#708499' },
-                grid: { 
-                  color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.08)",
-                  lineWidth: (context) => context.tick.value === 0 ? 2 : 1
-                },
-                ticks: { stepSize: 1, color: '#708499' }
-              },
-              y: {
-                title: { display: true, text: t.axisY, color: '#708499' },
-                grid: { 
-                  color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.08)",
-                  lineWidth: (context) => context.tick.value === 0 ? 2 : 1
-                },
-                ticks: { color: '#708499' }
-              }
-            }
+      // 2. Draw Axes
+      ctx.strokeStyle = '#a6adc8';
+      ctx.lineWidth = 2;
+
+      // X Axis
+      ctx.beginPath();
+      ctx.moveTo(0, cy);
+      ctx.lineTo(canvas.width, cy);
+      ctx.stroke();
+
+      // Y Axis
+      ctx.beginPath();
+      ctx.moveTo(cx, 0);
+      ctx.lineTo(cx, canvas.height);
+      ctx.stroke();
+
+      // Origin label
+      ctx.fillStyle = '#a6adc8';
+      ctx.font = '12px monospace';
+      ctx.fillText("0", cx - 12, cy + 14);
+
+      // 3. Plot Functions
+      const eq1 = document.getElementById('eq1').value;
+      const eq2 = document.getElementById('eq2').value;
+
+      function plotCurve(expr, color, isDash = false) {
+        if (!expr.trim()) return;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash(isDash ? [4, 4] : []);
+        ctx.beginPath();
+
+        let first = true;
+        for (let px = 0; px <= canvas.width; px += 2) {
+          let mathX = (px - cx) / scale;
+          let mathY = evalFn(expr, mathX, paramA);
+          if (mathY === null || isNaN(mathY) || !isFinite(mathY)) {
+            first = true;
+            continue;
+          }
+          let py = cy - mathY * scale;
+
+          if (first) {
+            ctx.moveTo(px, py);
+            first = false;
+          } else {
+            ctx.lineTo(px, py);
+          }
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Plot f(x)
+      plotCurve(eq1, '#89b4fa');
+      // Plot g(x)
+      plotCurve(eq2, '#f38ba8');
+
+      // Plot Derivative f'(x)
+      if (showDeriv) {
+        plotCurve((x, a) => {}, '#fab387', true); // custom deriv plot loop below
+        ctx.strokeStyle = '#fab387';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        let first = true;
+        for (let px = 0; px <= canvas.width; px += 2) {
+          let mathX = (px - cx) / scale;
+          let dVal = derivative(eq1, mathX, paramA);
+          if (dVal === null || isNaN(dVal) || !isFinite(dVal)) {
+            first = true;
+            continue;
+          }
+          let py = cy - dVal * scale;
+          if (first) { ctx.moveTo(px, py); first = false; }
+          else { ctx.lineTo(px, py); }
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // 4. Plot Roots & Intersections
+      if (showRoots) {
+        const roots = [];
+        const intersections = [];
+        for (let px = 0; px <= canvas.width; px += 2) {
+          let mathX = (px - cx) / scale;
+          let y1 = evalFn(eq1, mathX, paramA);
+          let y2 = evalFn(eq2, mathX, paramA);
+
+          if (y1 !== null && Math.abs(y1) < 0.15) {
+            roots.push(mathX);
+          }
+          if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.2) {
+            intersections.push(mathX);
+          }
+        }
+
+        // Draw roots (Green dots)
+        ctx.fillStyle = '#a6e3a1';
+        roots.forEach(rx => {
+          let px = cx + rx * scale;
+          let py = cy; // y = 0
+          ctx.beginPath();
+          ctx.arc(px, py, 5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Draw intersections (Purple dots)
+        ctx.fillStyle = '#cba6f7';
+        intersections.forEach(ix => {
+          let mathY = evalFn(eq1, ix, paramA);
+          if (mathY !== null) {
+            let px = cx + ix * scale;
+            let py = cy - mathY * scale;
+            ctx.beginPath();
+            ctx.arc(px, py, 6, 0, Math.PI * 2);
+            ctx.fill();
           }
         });
-      } catch (e) {
-        errorEl.textContent = t.error;
       }
     }
 
-    window.onload = function() {
-      plot();
+    window.onload = () => {
+      resizeCanvas();
     };
   </script>
 </body>
