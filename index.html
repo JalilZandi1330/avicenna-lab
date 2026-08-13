@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title id="pageTitle">Science Swiss Knife | Pro Math & Chemistry</title>
+  <title id="pageTitle">Avicenna Lab | Pro Math & Chemistry</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- 3D Molecule Viewer via 3Dmol.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
@@ -274,7 +274,7 @@
 </head>
 <body>
   <div class="header">
-    <h2>📐 Science Swiss Knife</h2>
+    <h2>📜 Avicenna Lab (آزمایشگاه ابن سینا)</h2>
     <div class="nav-container">
       <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
     </div>
@@ -291,8 +291,8 @@
   <div class="view active" id="viewHome">
     <div class="home-container">
       <div class="hero-card">
-        <h1>Welcome to Science Swiss Knife!</h1>
-        <p>An advanced professional mini-app for students and engineers. Use the top menu to switch between Math Plotting, Chemical Balancer, and Compounds & 3D Viewer.</p>
+        <h1>Welcome to Avicenna Lab (آزمایشگاه ابن‌سینا)!</h1>
+        <p>An advanced professional scientific mini-app developed by an Iranian developer. Explore Math Plotting, Chemical Equations, and 3D Molecular structures.</p>
       </div>
       <div class="feature-grid">
         <div class="feature-box" onclick="switchView('math')">
@@ -305,7 +305,7 @@
         </div>
         <div class="feature-box" onclick="switchView('compounds')">
           <h3>🔬 Compounds & 3D Molecular Viewer</h3>
-          <p>Search compounds and view interactive 3D molecular structures with rotation.</p>
+          <p>Search elements/compounds with electron configuration and interactive 3D structures.</p>
         </div>
       </div>
     </div>
@@ -399,10 +399,10 @@
   <div class="view" id="viewCompounds">
     <div class="chem-container">
       <div class="chem-card">
-        <h3>🔬 Compounds & Elements 3D Dictionary</h3>
-        <p style="font-size:0.8rem; color:var(--hint-color); margin:0;">Enter formula or name (e.g., H2O, CO2, CH4, NH3, NaCl, O2, H2, Ethanol, Fe, Au, C):</p>
+        <h3>🔬 Avicenna Elements & 3D Dictionary</h3>
+        <p style="font-size:0.8rem; color:var(--hint-color); margin:0;">Enter element symbol/name or formula (e.g., H, C, Fe, Au, H2O, CO2, NaCl):</p>
         <div class="input-row">
-          <input type="text" id="compInput" value="H2O" placeholder="H2O, CO2, Fe, Ethanol..." style="direction:ltr; text-align:left;">
+          <input type="text" id="compInput" value="H2O" placeholder="H2O, Fe, Ethanol..." style="direction:ltr; text-align:left;">
         </div>
         <button class="calc-btn" onclick="searchCompound3D()">Show Details & 3D</button>
         <div class="chem-output" id="compOutput" style="white-space: pre-line;">Detailed info and electron configuration will appear here...</div>
@@ -501,7 +501,6 @@
       "fe": { name: "Iron", atomic: 26, mass: "55.845 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁶", group: "Transition Metal" },
       "cu": { name: "Copper", atomic: 29, mass: "63.546 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹ 3d¹⁰", group: "Transition Metal" },
       "zn": { name: "Zinc", atomic: 30, mass: "65.38 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d¹⁰", group: "Transition Metal" },
-      "ag": { name: "Silver", atomic: 47, mass: "107.87 u", config: "[Kr] 4d¹⁰ 5s¹", group: "Transition Metal" },
       "gold": { name: "Gold", atomic: 79, mass: "196.97 u", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group: "Transition Metal" },
       "au": { name: "Gold", atomic: 79, mass: "196.97 u", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group: "Transition Metal" }
     };
@@ -535,7 +534,6 @@
           viewer3D.render();
         })
         .catch(err => {
-          // Final universal fallback 3D model
           viewer3D.clear();
           viewer3D.addModel(`
 3Dmol 
@@ -578,7 +576,6 @@
           })
           .catch(() => fetchPubChemByName(key));
       } else {
-        // Query direct name or SMILES on PubChem
         fetchPubChemByName(key);
       }
     }
@@ -597,7 +594,7 @@
         out.textContent = `📁 Compound Info:\n• Name: ${c.name}\n• Molar Mass: ${c.molarMass}\n• State: ${c.state}\n• Description: ${c.desc}`;
         loadMolecule(query);
       } else {
-        out.textContent = `📁 Queried Compound / Molecule: ${query.toUpperCase()}\n• Fetching live 3D molecular structure from PubChem database...`;
+        out.textContent = `📁 Queried: ${query.toUpperCase()}\n• Fetching live 3D molecular structure from PubChem database...`;
         loadMolecule(query);
       }
     }
