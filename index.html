@@ -113,7 +113,7 @@
       direction: ltr;
     }
 
-    /* Math Keyboard (Standard Phone Layout: 123 on right, symbols on left) */
+    /* Math Keyboard */
     .math-keyboard {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -130,8 +130,8 @@
       border: 1px solid rgba(255,255,255,0.08);
       color: var(--text-color);
       border-radius: 4px;
-      padding: 8px 0;
-      font-size: 0.9rem;
+      padding: 7px 0;
+      font-size: 0.85rem;
       cursor: pointer;
       font-family: monospace;
       text-align: center;
@@ -139,6 +139,49 @@
     .kb-btn:active { background: var(--button-color); color: var(--button-text); }
     .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
     .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
+
+    /* Analysis Modal / Panel */
+    .analysis-panel {
+      position: absolute;
+      bottom: 60px;
+      left: 10px;
+      right: 10px;
+      background: rgba(30, 30, 46, 0.95);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      max-height: 50vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+      backdrop-filter: blur(5px);
+    }
+    .analysis-panel.hidden { display: none; }
+    .analysis-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 6px;
+    }
+    .analysis-content { font-family: monospace; font-size: 0.8rem; line-height: 1.5; }
+    .sign-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+    .sign-table th, .sign-table td {
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 4px;
+    }
+    .close-modal { background: #f38ba8; color: #111; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -150,12 +193,24 @@
   <div class="canvas-container" id="canvasBox">
     <div class="coords-overlay" id="coordsOverlay">x: 0.00, y: 0.00</div>
     <canvas id="geoCanvas"></canvas>
+
+    <!-- Analysis & Sign Table Modal -->
+    <div class="analysis-panel hidden" id="analysisPanel">
+      <div class="analysis-header">
+        <span id="analysisTitle">📊 تحلیل جامع و جدول تعیین علامت</span>
+        <button class="close-modal" onclick="toggleAnalysis()">✕</button>
+      </div>
+      <div class="analysis-content" id="analysisContent">
+        در حال تحلیل...
+      </div>
+    </div>
   </div>
 
   <div class="bottom-panel">
     <div class="toolbar">
       <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
       <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
+      <button class="tool-btn" id="btnAnalysis" onclick="toggleAnalysis()">📈 تحلیل و تعیین علامت</button>
       <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ صفحه کلید</button>
       <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
     </div>
@@ -163,15 +218,15 @@
     <div class="input-section">
       <div class="input-row" id="row1">
         <span class="prefix">f(x)=</span>
-        <input type="text" id="eq1" value="xx - 4" onfocus="setActiveInput('eq1')" oninput="draw()" readonly>
+        <input type="text" id="eq1" value="xx - 4" onfocus="setActiveInput('eq1')" oninput="draw()">
       </div>
       <div class="input-row" id="row2">
         <span class="prefix">g(x)=</span>
-        <input type="text" id="eq2" value="2x" onfocus="setActiveInput('eq2')" oninput="draw()" readonly>
+        <input type="text" id="eq2" value="2x" onfocus="setActiveInput('eq2')" oninput="draw()">
       </div>
     </div>
 
-    <!-- Sorted & Clean Math Keyboard -->
+    <!-- Math Keyboard with tan, cot -->
     <div class="math-keyboard" id="mathKeyboard">
       <!-- Row 1 -->
       <button class="kb-btn action" onclick="kbInsert('x')">x</button>
@@ -195,17 +250,17 @@
       <button class="kb-btn num" onclick="kbInsert('3')">3</button>
 
       <!-- Row 4 -->
-      <button class="kb-btn action" onclick="kbInsert('+')">+</button>
-      <button class="kb-btn action" onclick="kbInsert('-')">-</button>
+      <button class="kb-btn action" onclick="kbInsert('tan(')">tan</button>
+      <button class="kb-btn action" onclick="kbInsert('cot(')">cot</button>
       <button class="kb-btn num" onclick="kbInsert('0')">0</button>
       <button class="kb-btn num" onclick="kbInsert('.')">.</button>
-      <button class="kb-btn action" onclick="kbInsert('*')">×</button>
+      <button class="kb-btn action" onclick="kbInsert('+')">+</button>
 
       <!-- Row 5 -->
+      <button class="kb-btn action" onclick="kbInsert('-')">-</button>
+      <button class="kb-btn action" onclick="kbInsert('*')">×</button>
       <button class="kb-btn action" onclick="kbInsert('/')">/</button>
       <button class="kb-btn action" onclick="kbInsert('^')">^</button>
-      <button class="kb-btn action" onclick="kbInsert('(')">(</button>
-      <button class="kb-btn action" onclick="kbInsert(')')">)</button>
       <button class="kb-btn" style="color:#f38ba8; background:rgba(243,139,168,0.15)" onclick="kbBackspace()">⌫</button>
     </div>
   </div>
@@ -220,6 +275,7 @@
     let showGrid = true;
     let showRoots = true;
     let isKeyboardOpen = true;
+    let isAnalysisOpen = false;
     let activeInputId = 'eq1';
 
     let scale = 40;
@@ -227,7 +283,7 @@
     let offsetY = 0;
     let isDragging = false;
     let startX, startY;
-    let hoverPoint = null; // for tracking nearest point on curve
+    let hoverPoint = null;
 
     const canvas = document.getElementById('geoCanvas');
     const ctx = canvas.getContext('2d');
@@ -239,6 +295,7 @@
         langBtn: "English",
         grid: "شبکه",
         roots: "ریشه‌ها",
+        analysis: "📈 تحلیل و تعیین علامت",
         keyboard: "⌨️ صفحه کلید",
         reset: "مرکز"
       },
@@ -247,6 +304,7 @@
         langBtn: "فارسی",
         grid: "Grid",
         roots: "Analysis",
+        analysis: "📈 Analysis & Sign Table",
         keyboard: "⌨️ Keyboard",
         reset: "Reset"
       }
@@ -261,6 +319,7 @@
       document.getElementById('langBtn').textContent = t.langBtn;
       document.getElementById('btnGrid').textContent = t.grid;
       document.getElementById('btnRoots').textContent = t.roots;
+      document.getElementById('btnAnalysis').textContent = t.analysis;
       document.getElementById('btnKeyboard').textContent = t.keyboard;
       document.getElementById('btnReset').textContent = t.reset;
       draw();
@@ -268,9 +327,15 @@
 
     function toggleKeyboard() {
       isKeyboardOpen = !isKeyboardOpen;
-      const kb = document.getElementById('mathKeyboard');
-      kb.classList.toggle('hidden', !isKeyboardOpen);
+      document.getElementById('mathKeyboard').classList.toggle('hidden', !isKeyboardOpen);
       resizeCanvas();
+    }
+
+    function toggleAnalysis() {
+      isAnalysisOpen = !isAnalysisOpen;
+      const panel = document.getElementById('analysisPanel');
+      panel.classList.toggle('hidden', !isAnalysisOpen);
+      if (isAnalysisOpen) updateAnalysis();
     }
 
     function setActiveInput(id) {
@@ -279,15 +344,32 @@
       document.getElementById('row2').classList.toggle('focused', id === 'eq2');
     }
 
+    // Physical keyboard input listener
+    document.getElementById('eq1').addEventListener('input', () => draw());
+    document.getElementById('eq2').addEventListener('input', () => draw());
+
     function kbInsert(val) {
       const el = document.getElementById(activeInputId);
-      el.value += val;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      el.value = el.value.substring(0, start) + val + el.value.substring(end);
+      el.selectionStart = el.selectionEnd = start + val.length;
+      el.focus();
       draw();
     }
 
     function kbBackspace() {
       const el = document.getElementById(activeInputId);
-      el.value = el.value.slice(0, -1);
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      if (start !== end) {
+        el.value = el.value.substring(0, start) + el.value.substring(end);
+        el.selectionStart = el.selectionEnd = start;
+      } else if (start > 0) {
+        el.value = el.value.substring(0, start - 1) + el.value.substring(start);
+        el.selectionStart = el.selectionEnd = start - 1;
+      }
+      el.focus();
       draw();
     }
 
@@ -315,7 +397,6 @@
 
     window.addEventListener('resize', resizeCanvas);
 
-    // Mouse / Touch Move for Hover Coordinates on Curve
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       const px = e.clientX - rect.left;
@@ -327,14 +408,9 @@
 
       document.getElementById('coordsOverlay').textContent = `x: ${mx.toFixed(2)}, y: ${my.toFixed(2)}`;
 
-      // Find nearest curve point
       const eq1 = document.getElementById('eq1').value;
       const y1 = evalFn(eq1, mx);
-      if (y1 !== null) {
-        hoverPoint = { x: mx, y: y1 };
-      } else {
-        hoverPoint = null;
-      }
+      hoverPoint = y1 !== null ? { x: mx, y: y1 } : null;
       draw();
 
       if (isDragging) {
@@ -359,22 +435,6 @@
       draw();
     }, {passive: false});
 
-    canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        isDragging = true;
-        startX = e.touches[0].clientX - offsetX;
-        startY = e.touches[0].clientY - offsetY;
-      }
-    });
-    canvas.addEventListener('touchmove', (e) => {
-      if (isDragging && e.touches.length === 1) {
-        offsetX = e.touches[0].clientX - startX;
-        offsetY = e.touches[0].clientY - startY;
-        draw();
-      }
-    });
-    canvas.addEventListener('touchend', () => isDragging = false);
-
     function preprocess(expr) {
       if (!expr || !expr.trim()) return null;
       return expr.toLowerCase()
@@ -383,6 +443,8 @@
         .replace(/√\(([^)]+)\)/g, 'Math.sqrt($1)')
         .replace(/√(\w+)/g, 'Math.sqrt($1)')
         .replace(/\|([^|]+)\|/g, 'Math.abs($1)')
+        .replace(/cot\(([^)]+)\)/g, '(1 / Math.tan($1))')
+        .replace(/cot(\w+)/g, '(1 / Math.tan($1))')
         .replace(/sin/g, 'Math.sin')
         .replace(/cos/g, 'Math.cos')
         .replace(/tan/g, 'Math.tan')
@@ -400,12 +462,36 @@
       } catch(e) { return null; }
     }
 
+    function updateAnalysis() {
+      const eq1 = document.getElementById('eq1').value;
+      const eq2 = document.getElementById('eq2').value;
+      let html = `<b>تابع اول: f(x) = ${eq1}</b><br>`;
+      
+      const roots = [];
+      const intersections = [];
+      for (let mx = -10; mx <= 10; mx += 0.05) {
+        let y1 = evalFn(eq1, mx);
+        let y2 = evalFn(eq2, mx);
+        if (y1 !== null && Math.abs(y1) < 0.05) roots.push(mx.toFixed(2));
+        if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.08) intersections.push(`(${mx.toFixed(2)}, ${y1.toFixed(2)})`);
+      }
+
+      html += `• ریشه‌ها (تقاطع با محور X): ${[...new Set(roots)].join(', ') || 'یافت نشد'}<br>`;
+      html += `• نقاط برخورد f و g: ${[...new Set(intersections)].join(', ') || 'یافت نشد'}<br>`;
+
+      // Simple quadratic delta check if contains x^2
+      if (eq1.includes('xx') || eq1.includes('x^2')) {
+        html += `<br><b>تحلیل درجه دوم (دلتا):</b><br>دارای ساختار درجه دوم است.`;
+      }
+
+      document.getElementById('analysisContent').innerHTML = html;
+    }
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const cx = canvas.width/2 + offsetX;
       const cy = canvas.height/2 + offsetY;
 
-      // 1. Grid
       if (showGrid) {
         ctx.strokeStyle = 'rgba(88, 91, 112, 0.15)';
         ctx.lineWidth = 1;
@@ -427,13 +513,11 @@
         }
       }
 
-      // 2. Axes
       ctx.strokeStyle = '#a6adc8';
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
 
-      // 3. Curves
       const eq1 = document.getElementById('eq1').value;
       const eq2 = document.getElementById('eq2').value;
 
@@ -457,7 +541,6 @@
       plot(eq1, '#89b4fa');
       plot(eq2, '#f38ba8');
 
-      // 4. Analysis (Roots & Intersections)
       if (showRoots) {
         const step = 0.1;
         for (let mx = -canvas.width/(2*scale)-offsetX/scale; mx <= canvas.width/(2*scale)-offsetX/scale; mx += step) {
@@ -475,7 +558,6 @@
         }
       }
 
-      // 5. Hover point on curve showing (x, y)
       if (hoverPoint) {
         let px = cx + hoverPoint.x * scale;
         let py = cy - hoverPoint.y * scale;
@@ -486,7 +568,6 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Draw coordinate popup label
         ctx.fillStyle = 'rgba(17, 17, 27, 0.9)';
         ctx.fillRect(px + 10, py - 25, 90, 22);
         ctx.strokeStyle = '#fab387';
