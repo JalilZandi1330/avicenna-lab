@@ -199,7 +199,6 @@
     .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
     .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
 
-    /* Info Panel for Exact Roots & Intersections */
     .info-panel {
       background: #181825;
       border: 1px solid rgba(255,255,255,0.15);
@@ -264,12 +263,12 @@
     }
     .viewer-3d {
       width: 100%;
-      height: 250px;
-      background: #11111b;
+      height: 280px;
+      background: #09090f;
       border-radius: 8px;
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
     }
   </style>
 </head>
@@ -452,7 +451,10 @@
         if (!viewer3D) {
           init3DViewer();
         } else {
-          setTimeout(() => viewer3D.resize(), 200);
+          setTimeout(() => {
+            viewer3D.resize();
+            viewer3D.render();
+          }, 250);
         }
       }
     }
@@ -460,7 +462,7 @@
     // --- 3D MOLECULE VIEWER (3Dmol.js) ---
     function init3DViewer() {
       let element = document.getElementById('container3D');
-      let config = { backgroundColor: '#11111b' };
+      let config = { backgroundColor: '#09090f' };
       viewer3D = $3Dmol.createViewer(element, config);
       loadMolecule('H2O');
     }
@@ -490,16 +492,21 @@
         .then(sdf => {
           viewer3D.clear();
           viewer3D.addModel(sdf, "sdf");
-          viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+          viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.35 } });
           viewer3D.zoomTo();
           viewer3D.render();
         })
         .catch(err => {
+          // Fallback: render custom water or sphere if API fails
           viewer3D.clear();
           viewer3D.addModel(`
 3Dmol 
-  -1.0 0.0 0.0 C 0 0 0 0 0 0 0 0 0 0 0 0
+  -1.0 0.0 0.0 O 0 0 0 0 0 0 0 0 0 0 0 0
+   0.5 0.8 0.0 H 0 0 0 0 0 0 0 0 0 0 0 0
+   0.5 -0.8 0.0 H 0 0 0 0 0 0 0 0 0 0 0 0
           `, "sdf");
+          viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.35 } });
+          viewer3D.zoomTo();
           viewer3D.render();
         });
     }
