@@ -270,6 +270,22 @@
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.15);
     }
+    /* Loading Progress Bar */
+    .loading-bar-container {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+      margin-top: 6px;
+      display: none;
+    }
+    .loading-bar {
+      width: 0%;
+      height: 100%;
+      background: var(--button-color);
+      transition: width 0.3s ease;
+    }
   </style>
 </head>
 <body>
@@ -407,6 +423,11 @@
         <button class="calc-btn" onclick="searchCompound3D()">Show Details & 3D</button>
         <div class="chem-output" id="compOutput" style="white-space: pre-line;">Detailed info and electron configuration will appear here...</div>
         
+        <!-- Loading Progress Bar -->
+        <div class="loading-bar-container" id="loadingBarContainer">
+          <div class="loading-bar" id="loadingBar"></div>
+        </div>
+
         <!-- 3D Mol Viewer Container -->
         <div class="viewer-3d" id="container3D"></div>
       </div>
@@ -501,6 +522,7 @@
       "fe": { name: "Iron", atomic: 26, mass: "55.845 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁶", group: "Transition Metal" },
       "cu": { name: "Copper", atomic: 29, mass: "63.546 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹ 3d¹⁰", group: "Transition Metal" },
       "zn": { name: "Zinc", atomic: 30, mass: "65.38 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d¹⁰", group: "Transition Metal" },
+      "ag": { name: "Silver", atomic: 47, mass: "107.87 u", config: "[Kr] 4d¹⁰ 5s¹", group: "Transition Metal" },
       "gold": { name: "Gold", atomic: 79, mass: "196.97 u", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group: "Transition Metal" },
       "au": { name: "Gold", atomic: 79, mass: "196.97 u", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group: "Transition Metal" }
     };
@@ -518,15 +540,28 @@
       "c2h5oh": { name: "Ethanol", molarMass: "46.07 g/mol", state: "Liquid", desc: "Alcohol used in solvents, antiseptics and fuels." }
     };
 
+    function showProgress(percent) {
+      let container = document.getElementById('loadingBarContainer');
+      let bar = document.getElementById('loadingBar');
+      container.style.display = 'block';
+      bar.style.width = percent + '%';
+      if (percent >= 100) {
+        setTimeout(() => { container.style.display = 'none'; bar.style.width = '0%'; }, 500);
+      }
+    }
+
     function fetchPubChemByName(query) {
+      showProgress(30);
       let url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(query)}/SDF?record_type=3d`;
       
+      showProgress(60);
       fetch(url)
         .then(res => {
           if (!res.ok) throw new Error("Not found by name");
           return res.text();
         })
         .then(sdf => {
+          showProgress(100);
           viewer3D.clear();
           viewer3D.addModel(sdf, "sdf");
           viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.35 } });
@@ -534,6 +569,7 @@
           viewer3D.render();
         })
         .catch(err => {
+          showProgress(100);
           viewer3D.clear();
           viewer3D.addModel(`
 3Dmol 
@@ -552,6 +588,7 @@
       let smiles = pubchemSMILES[key];
       
       if (elementsDatabase[key]) {
+        showProgress(100);
         viewer3D.clear();
         viewer3D.addModel(`
 3Dmol 
@@ -563,11 +600,14 @@
         return;
       }
 
+      showProgress(20);
       if (smiles) {
         let url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeURIComponent(smiles)}/SDF?record_type=3d`;
+        showProgress(50);
         fetch(url)
           .then(res => res.text())
           .then(sdf => {
+            showProgress(100);
             viewer3D.clear();
             viewer3D.addModel(sdf, "sdf");
             viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.35 } });
@@ -585,6 +625,7 @@
       let out = document.getElementById('compOutput');
       if (!query) { out.textContent = "Please enter an element or formula."; return; }
 
+      showProgress(10);
       if (elementsDatabase[query]) {
         let el = elementsDatabase[query];
         out.textContent = `⚛️ Element Info:\n• Name: ${el.name}\n• Atomic Number: ${el.atomic}\n• Atomic Mass: ${el.mass}\n• Electron Configuration: ${el.config}\n• Category: ${el.group}`;
@@ -903,7 +944,7 @@
       const eq1 = document.getElementById('eq1').value;
       const eq2 = document.getElementById('eq2').value;
 
-      function plot(expr, color) {
+      let plot = (expr, color) => {
         if (!expr.trim()) return;
         ctx.strokeStyle = color;
         ctx.lineWidth = 3;
@@ -918,7 +959,7 @@
           else ctx.lineTo(px, py);
         }
         ctx.stroke();
-      }
+      };
 
       plot(eq1, '#89b4fa');
       plot(eq2, '#f38ba8');
