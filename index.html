@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Math Plotter Mini App</title>
+  <title>رسم‌گر پیشرفته توابع ریاضی</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -13,6 +13,7 @@
       --button-color: var(--tg-theme-button-color, #5288c1);
       --button-text: var(--tg-theme-button-text-color, #ffffff);
       --card-bg: var(--tg-theme-secondary-bg-color, #232e3c);
+      --hint-color: var(--tg-theme-hint-color, #708499);
     }
     body {
       background-color: var(--bg-color);
@@ -22,10 +23,10 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
     h2 {
-      margin: 0 0 8px 0;
+      margin: 0 0 4px 0;
       text-align: center;
       font-size: 1.2rem;
     }
@@ -36,19 +37,35 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     label {
-      font-size: 0.85rem;
-      opacity: 0.8;
+      font-size: 0.9rem;
+      font-weight: bold;
     }
-    input {
+    .input-row {
+      display: flex;
+      align-items: center;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
+      padding: 0 10px;
+    }
+    .prefix {
+      font-family: monospace;
+      font-size: 1.1rem;
+      color: var(--hint-color);
+      margin-left: 6px;
+    }
+    input {
+      background: transparent;
+      border: none;
       color: var(--text-color);
-      padding: 10px;
-      font-size: 1rem;
+      padding: 10px 0;
+      font-size: 1.1rem;
+      width: 100%;
       outline: none;
+      font-family: monospace;
     }
     button {
       background: var(--button-color);
@@ -59,23 +76,66 @@
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:active {
+      opacity: 0.8;
+    }
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .chip {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    .chip:hover {
+      background: rgba(255, 255, 255, 0.15);
     }
     .chart-container {
       background: var(--card-bg);
       padding: 10px;
       border-radius: 12px;
       position: relative;
-      height: 300px;
+      height: 320px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 0.85rem;
+      text-align: center;
+      min-height: 20px;
     }
   </style>
 </head>
 <body>
-  <h2>📐 Math Plotter Mini App</h2>
+  <h2>📐 رسم‌گر توابع ریاضی</h2>
+  
   <div class="input-card">
-    <label for="equation">Enter Function f(x):</label>
-    <input type="text" id="equation" value="Math.sin(x) * x" placeholder="e.g. Math.sin(x) or x*x">
-    <button onclick="plot()">Plot Function</button>
+    <label for="equation">عبارت تابع را وارد کنید:</label>
+    <div class="input-row">
+      <span class="prefix">y =</span>
+      <input type="text" id="equation" value="3*x + 2" placeholder="مثلاً: 3*x + 2 یا Math.sin(x)">
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    
+    <label style="font-size: 0.8rem; opacity: 0.7; margin-top: -4px;">نمونه‌های سریع (کلیک کنید):</label>
+    <div class="examples">
+      <span class="chip" onclick="setEq('3*x + 2')">3*x + 2</span>
+      <span class="chip" onclick="setEq('x**2 - 4')">x**2 - 4</span>
+      <span class="chip" onclick="Math.sin(x)">Math.sin(x)</span>
+      <span class="chip" onclick="setEq('Math.sin(x) * x')">Math.sin(x) * x</span>
+    </div>
+
+    <button onclick="plot()">رسم نمودار</button>
   </div>
+
   <div class="chart-container">
     <canvas id="mathChart"></canvas>
   </div>
@@ -88,16 +148,37 @@
 
     let chart = null;
 
+    function setEq(eq) {
+      document.getElementById('equation').value = eq;
+      plot();
+    }
+
+    function preprocessExpression(expr) {
+      // Convert standard math syntax to JS syntax safely
+      let jsExpr = expr
+        .replace(/\^/g, '**')
+        .replace(/(\d)([a-zA-Z\(])/g, '$1*$2') // e.g. 3x -> 3*x
+        .replace(/([x\)])(\d)/g, '$1*$2');   // e.g. x2 -> x*2 (if applicable)
+      return jsExpr;
+    }
+
     function plot() {
-      const eqStr = document.getElementById('equation').value;
+      const rawInput = document.getElementById('equation').value;
+      const errorEl = document.getElementById('errorMsg');
+      errorEl.textContent = '';
+
       const xValues = [];
       const yValues = [];
 
       try {
-        const fn = new Function('x', `return ${eqStr};`);
-        for (let x = -10; x <= 10; x += 0.2) {
-          xValues.append ? xValues.append(x.toFixed(1)) : xValues.push(x.toFixed(1));
-          yValues.push(fn(x));
+        const processed = preprocessExpression(rawInput);
+        const fn = new Function('x', `try { return ${processed}; } catch(e) { return NaN; }`);
+
+        // Generate points from -10 to 10 with step 1 (1 unit intervals)
+        for (let x = -10; x <= 10; x += 1) {
+          xValues.push(x);
+          let y = fn(x);
+          yValues.push(isNaN(y) ? null : y);
         }
 
         if (chart) chart.destroy();
@@ -108,25 +189,35 @@
           data: {
             labels: xValues,
             datasets: [{
-              label: `y = ${eqStr}`,
+              label: `y = ${rawInput}`,
               data: yValues,
               borderColor: '#5288c1',
-              borderWidth: 2,
-              fill: false,
-              tension: 0.3
+              backgroundColor: 'rgba(82, 136, 193, 0.1)',
+              borderWidth: 2.5,
+              pointRadius: 3,
+              fill: true,
+              tension: 0.2
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-              x: { grid: { color: 'rgba(255,255,255,0.1)' } },
-              y: { grid: { color: 'rgba(255,255,255,0.1)' } }
+              x: {
+                title: { display: true, text: 'محور X', color: '#708499' },
+                grid: { color: 'context => context.tick.value === 0 ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.08)" },
+                ticks: { stepSize: 1, color: '#708499' }
+              },
+              y: {
+                title: { display: true, text: 'محور Y', color: '#708499' },
+                grid: { color: 'context => context.tick.value === 0 ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.08)" },
+                ticks: { color: '#708499' }
+              }
             }
           }
         });
       } catch (e) {
-        alert("Invalid Equation! Use JavaScript math syntax e.g., Math.sin(x) or x*x");
+        errorEl.textContent = 'خطا در فرمول! لطفاً عبارت درستی وارد کنید.';
       }
     }
 
