@@ -399,13 +399,13 @@
   <div class="view" id="viewCompounds">
     <div class="chem-container">
       <div class="chem-card">
-        <h3>🔬 Compounds & 3D Molecular Viewer</h3>
-        <p style="font-size:0.8rem; color:var(--hint-color); margin:0;">Enter formula or molecule name (e.g., H2O, CO2, CH4, NH3, NaCl):</p>
+        <h3>🔬 Compounds & Elements 3D Dictionary</h3>
+        <p style="font-size:0.8rem; color:var(--hint-color); margin:0;">Enter element symbol/name or formula (e.g., H, C, Fe, Au, H2O, CO2, NaCl):</p>
         <div class="input-row">
-          <input type="text" id="compInput" value="H2O" placeholder="H2O or CO2" style="direction:ltr; text-align:left;">
+          <input type="text" id="compInput" value="H2O" placeholder="H2O or Fe" style="direction:ltr; text-align:left;">
         </div>
-        <button class="calc-btn" onclick="searchCompound3D()">Show 3D & Info</button>
-        <div class="chem-output" id="compOutput" style="white-space: pre-line;">Molecule info will appear here...</div>
+        <button class="calc-btn" onclick="searchCompound3D()">Show Details & 3D</button>
+        <div class="chem-output" id="compOutput" style="white-space: pre-line;">Detailed info and electron configuration will appear here...</div>
         
         <!-- 3D Mol Viewer Container -->
         <div class="viewer-3d" id="container3D"></div>
@@ -478,10 +478,53 @@
       "c6h12o6": "C(C1C(C(C(C1O)O)O)O)O"
     };
 
+    const elementsDatabase = {
+      "h": { name: "Hydrogen", atomic: 1, mass: "1.008 u", config: "1s¹", group: "Nonmetal (Group 1)" },
+      "he": { name: "Helium", atomic: 2, mass: "4.003 u", config: "1s²", group: "Noble Gas (Group 18)" },
+      "c": { name: "Carbon", atomic: 6, mass: "12.011 u", config: "1s² 2s² 2p²", group: "Nonmetal (Group 14)" },
+      "n": { name: "Nitrogen", atomic: 7, mass: "14.007 u", config: "1s² 2s² 2p³", group: "Nonmetal (Group 15)" },
+      "o": { name: "Oxygen", atomic: 8, mass: "15.999 u", config: "1s² 2s² 2p⁴", group: "Nonmetal (Group 16)" },
+      "na": { name: "Sodium", atomic: 11, mass: "22.990 u", config: "1s² 2s² 2p⁶ 3s¹", group: "Alkali Metal (Group 1)" },
+      "mg": { name: "Magnesium", atomic: 12, mass: "24.305 u", config: "1s² 2s² 2p⁶ 3s²", group: "Alkaline Earth (Group 2)" },
+      "al": { name: "Aluminum", atomic: 13, mass: "26.982 u", config: "1s² 2s² 2p⁶ 3s² 3p¹", group: "Post-transition Metal" },
+      "si": { name: "Silicon", atomic: 14, mass: "28.085 u", config: "1s² 2s² 2p⁶ 3s² 3p²", group: "Metalloid" },
+      "p": { name: "Phosphorus", atomic: 15, mass: "30.974 u", config: "1s² 2s² 2p⁶ 3s² 3p³", group: "Nonmetal (Group 15)" },
+      "s": { name: "Sulfur", atomic: 16, mass: "32.06 u", config: "1s² 2s² 2p⁶ 3s² 3p⁴", group: "Nonmetal (Group 16)" },
+      "cl": { name: "Chlorine", atomic: 17, mass: "35.45 u", config: "1s² 2s² 2p⁶ 3s² 3p⁵", group: "Halogen (Group 17)" },
+      "k": { name: "Potassium", atomic: 19, mass: "39.098 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹", group: "Alkali Metal (Group 1)" },
+      "ca": { name: "Calcium", atomic: 20, mass: "40.078 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s²", group: "Alkaline Earth (Group 2)" },
+      "fe": { name: "Iron", atomic: 26, mass: "55.845 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁶", group: "Transition Metal" },
+      "cu": { name: "Copper", atomic: 29, mass: "63.546 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹ 3d¹⁰", group: "Transition Metal" },
+      "zn": { name: "Zinc", atomic: 30, mass: "65.38 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d¹⁰", group: "Transition Metal" },
+      "gold": { name: "Gold", atomic: 79, mass: "196.97 u", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group: "Transition Metal" },
+      "au": { name: "Gold", atomic: 79, mass: "196.97 u", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group: "Transition Metal" }
+    };
+
+    const compoundsDatabase = {
+      "h2o": { name: "Water", molarMass: "18.015 g/mol", state: "Liquid", desc: "Most vital substance on Earth, universal solvent." },
+      "co2": { name: "Carbon Dioxide", molarMass: "44.01 g/mol", state: "Gas", desc: "Greenhouse gas produced by respiration and combustion." },
+      "ch4": { name: "Methane", molarMass: "16.04 g/mol", state: "Gas", desc: "Simplest hydrocarbon and primary component of natural gas." },
+      "nh3": { name: "Ammonia", molarMass: "17.03 g/mol", state: "Gas", desc: "Pungent gas widely used in fertilizers and cleaning." },
+      "nacl": { name: "Sodium Chloride", molarMass: "58.44 g/mol", state: "Solid", desc: "Essential table salt used in food and chemical industry." }
+    };
+
     function loadMolecule(formula) {
       let key = formula.toLowerCase().trim();
       let smiles = pubchemSMILES[key] || formula;
       
+      // If it's a single element, render as a sphere
+      if (elementsDatabase[key]) {
+        viewer3D.clear();
+        viewer3D.addModel(`
+3Dmol 
+  0.0 0.0 0.0 ${elementsDatabase[key].name[0]} 0 0 0 0 0 0 0 0 0 0 0 0
+        `, "sdf");
+        viewer3D.setStyle({}, { sphere: { scale: 0.6 } });
+        viewer3D.zoomTo();
+        viewer3D.render();
+        return;
+      }
+
       let url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeURIComponent(smiles)}/SDF?record_type=3d`;
       
       fetch(url)
@@ -497,7 +540,6 @@
           viewer3D.render();
         })
         .catch(err => {
-          // Fallback: render custom water or sphere if API fails
           viewer3D.clear();
           viewer3D.addModel(`
 3Dmol 
@@ -514,24 +556,20 @@
     function searchCompound3D() {
       let query = document.getElementById('compInput').value.trim().toLowerCase();
       let out = document.getElementById('compOutput');
-      if (!query) { out.textContent = "Please enter a formula."; return; }
+      if (!query) { out.textContent = "Please enter an element or formula."; return; }
 
-      const database = {
-        "h2o": { name: "Water", molarMass: "18.015 g/mol", state: "Liquid", desc: "Most vital substance on Earth." },
-        "co2": { name: "Carbon Dioxide", molarMass: "44.01 g/mol", state: "Gas", desc: "Greenhouse gas from respiration and combustion." },
-        "ch4": { name: "Methane", molarMass: "16.04 g/mol", state: "Gas", desc: "Simplest hydrocarbon and natural gas." },
-        "nh3": { name: "Ammonia", molarMass: "17.03 g/mol", state: "Gas", desc: "Important fertilizer precursor." },
-        "nacl": { name: "Sodium Chloride", molarMass: "58.44 g/mol", state: "Solid", desc: "Common table salt." }
-      };
-
-      if (database[query]) {
-        let c = database[query];
+      if (elementsDatabase[query]) {
+        let el = elementsDatabase[query];
+        out.textContent = `⚛️ Element Info:\n• Name: ${el.name}\n• Atomic Number: ${el.atomic}\n• Atomic Mass: ${el.mass}\n• Electron Configuration: ${el.config}\n• Category: ${el.group}`;
+        loadMolecule(query);
+      } else if (compoundsDatabase[query]) {
+        let c = compoundsDatabase[query];
         out.textContent = `📁 Compound Info:\n• Name: ${c.name}\n• Molar Mass: ${c.molarMass}\n• State: ${c.state}\n• Description: ${c.desc}`;
+        loadMolecule(query);
       } else {
-        out.textContent = `📁 Queried Formula: ${query.toUpperCase()}\n• Interactive 3D model loaded below.`;
+        out.textContent = `📁 Queried: ${query.toUpperCase()}\n• Interactive 3D molecular structure loaded below.`;
+        loadMolecule(query);
       }
-
-      loadMolecule(query);
     }
 
     // --- CHEMISTRY BALANCER ---
