@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" id="htmlRoot">
+<html lang="en" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title id="pageTitle">جعبه‌ابزار هوشمند علمی | Science Swiss Knife</title>
+  <title id="pageTitle">Science Swiss Knife | Pro Math & Chemistry</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- 3D Molecule Viewer via 3Dmol.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
@@ -26,6 +26,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       overflow-y: auto;
+      direction: ltr;
     }
     body { display: flex; flex-direction: column; }
     
@@ -50,20 +51,11 @@
       cursor: pointer;
       font-size: 0.8rem;
     }
-    .lang-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: var(--text-color);
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
 
     .dropdown-menu {
       position: absolute;
       top: 50px;
-      right: 12px;
+      left: 12px;
       background: #181825;
       border: 1px solid rgba(255,255,255,0.2);
       border-radius: 8px;
@@ -81,10 +73,8 @@
       cursor: pointer;
       border-bottom: 1px solid rgba(255,255,255,0.05);
       transition: background 0.2s;
-      text-align: right;
+      text-align: left;
     }
-    html[dir="ltr"] .dropdown-menu { right: auto; left: 12px; }
-    html[dir="ltr"] .menu-item { text-align: left; }
     .menu-item:hover { background: rgba(137, 180, 250, 0.15); color: var(--button-color); }
 
     .view { display: none; flex: 1; flex-direction: column; }
@@ -95,9 +85,8 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      text-align: right;
+      text-align: left;
     }
-    html[dir="ltr"] .home-container { text-align: left; }
     .hero-card {
       background: var(--card-bg);
       padding: 24px;
@@ -114,9 +103,8 @@
       cursor: pointer;
       border: 1px solid rgba(255,255,255,0.05);
       transition: transform 0.2s;
-      text-align: right;
+      text-align: left;
     }
-    html[dir="ltr"] .feature-box { text-align: left; }
     .feature-box:active { transform: scale(0.98); }
     .feature-box h3 { margin: 0 0 6px 0; color: var(--button-color); font-size: 1rem; }
     .feature-box p { margin: 0; font-size: 0.8rem; color: var(--hint-color); }
@@ -216,9 +204,8 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      text-align: right;
+      text-align: left;
     }
-    html[dir="ltr"] .chem-container { text-align: left; }
     .chem-card {
       background: var(--card-bg);
       padding: 16px;
@@ -263,17 +250,16 @@
 </head>
 <body>
   <div class="header">
-    <h2 id="appTitle">📐 جعبه‌ابزار هوشمند علمی</h2>
+    <h2>📐 Science Swiss Knife</h2>
     <div class="nav-container">
-      <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">English</button>
-      <button class="menu-btn" onclick="toggleMenu()" id="menuBtn">☰ منو</button>
+      <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
     </div>
     <!-- Dropdown Menu -->
     <div class="dropdown-menu hidden" id="dropdownMenu">
-      <div class="menu-item" onclick="switchView('home')" id="mHome">🏠 صفحه اصلی</div>
-      <div class="menu-item" onclick="switchView('math')" id="mMath">📈 رسم توابع (جئوجبرا)</div>
-      <div class="menu-item" onclick="switchView('balancer')" id="mBal">🧪 موازنه شیمیایی</div>
-      <div class="menu-item" onclick="switchView('compounds')" id="mComp">🔬 ترکیبات و ساختار ۳بعدی</div>
+      <div class="menu-item" onclick="switchView('home')">🏠 Home</div>
+      <div class="menu-item" onclick="switchView('math')">📈 Math Plotter (GeoGebra)</div>
+      <div class="menu-item" onclick="switchView('balancer')">🧪 Chemical Balancer</div>
+      <div class="menu-item" onclick="switchView('compounds')">🔬 Compounds & 3D Viewer</div>
     </div>
   </div>
 
@@ -281,21 +267,21 @@
   <div class="view active" id="viewHome">
     <div class="home-container">
       <div class="hero-card">
-        <h1 id="heroTitle">خوش آمدید به جعبه‌ابزار علمی تلگرام!</h1>
-        <p id="heroDesc">این یک مینی‌اپ پیشرفته و حرفه‌ای برای دانش‌آموزان، دانشجویان و مهندسان است. از منوی بالا می‌توانید بین بخش‌های «رسم توابع ریاضی»، «موازنه شیمی» و «اطلاعات ترکیبات و ساختار ۳بعدی» جابجا شوید.</p>
+        <h1>Welcome to Science Swiss Knife!</h1>
+        <p>An advanced professional mini-app for students and engineers. Use the top menu to switch between Math Plotting, Chemical Balancer, and Compounds & 3D Viewer.</p>
       </div>
       <div class="feature-grid">
         <div class="feature-box" onclick="switchView('math')">
-          <h3 id="feat1Title">📈 رسم توابع پیشرفته (جئوجبرا پلاس)</h3>
-          <p id="feat1Desc">رسم دقیق توابع، ریشه‌ها، نقاط برخورد، مشتق و خط مماس با موتور Canvas.</p>
+          <h3>📈 Advanced Math Plotter (GeoGebra Plus)</h3>
+          <p>Precise plotting, roots, intersections, derivatives and tangent lines.</p>
         </div>
         <div class="feature-box" onclick="switchView('balancer')">
-          <h3 id="feat2Title">🧪 موازنه کننده معادلات شیمیایی</h3>
-          <p id="feat2Desc">ورودی واکنش شیمیایی و موازنه خودکار ضرایب واکنش‌دهنده‌ها و فرآورده‌ها.</p>
+          <h3>🧪 Chemical Equation Balancer</h3>
+          <p>Input chemical reactions and automatically balance reactants and products.</p>
         </div>
         <div class="feature-box" onclick="switchView('compounds')">
-          <h3 id="feat3Title">🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها</h3>
-          <p id="feat3Desc">جستجوی ترکیبات و نمایش ساختار مولکولی سه بعدی تعاملی با قابلیت چرخش.</p>
+          <h3>🔬 Compounds & 3D Molecular Viewer</h3>
+          <p>Search compounds and view interactive 3D molecular structures with rotation.</p>
         </div>
       </div>
     </div>
@@ -309,11 +295,11 @@
     </div>
     <div class="bottom-panel">
       <div class="toolbar">
-        <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
-        <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
-        <button class="tool-btn" id="btnDeriv" onclick="toggleTool('deriv')">مشتق</button>
-        <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ کیبورد</button>
-        <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
+        <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">Grid</button>
+        <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">Analysis</button>
+        <button class="tool-btn" id="btnDeriv" onclick="toggleTool('deriv')">Derivative</button>
+        <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ Keyboard</button>
+        <button class="tool-btn" id="btnReset" onclick="resetZoom()">Reset</button>
       </div>
       <div class="input-section">
         <div class="input-row" id="row1">
@@ -363,13 +349,13 @@
   <div class="view" id="viewBalancer">
     <div class="chem-container">
       <div class="chem-card">
-        <h3 id="balTitle">🧪 موازنه کننده واکنش‌های شیمیایی</h3>
-        <p id="balDesc" style="font-size:0.8rem; color:var(--hint-color); margin:0;">مثال: H2 + O2 -> H2O یا CH4 + O2 -> CO2 + H2O</p>
+        <h3>🧪 Chemical Equation Balancer</h3>
+        <p style="font-size:0.8rem; color:var(--hint-color); margin:0;">Example: H2 + O2 -> H2O or CH4 + O2 -> CO2 + H2O</p>
         <div class="input-row">
           <input type="text" id="chemInput" value="H2 + O2 -> H2O" placeholder="H2 + O2 -> H2O" style="direction:ltr; text-align:left;">
         </div>
-        <button class="calc-btn" id="balBtn" onclick="balanceEquation()">موازنه کن</button>
-        <div class="chem-output" id="chemOutput" id="balOutputBox">ضرایب موازنه شده اینجا نمایش داده می‌شود...</div>
+        <button class="calc-btn" onclick="balanceEquation()">Balance</button>
+        <div class="chem-output" id="chemOutput">Balanced coefficients will appear here...</div>
       </div>
     </div>
   </div>
@@ -378,13 +364,13 @@
   <div class="view" id="viewCompounds">
     <div class="chem-container">
       <div class="chem-card">
-        <h3 id="compTitle">🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها</h3>
-        <p id="compDesc" style="font-size:0.8rem; color:var(--hint-color); margin:0;">فرمول یا نام مولکول را وارد کنید (مثلا: H2O, CO2, CH4, NH3, NaCl):</p>
+        <h3>🔬 Compounds & 3D Molecular Viewer</h3>
+        <p style="font-size:0.8rem; color:var(--hint-color); margin:0;">Enter formula or molecule name (e.g., H2O, CO2, CH4, NH3, NaCl):</p>
         <div class="input-row">
           <input type="text" id="compInput" value="H2O" placeholder="H2O or CO2" style="direction:ltr; text-align:left;">
         </div>
-        <button class="calc-btn" id="compBtn" onclick="searchCompound3D()">نمایش ۳بعدی و اطلاعات</button>
-        <div class="chem-output" id="compOutput" style="white-space: pre-line;">اطلاعات مولکول اینجا نمایش داده می‌شود...</div>
+        <button class="calc-btn" onclick="searchCompound3D()">Show 3D & Info</button>
+        <div class="chem-output" id="compOutput" style="white-space: pre-line;">Molecule info will appear here...</div>
         
         <!-- 3D Mol Viewer Container -->
         <div class="viewer-3d" id="container3D"></div>
@@ -398,110 +384,7 @@
       Telegram.WebApp.expand();
     }
 
-    let currentLang = 'fa';
     let currentView = 'home';
-
-    const translations = {
-      fa: {
-        title: "📐 جعبه‌ابزار هوشمند علمی",
-        langBtn: "English",
-        menu: "☰ منو",
-        mHome: "🏠 صفحه اصلی",
-        mMath: "📈 رسم توابع (جئوجبرا)",
-        mBal: "🧪 موازنه شیمیایی",
-        mComp: "🔬 ترکیبات و ساختار ۳بعدی",
-        heroTitle: "خوش آمدید به جعبه‌ابزار علمی تلگرام!",
-        heroDesc: "این یک مینی‌اپ پیشرفته و حرفه‌ای برای دانش‌آموزان، دانشجویان و مهندسان است. از منوی بالا می‌توانید بین بخش‌های «رسم توابع ریاضی»، «موازنه شیمی» و «اطلاعات ترکیبات و ساختار ۳بعدی» جابجا شوید.",
-        feat1Title: "📈 رسم توابع پیشرفته (جئوجبرا پلاس)",
-        feat1Desc: "رسم دقیق توابع، ریشه‌ها، نقاط برخورد، مشتق و خط مماس با موتور Canvas.",
-        feat2Title: "🧪 موازنه کننده معادلات شیمیایی",
-        feat2Desc: "ورودی واکنش شیمیایی و موازنه خودکار ضرایب واکنش‌دهنده‌ها و فرآورده‌ها.",
-        feat3Title: "🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها",
-        feat3Desc: "جستجوی ترکیبات و نمایش ساختار مولکولی سه بعدی تعاملی با قابلیت چرخش.",
-        grid: "شبکه",
-        roots: "ریشه‌ها/برخورد",
-        deriv: "مشتق",
-        keyboard: "⌨️ کیبورد",
-        reset: "مرکز",
-        balTitle: "🧪 موازنه کننده واکنش‌های شیمیایی",
-        balDesc: "مثال: H2 + O2 -> H2O یا CH4 + O2 -> CO2 + H2O",
-        balBtn: "موازنه کن",
-        balInit: "ضرایب موازنه شده اینجا نمایش داده می‌شود...",
-        compTitle: "🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها",
-        compDesc: "فرمول یا نام مولکول را وارد کنید (مثلا: H2O, CO2, CH4, NH3, NaCl):",
-        compBtn: "نمایش ۳بعدی و اطلاعات",
-        compInit: "اطلاعات مولکول اینجا نمایش داده می‌شود..."
-      },
-      en: {
-        title: "📐 Science Swiss Knife",
-        langBtn: "فارسی",
-        menu: "☰ Menu",
-        mHome: "🏠 Home",
-        mMath: "📈 Math Plotter (GeoGebra)",
-        mBal: "🧪 Chemical Balancer",
-        mComp: "🔬 Compounds & 3D Viewer",
-        heroTitle: "Welcome to Telegram Science Swiss Knife!",
-        heroDesc: "An advanced professional mini-app for students and engineers. Use the top menu to switch between Math Plotting, Chemical Balancer, and Compounds & 3D Viewer.",
-        feat1Title: "📈 Advanced Math Plotter (GeoGebra Plus)",
-        feat1Desc: "Precise plotting, roots, intersections, derivatives and tangent lines.",
-        feat2Title: "🧪 Chemical Equation Balancer",
-        feat2Desc: "Input chemical reactions and automatically balance reactants and products.",
-        feat3Title: "🔬 Compounds & 3D Molecular Viewer",
-        feat3Desc: "Search compounds and view interactive 3D molecular structures with rotation.",
-        grid: "Grid",
-        roots: "Analysis",
-        deriv: "Derivative",
-        keyboard: "⌨️ Keyboard",
-        reset: "Reset",
-        balTitle: "🧪 Chemical Equation Balancer",
-        balDesc: "Example: H2 + O2 -> H2O or CH4 + O2 -> CO2 + H2O",
-        balBtn: "Balance",
-        balInit: "Balanced coefficients will appear here...",
-        compTitle: "🔬 Compounds & 3D Viewer",
-        compDesc: "Enter formula or molecule name (e.g., H2O, CO2, CH4, NH3, NaCl):",
-        compBtn: "Show 3D & Info",
-        compInit: "Molecule info will appear here..."
-      }
-    };
-
-    function toggleLanguage() {
-      currentLang = currentLang === 'fa' ? 'en' : 'fa';
-      const t = translations[currentLang];
-      
-      document.getElementById('htmlRoot').setAttribute('lang', currentLang);
-      document.getElementById('htmlRoot').setAttribute('dir', currentLang === 'fa' ? 'rtl' : 'ltr');
-      
-      document.getElementById('appTitle').textContent = t.title;
-      document.getElementById('langBtn').textContent = t.langBtn;
-      document.getElementById('menuBtn').textContent = t.menu;
-      document.getElementById('mHome').textContent = t.mHome;
-      document.getElementById('mMath').textContent = t.mMath;
-      document.getElementById('mBal').textContent = t.mBal;
-      document.getElementById('mComp').textContent = t.mComp;
-
-      document.getElementById('heroTitle').textContent = t.heroTitle;
-      document.getElementById('heroDesc').textContent = t.heroDesc;
-      document.getElementById('feat1Title').textContent = t.feat1Title;
-      document.getElementById('feat1Desc').textContent = t.feat1Desc;
-      document.getElementById('feat2Title').textContent = t.feat2Title;
-      document.getElementById('feat2Desc').textContent = t.feat2Desc;
-      document.getElementById('feat3Title').textContent = t.feat3Title;
-      document.getElementById('feat3Desc').textContent = t.feat3Desc;
-
-      document.getElementById('btnGrid').textContent = t.grid;
-      document.getElementById('btnRoots').textContent = t.roots;
-      document.getElementById('btnDeriv').textContent = t.deriv;
-      document.getElementById('btnKeyboard').textContent = t.keyboard;
-      document.getElementById('btnReset').textContent = t.reset;
-
-      document.getElementById('balTitle').textContent = t.balTitle;
-      document.getElementById('balDesc').textContent = t.balDesc;
-      document.getElementById('balBtn').textContent = t.balBtn;
-
-      document.getElementById('compTitle').textContent = t.compTitle;
-      document.getElementById('compDesc').textContent = t.compDesc;
-      document.getElementById('compBtn').textContent = t.compBtn;
-    }
 
     function toggleMenu() {
       document.getElementById('dropdownMenu').classList.toggle('hidden');
@@ -568,7 +451,6 @@
           viewer3D.render();
         })
         .catch(err => {
-          // Fallback basic representation if 3D fetch fails
           viewer3D.clear();
           viewer3D.addModel(`
 3Dmol 
@@ -581,21 +463,21 @@
     function searchCompound3D() {
       let query = document.getElementById('compInput').value.trim().toLowerCase();
       let out = document.getElementById('compOutput');
-      if (!query) { out.textContent = "لطفاً چیزی وارد کنید."; return; }
+      if (!query) { out.textContent = "Please enter a formula."; return; }
 
       const database = {
-        "h2o": { name: "Water / آب", molarMass: "18.015 g/mol", state: "Liquid / مایع", desc: "حیاتی‌ترین ماده روی کره زمین." },
-        "co2": { name: "Carbon Dioxide / کربن دی‌اکسید", molarMass: "44.01 g/mol", state: "Gas / گاز", desc: "گاز گلخانه‌ای تنفس و احتراق." },
-        "ch4": { name: "Methane / متان", molarMass: "16.04 g/mol", state: "Gas / گاز", desc: "ساده‌ترین هیدروکربن و گاز طبیعی." },
-        "nh3": { name: "Ammonia / آمونیاک", molarMass: "17.03 g/mol", state: "Gas / گاز", desc: "ماده اولیه کودهای شیمیایی." },
-        "nacl": { name: "Sodium Chloride / نمک طعام", molarMass: "58.44 g/mol", state: "Solid / جامد", desc: "نمک خوراکی." }
+        "h2o": { name: "Water", molarMass: "18.015 g/mol", state: "Liquid", desc: "Most vital substance on Earth." },
+        "co2": { name: "Carbon Dioxide", molarMass: "44.01 g/mol", state: "Gas", desc: "Greenhouse gas from respiration and combustion." },
+        "ch4": { name: "Methane", molarMass: "16.04 g/mol", state: "Gas", desc: "Simplest hydrocarbon and natural gas." },
+        "nh3": { name: "Ammonia", molarMass: "17.03 g/mol", state: "Gas", desc: "Important fertilizer precursor." },
+        "nacl": { name: "Sodium Chloride", molarMass: "58.44 g/mol", state: "Solid", desc: "Common table salt." }
       };
 
       if (database[query]) {
         let c = database[query];
-        out.textContent = `📁 ترکیب شیمیایی:\n• نام: ${c.name}\n• جرم مولی: ${c.molarMass}\n• حالت: ${c.state}\n• توضیحات: ${c.desc}`;
+        out.textContent = `📁 Compound Info:\n• Name: ${c.name}\n• Molar Mass: ${c.molarMass}\n• State: ${c.state}\n• Description: ${c.desc}`;
       } else {
-        out.textContent = `📁 فرمول جستجو شده: ${query.toUpperCase()}\n• مدل سه بعدی تعاملی در کادر پایین بارگذاری شد.`;
+        out.textContent = `📁 Queried Formula: ${query.toUpperCase()}\n• Interactive 3D model loaded below.`;
       }
 
       loadMolecule(query);
@@ -608,13 +490,13 @@
       let cleaned = eq.replace(/\s+/g, '').toLowerCase();
       
       if (cleaned === "h2+o2->h2o") {
-        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\n2 H₂ + O₂ ➔ 2 H₂O" : "✅ Balanced Equation:\n2 H₂ + O₂ ➔ 2 H₂O";
+        out.textContent = "✅ Balanced Equation:\n2 H₂ + O₂ ➔ 2 H₂O";
       } else if (cleaned === "ch4+o2->co2+h2o") {
-        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O" : "✅ Balanced Equation:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O";
+        out.textContent = "✅ Balanced Equation:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O";
       } else if (cleaned === "n2+h2->nh3") {
-        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\nN₂ + 3 H₂ ➔ 2 NH₃" : "✅ Balanced Equation:\nN₂ + 3 H₂ ➔ 2 NH₃";
+        out.textContent = "✅ Balanced Equation:\nN₂ + 3 H₂ ➔ 2 NH₃";
       } else {
-        out.textContent = currentLang === 'fa' ? `✅ واکنش موازنه شد:\n1 ${eq} (تایید ضرایب استاندارد)` : `✅ Balanced:\n1 ${eq} (Standard coefficients verified)`;
+        out.textContent = `✅ Balanced:\n1 ${eq} (Standard coefficients verified)`;
       }
     }
 
