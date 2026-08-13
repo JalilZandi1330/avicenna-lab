@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>رسم‌گر پیشرفته توابع ریاضی</title>
+  <title id="pageTitle">رسم‌گر پیشرفته توابع ریاضی</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -25,10 +25,23 @@
       flex-direction: column;
       gap: 14px;
     }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
     h2 {
-      margin: 0 0 4px 0;
-      text-align: center;
+      margin: 0;
       font-size: 1.2rem;
+    }
+    .lang-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
     }
     .input-card {
       background: var(--card-bg);
@@ -56,6 +69,7 @@
       font-size: 1.1rem;
       color: var(--hint-color);
       margin-left: 6px;
+      margin-right: 6px;
     }
     input {
       background: transparent;
@@ -66,8 +80,10 @@
       width: 100%;
       outline: none;
       font-family: monospace;
+      direction: ltr;
+      text-align: left;
     }
-    button {
+    button.action-btn {
       background: var(--button-color);
       color: var(--button-text);
       border: none;
@@ -78,7 +94,7 @@
       cursor: pointer;
       transition: opacity 0.2s;
     }
-    button:active {
+    button.action-btn:active {
       opacity: 0.8;
     }
     .examples {
@@ -94,6 +110,7 @@
       font-size: 0.8rem;
       cursor: pointer;
       font-family: monospace;
+      direction: ltr;
     }
     .chip:hover {
       background: rgba(255, 255, 255, 0.15);
@@ -115,25 +132,28 @@
   </style>
 </head>
 <body>
-  <h2>📐 رسم‌گر توابع ریاضی</h2>
+  <div class="header">
+    <h2 id="appTitle">📐 رسم‌گر توابع ریاضی</h2>
+    <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">EN / فارسی</button>
+  </div>
   
   <div class="input-card">
-    <label for="equation">عبارت تابع را وارد کنید:</label>
+    <label id="labelEq" for="equation">عبارت تابع را وارد کنید:</label>
     <div class="input-row">
       <span class="prefix">y =</span>
-      <input type="text" id="equation" value="3*x + 2" placeholder="مثلاً: 3*x + 2 یا Math.sin(x)">
+      <input type="text" id="equation" value="3*x + 2" placeholder="3*x + 2">
     </div>
     <div class="error-msg" id="errorMsg"></div>
     
-    <label style="font-size: 0.8rem; opacity: 0.7; margin-top: -4px;">نمونه‌های سریع (کلیک کنید):</label>
+    <label id="labelExamples" style="font-size: 0.8rem; opacity: 0.7; margin-top: -4px;">نمونه‌های سریع (کلیک کنید):</label>
     <div class="examples">
       <span class="chip" onclick="setEq('3*x + 2')">3*x + 2</span>
       <span class="chip" onclick="setEq('x**2 - 4')">x**2 - 4</span>
-      <span class="chip" onclick="Math.sin(x)">Math.sin(x)</span>
+      <span class="chip" onclick="setEq('Math.sin(x)')">Math.sin(x)</span>
       <span class="chip" onclick="setEq('Math.sin(x) * x')">Math.sin(x) * x</span>
     </div>
 
-    <button onclick="plot()">رسم نمودار</button>
+    <button class="action-btn" id="plotBtn" onclick="plot()">رسم نمودار</button>
   </div>
 
   <div class="chart-container">
@@ -146,6 +166,47 @@
       Telegram.WebApp.expand();
     }
 
+    let currentLang = 'fa';
+
+    const translations = {
+      fa: {
+        title: "📐 رسم‌گر توابع ریاضی",
+        labelEq: "عبارت تابع را وارد کنید:",
+        labelExamples: "نمونه‌های سریع (کلیک کنید):",
+        plotBtn: "رسم نمودار",
+        langBtn: "English",
+        axisX: "محور X",
+        axisY: "محور Y",
+        error: "خطا در فرمول! لطفاً عبارت درستی وارد کنید (مثلا 3*x + 2)"
+      },
+      en: {
+        title: "📐 Math Function Plotter",
+        labelEq: "Enter function expression:",
+        labelExamples: "Quick examples (click to test):",
+        plotBtn: "Plot Function",
+        langBtn: "فارسی",
+        axisX: "X Axis",
+        axisY: "Y Axis",
+        error: "Invalid formula! Please enter a valid expression (e.g. 3*x + 2)"
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'fa' ? 'en' : 'fa';
+      const t = translations[currentLang];
+      
+      document.getElementById('htmlRoot').setAttribute('lang', currentLang);
+      document.getElementById('htmlRoot').setAttribute('dir', currentLang === 'fa' ? 'rtl' : 'ltr');
+      document.getElementById('pageTitle').textContent = t.title;
+      document.getElementById('appTitle').textContent = t.title;
+      document.getElementById('labelEq').textContent = t.labelEq;
+      document.getElementById('labelExamples').textContent = t.labelExamples;
+      document.getElementById('plotBtn').textContent = t.plotBtn;
+      document.getElementById('langBtn').textContent = t.langBtn;
+      
+      plot();
+    }
+
     let chart = null;
 
     function setEq(eq) {
@@ -154,11 +215,10 @@
     }
 
     function preprocessExpression(expr) {
-      // Convert standard math syntax to JS syntax safely
       let jsExpr = expr
         .replace(/\^/g, '**')
-        .replace(/(\d)([a-zA-Z\(])/g, '$1*$2') // e.g. 3x -> 3*x
-        .replace(/([x\)])(\d)/g, '$1*$2');   // e.g. x2 -> x*2 (if applicable)
+        .replace(/(\d)([a-zA-Z\(])/g, '$1*$2') // 3x -> 3*x
+        .replace(/([x\)])(\d)/g, '$1*$2');   // x2 -> x*2
       return jsExpr;
     }
 
@@ -174,7 +234,6 @@
         const processed = preprocessExpression(rawInput);
         const fn = new Function('x', `try { return ${processed}; } catch(e) { return NaN; }`);
 
-        // Generate points from -10 to 10 with step 1 (1 unit intervals)
         for (let x = -10; x <= 10; x += 1) {
           xValues.push(x);
           let y = fn(x);
@@ -183,6 +242,7 @@
 
         if (chart) chart.destroy();
 
+        const t = translations[currentLang];
         const ctx = document.getElementById('mathChart').getContext('2d');
         chart = new Chart(ctx, {
           type: 'line',
@@ -204,25 +264,27 @@
             maintainAspectRatio: false,
             scales: {
               x: {
-                title: { display: true, text: 'محور X', color: '#708499' },
-                grid: { color: 'context => context.tick.value === 0 ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.08)" },
+                title: { display: true, text: t.axisX, color: '#708499' },
+                grid: { color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.08)" },
                 ticks: { stepSize: 1, color: '#708499' }
               },
               y: {
-                title: { display: true, text: 'محور Y', color: '#708499' },
-                grid: { color: 'context => context.tick.value === 0 ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.08)" },
+                title: { display: true, text: t.axisY, color: '#708499' },
+                grid: { color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.08)" },
                 ticks: { color: '#708499' }
               }
             }
           }
         });
       } catch (e) {
-        errorEl.textContent = 'خطا در فرمول! لطفاً عبارت درستی وارد کنید.';
+        errorEl.textContent = translations[currentLang].error;
       }
     }
 
-    // Initial plot
-    plot();
+    // Initial plot on load
+    window.onload = function() {
+      plot();
+    };
   </script>
 </body>
 </html>
