@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Plotter Mini App</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-color: var(--tg-theme-bg-color, #17212b);
+      --text-color: var(--tg-theme-text-color, #ffffff);
+      --button-color: var(--tg-theme-button-color, #5288c1);
+      --button-text: var(--tg-theme-button-text-color, #ffffff);
+      --card-bg: var(--tg-theme-secondary-bg-color, #232e3c);
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    h2 {
+      margin: 0 0 8px 0;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+    .input-card {
+      background: var(--card-bg);
+      padding: 14px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+    input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: var(--text-color);
+      padding: 10px;
+      font-size: 1rem;
+      outline: none;
+    }
+    button {
+      background: var(--button-color);
+      color: var(--button-text);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .chart-container {
+      background: var(--card-bg);
+      padding: 10px;
+      border-radius: 12px;
+      position: relative;
+      height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📐 Math Plotter Mini App</h2>
+  <div class="input-card">
+    <label for="equation">Enter Function f(x):</label>
+    <input type="text" id="equation" value="Math.sin(x) * x" placeholder="e.g. Math.sin(x) or x*x">
+    <button onclick="plot()">Plot Function</button>
+  </div>
+  <div class="chart-container">
+    <canvas id="mathChart"></canvas>
+  </div>
+
+  <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+    }
+
+    let chart = null;
+
+    function plot() {
+      const eqStr = document.getElementById('equation').value;
+      const xValues = [];
+      const yValues = [];
+
+      try {
+        const fn = new Function('x', `return ${eqStr};`);
+        for (let x = -10; x <= 10; x += 0.2) {
+          xValues.append ? xValues.append(x.toFixed(1)) : xValues.push(x.toFixed(1));
+          yValues.push(fn(x));
+        }
+
+        if (chart) chart.destroy();
+
+        const ctx = document.getElementById('mathChart').getContext('2d');
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: xValues,
+            datasets: [{
+              label: `y = ${eqStr}`,
+              data: yValues,
+              borderColor: '#5288c1',
+              borderWidth: 2,
+              fill: false,
+              tension: 0.3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.1)' } },
+              y: { grid: { color: 'rgba(255,255,255,0.1)' } }
+            }
+          }
+        });
+      } catch (e) {
+        alert("Invalid Equation! Use JavaScript math syntax e.g., Math.sin(x) or x*x");
+      }
+    }
+
+    // Initial plot
+    plot();
+  </script>
+</body>
+</html>
