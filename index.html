@@ -146,18 +146,18 @@
       bottom: 60px;
       left: 10px;
       right: 10px;
-      background: rgba(30, 30, 46, 0.95);
+      background: rgba(30, 30, 46, 0.98);
       border: 1px solid rgba(255,255,255,0.2);
       border-radius: 10px;
       padding: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      max-height: 50vh;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      max-height: 55vh;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
       z-index: 100;
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(8px);
     }
     .analysis-panel.hidden { display: none; }
     .analysis-header {
@@ -170,17 +170,31 @@
       padding-bottom: 6px;
     }
     .analysis-content { font-family: monospace; font-size: 0.8rem; line-height: 1.5; }
+    
+    /* Sign Table Styling */
+    .sign-table-wrapper {
+      margin-top: 8px;
+      overflow-x: auto;
+    }
     .sign-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 6px;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       text-align: center;
+      background: rgba(0,0,0,0.2);
+      border-radius: 6px;
+      overflow: hidden;
     }
     .sign-table th, .sign-table td {
       border: 1px solid rgba(255,255,255,0.15);
-      padding: 4px;
+      padding: 6px;
+      font-weight: bold;
     }
+    .sign-table th { background: rgba(255,255,255,0.08); color: var(--button-color); }
+    .sign-plus { color: #a6e3a1; font-weight: bold; }
+    .sign-minus { color: #f38ba8; font-weight: bold; }
+    .sign-zero { color: #fab387; font-weight: bold; }
+
     .close-modal { background: #f38ba8; color: #111; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
   </style>
 </head>
@@ -197,7 +211,7 @@
     <!-- Analysis & Sign Table Modal -->
     <div class="analysis-panel hidden" id="analysisPanel">
       <div class="analysis-header">
-        <span id="analysisTitle">📊 تحلیل جامع و جدول تعیین علامت</span>
+        <span id="analysisTitle">📊 جدول تعیین علامت و تحلیل</span>
         <button class="close-modal" onclick="toggleAnalysis()">✕</button>
       </div>
       <div class="analysis-content" id="analysisContent">
@@ -210,7 +224,7 @@
     <div class="toolbar">
       <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
       <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
-      <button class="tool-btn" id="btnAnalysis" onclick="toggleAnalysis()">📈 تحلیل و تعیین علامت</button>
+      <button class="tool-btn" id="btnAnalysis" onclick="toggleAnalysis()">📈 تعیین علامت</button>
       <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ صفحه کلید</button>
       <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
     </div>
@@ -226,37 +240,32 @@
       </div>
     </div>
 
-    <!-- Math Keyboard with tan, cot -->
+    <!-- Math Keyboard -->
     <div class="math-keyboard" id="mathKeyboard">
-      <!-- Row 1 -->
       <button class="kb-btn action" onclick="kbInsert('x')">x</button>
       <button class="kb-btn action" onclick="kbInsert('xx')">x²</button>
       <button class="kb-btn num" onclick="kbInsert('7')">7</button>
       <button class="kb-btn num" onclick="kbInsert('8')">8</button>
       <button class="kb-btn num" onclick="kbInsert('9')">9</button>
 
-      <!-- Row 2 -->
       <button class="kb-btn action" onclick="kbInsert('|')">| |</button>
       <button class="kb-btn action" onclick="kbInsert('√(')">√</button>
       <button class="kb-btn num" onclick="kbInsert('4')">4</button>
       <button class="kb-btn num" onclick="kbInsert('5')">5</button>
       <button class="kb-btn num" onclick="kbInsert('6')">6</button>
 
-      <!-- Row 3 -->
       <button class="kb-btn action" onclick="kbInsert('sin(')">sin</button>
       <button class="kb-btn action" onclick="kbInsert('cos(')">cos</button>
       <button class="kb-btn num" onclick="kbInsert('1')">1</button>
       <button class="kb-btn num" onclick="kbInsert('2')">2</button>
       <button class="kb-btn num" onclick="kbInsert('3')">3</button>
 
-      <!-- Row 4 -->
       <button class="kb-btn action" onclick="kbInsert('tan(')">tan</button>
       <button class="kb-btn action" onclick="kbInsert('cot(')">cot</button>
       <button class="kb-btn num" onclick="kbInsert('0')">0</button>
       <button class="kb-btn num" onclick="kbInsert('.')">.</button>
       <button class="kb-btn action" onclick="kbInsert('+')">+</button>
 
-      <!-- Row 5 -->
       <button class="kb-btn action" onclick="kbInsert('-')">-</button>
       <button class="kb-btn action" onclick="kbInsert('*')">×</button>
       <button class="kb-btn action" onclick="kbInsert('/')">/</button>
@@ -294,19 +303,31 @@
         title: "📐 جئوجبرا پلاس پرو | GeoGebra Plus Pro",
         langBtn: "English",
         grid: "شبکه",
-        roots: "ریشه‌ها",
-        analysis: "📈 تحلیل و تعیین علامت",
+        roots: "ریشه‌ها/برخورد",
+        analysis: "📈 تعیین علامت",
         keyboard: "⌨️ صفحه کلید",
-        reset: "مرکز"
+        reset: "مرکز",
+        analysisTitle: "📊 جدول تعیین علامت و تحلیل",
+        rootsLabel: "ریشه‌ها (x): ",
+        intersectLabel: "نقاط برخورد (x,y): ",
+        noRoots: "ریشه‌ای یافت نشد",
+        noIntersect: "برخوردی یافت نشد",
+        signTableTitle: "جدول تعیین علامت f(x):"
       },
       en: {
         title: "📐 GeoGebra Plus Pro",
         langBtn: "فارسی",
         grid: "Grid",
         roots: "Analysis",
-        analysis: "📈 Analysis & Sign Table",
+        analysis: "📈 Sign Table",
         keyboard: "⌨️ Keyboard",
-        reset: "Reset"
+        reset: "Reset",
+        analysisTitle: "📊 Sign Table & Analysis",
+        rootsLabel: "Roots (x): ",
+        intersectLabel: "Intersections (x,y): ",
+        noRoots: "No roots found",
+        noIntersect: "No intersections found",
+        signTableTitle: "Sign Table for f(x):"
       }
     };
 
@@ -322,6 +343,9 @@
       document.getElementById('btnAnalysis').textContent = t.analysis;
       document.getElementById('btnKeyboard').textContent = t.keyboard;
       document.getElementById('btnReset').textContent = t.reset;
+      document.getElementById('analysisTitle').textContent = t.analysisTitle;
+      
+      if (isAnalysisOpen) updateAnalysis();
       draw();
     }
 
@@ -344,9 +368,8 @@
       document.getElementById('row2').classList.toggle('focused', id === 'eq2');
     }
 
-    // Physical keyboard input listener
-    document.getElementById('eq1').addEventListener('input', () => draw());
-    document.getElementById('eq2').addEventListener('input', () => draw());
+    document.getElementById('eq1').addEventListener('input', () => { draw(); if (isAnalysisOpen) updateAnalysis(); });
+    document.getElementById('eq2').addEventListener('input', () => { draw(); if (isAnalysisOpen) updateAnalysis(); });
 
     function kbInsert(val) {
       const el = document.getElementById(activeInputId);
@@ -356,6 +379,7 @@
       el.selectionStart = el.selectionEnd = start + val.length;
       el.focus();
       draw();
+      if (isAnalysisOpen) updateAnalysis();
     }
 
     function kbBackspace() {
@@ -371,6 +395,7 @@
       }
       el.focus();
       draw();
+      if (isAnalysisOpen) updateAnalysis();
     }
 
     function toggleTool(tool) {
@@ -465,24 +490,71 @@
     function updateAnalysis() {
       const eq1 = document.getElementById('eq1').value;
       const eq2 = document.getElementById('eq2').value;
-      let html = `<b>تابع اول: f(x) = ${eq1}</b><br>`;
+      const t = translations[currentLang];
+
+      let html = `<b>f(x) = ${eq1}</b><br>`;
       
-      const roots = [];
+      const rawRoots = [];
       const intersections = [];
       for (let mx = -10; mx <= 10; mx += 0.05) {
         let y1 = evalFn(eq1, mx);
         let y2 = evalFn(eq2, mx);
-        if (y1 !== null && Math.abs(y1) < 0.05) roots.push(mx.toFixed(2));
+        if (y1 !== null && Math.abs(y1) < 0.05) rawRoots.push(Number(mx.toFixed(2)));
         if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.08) intersections.push(`(${mx.toFixed(2)}, ${y1.toFixed(2)})`);
       }
 
-      html += `• ریشه‌ها (تقاطع با محور X): ${[...new Set(roots)].join(', ') || 'یافت نشد'}<br>`;
-      html += `• نقاط برخورد f و g: ${[...new Set(intersections)].join(', ') || 'یافت نشد'}<br>`;
+      // Deduplicate roots
+      const roots = [];
+      rawRoots.forEach(r => {
+        if (!roots.some(existing => Math.abs(existing - r) < 0.2)) {
+          roots.push(r);
+        }
+      });
+      roots.sort((a,b) => a - b);
 
-      // Simple quadratic delta check if contains x^2
-      if (eq1.includes('xx') || eq1.includes('x^2')) {
-        html += `<br><b>تحلیل درجه دوم (دلتا):</b><br>دارای ساختار درجه دوم است.`;
+      html += `${t.rootsLabel} <b>${roots.length ? roots.join(', ') : t.noRoots}</b><br>`;
+      if (eq2.trim()) {
+        html += `${t.intersectLabel} <b>${[...new Set(intersections)].join(', ') || t.noIntersect}</b><br>`;
       }
+
+      // Build Math Sign Table (جدول تعیین علامت)
+      html += `<br><b>${t.signTableTitle}</b>`;
+      html += `<div class="sign-table-wrapper"><table class="sign-table">`;
+      
+      // Header row (x values)
+      html += `<tr><th>x</th><td>-∞</td>`;
+      roots.forEach(r => {
+        html += `<td>${r}</td>`;
+      });
+      html += `<td>+∞</td></tr>`;
+
+      // f(x) row
+      html += `<tr><th>f(x)</th>`;
+      
+      if (roots.length === 0) {
+        let sampleY = evalFn(eq1, 0);
+        let sign = (sampleY !== null && sampleY >= 0) ? '<span class="sign-plus">+</span>' : '<span class="sign-minus">-</span>';
+        html += `<td>${sign}</td>`;
+      } else {
+        // Evaluate signs between roots
+        let testPoints = [];
+        testPoints.push(roots[0] - 1);
+        for (let i = 0; i < roots.length - 1; i++) {
+          testPoints.push((roots[i] + roots[i+1]) / 2);
+        }
+        testPoints.push(roots[roots.length - 1] + 1);
+
+        for (let i = 0; i < testPoints.length; i++) {
+          let y = evalFn(eq1, testPoints[i]);
+          let signStr = (y !== null && y >= 0) ? '<span class="sign-plus">+</span>' : '<span class="sign-minus">-</span>';
+          html += `<td>${signStr}</td>`;
+          if (i < roots.length) {
+            html += `<td class="sign-zero">0</td>`;
+          }
+        }
+      }
+
+      html += `</tr></table></div>`;
 
       document.getElementById('analysisContent').innerHTML = html;
     }
