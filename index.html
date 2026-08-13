@@ -199,6 +199,31 @@
     .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
     .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
 
+    /* Info Panel for Exact Roots & Intersections */
+    .info-panel {
+      background: #181825;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+      font-family: monospace;
+      font-size: 0.8rem;
+    }
+    .info-panel.hidden { display: none; }
+    .info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 4px;
+    }
+    .close-modal { background: #f38ba8; color: #111; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+
     .chem-container {
       padding: 16px;
       display: flex;
@@ -298,9 +323,20 @@
         <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">Grid</button>
         <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">Analysis</button>
         <button class="tool-btn" id="btnDeriv" onclick="toggleTool('deriv')">Derivative</button>
+        <button class="tool-btn" id="btnInfo" onclick="toggleInfo()">🎯 Exact Roots</button>
         <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ Keyboard</button>
         <button class="tool-btn" id="btnReset" onclick="resetZoom()">Reset</button>
       </div>
+
+      <!-- Info Panel for Exact Roots & Intersections -->
+      <div class="info-panel hidden" id="infoPanel">
+        <div class="info-header">
+          <span>🎯 Exact Roots & Intersections</span>
+          <button class="close-modal" onclick="toggleInfo()">✕</button>
+        </div>
+        <div id="infoContent">Calculating exact numerical values...</div>
+      </div>
+
       <div class="input-section">
         <div class="input-row" id="row1">
           <span class="prefix">f(x)=</span>
@@ -385,9 +421,17 @@
     }
 
     let currentView = 'home';
+    let isInfoOpen = false;
 
     function toggleMenu() {
       document.getElementById('dropdownMenu').classList.toggle('hidden');
+    }
+
+    function toggleInfo() {
+      isInfoOpen = !isInfoOpen;
+      const panel = document.getElementById('infoPanel');
+      panel.classList.toggle('hidden', !isInfoOpen);
+      if (isInfoOpen) updateExactInfo();
     }
 
     let viewer3D = null;
@@ -400,7 +444,7 @@
       if (viewName === 'home') document.getElementById('viewHome').classList.add('active');
       if (viewName === 'math') {
         document.getElementById('viewMath').classList.add('active');
-        resizeCanvas();
+        setTimeout(() => resizeCanvas(), 100);
       }
       if (viewName === 'balancer') document.getElementById('viewBalancer').classList.add('active');
       if (viewName === 'compounds') {
@@ -500,7 +544,7 @@
       }
     }
 
-    // --- MATH (GEOGEBRA) ENGINE ---
+    // --- MATH (GEOGEBRA) ENGINE WITH FULL PAN & TOUCH ---
     let showGrid = true;
     let showRoots = true;
     let showDerivative = false;
@@ -533,12 +577,14 @@
       const el = document.getElementById(activeInputId);
       el.value += val;
       draw();
+      if (isInfoOpen) updateExactInfo();
     }
 
     function kbBackspace() {
       const el = document.getElementById(activeInputId);
       el.value = el.value.slice(0, -1);
       draw();
+      if (isInfoOpen) updateExactInfo();
     }
 
     function toggleTool(tool) {
@@ -600,6 +646,35 @@
     });
 
     window.addEventListener('mouseup', () => isDragging = false);
+
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX - offsetX;
+        startY = e.touches[0].clientY - offsetY;
+      }
+    }, {passive: false});
+
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (isDragging && e.touches.length === 1) {
+        offsetX = e.touches[0].clientX - startX;
+        offsetY = e.touches[0].clientY - startY;
+
+        const rect = canvas.getBoundingClientRect();
+        const px = e.touches[0].clientX - rect.left;
+        const py = e.touches[0].clientY - rect.top;
+        const cx = canvas.width/2 + offsetX;
+        const cy = canvas.height/2 + offsetY;
+        const mx = (px - cx) / scale;
+        const my = (cy - py) / scale;
+        document.getElementById('coordsOverlay').textContent = `x: ${mx.toFixed(2)}, y: ${my.toFixed(2)}`;
+
+        draw();
+      }
+    }, {passive: false});
+
+    canvas.addEventListener('touchend', () => isDragging = false);
 
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
@@ -689,6 +764,28 @@
         }
       }
       return found;
+    }
+
+    function updateExactInfo() {
+      const eq1 = document.getElementById('eq1').value;
+      const eq2 = document.getElementById('eq2').value;
+
+      let html = "";
+      if (eq1.trim()) {
+        const roots1 = findExactRoots(eq1);
+        html += `Exact roots of f(x): <b>${roots1.length ? roots1.join(', ') : 'No roots found'}</b><br>`;
+      }
+      if (eq2.trim()) {
+        const roots2 = findExactRoots(eq2);
+        html += `Exact roots of g(x): <b>${roots2.length ? roots2.join(', ') : 'No roots found'}</b><br>`;
+      }
+      if (eq1.trim() && eq2.trim()) {
+        const intersects = findExactIntersections(eq1, eq2);
+        const formattedInts = intersects.map(it => `(${it.x}, ${it.y.toFixed(2)})`);
+        html += `Intersections (x,y): <b>${formattedInts.length ? formattedInts.join(', ') : 'No intersections found'}</b>`;
+      }
+
+      document.getElementById('infoContent').innerHTML = html;
     }
 
     function derivative(expr, x) {
