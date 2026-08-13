@@ -120,7 +120,7 @@
       padding: 10px;
       border-radius: 12px;
       position: relative;
-      height: 320px;
+      height: 350px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     .error-msg {
@@ -129,35 +129,54 @@
       text-align: center;
       min-height: 20px;
     }
+    .info-panel {
+      font-size: 0.8rem;
+      color: var(--hint-color);
+      background: rgba(0,0,0,0.15);
+      padding: 8px;
+      border-radius: 8px;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h2 id="appTitle">📐 رسم‌گر توابع ریاضی</h2>
+    <h2 id="appTitle">📐 رسم‌گر پیشرفته توابع ریاضی</h2>
     <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">EN / فارسی</button>
   </div>
   
   <div class="input-card">
-    <label id="labelEq" for="equation">عبارت تابع را وارد کنید:</label>
+    <label id="labelEq1" for="equation1">تابع اول f(x):</label>
     <div class="input-row">
-      <span class="prefix">y =</span>
-      <input type="text" id="equation" value="3*x + 2" placeholder="3*x + 2">
-    </div>
-    <div class="error-msg" id="errorMsg"></div>
-    
-    <label id="labelExamples" style="font-size: 0.8rem; opacity: 0.7; margin-top: -4px;">نمونه‌های سریع (کلیک کنید):</label>
-    <div class="examples">
-      <span class="chip" onclick="setEq('3*x + 2')">3*x + 2</span>
-      <span class="chip" onclick="setEq('x**2 - 4')">x**2 - 4</span>
-      <span class="chip" onclick="setEq('Math.sin(x)')">Math.sin(x)</span>
-      <span class="chip" onclick="setEq('Math.sin(x) * x')">Math.sin(x) * x</span>
+      <span class="prefix">f(x) =</span>
+      <input type="text" id="equation1" value="2x - 3" placeholder="2x - 3">
     </div>
 
-    <button class="action-btn" id="plotBtn" onclick="plot()">رسم نمودار</button>
+    <label id="labelEq2" for="equation2" style="margin-top: 4px;">تابع دوم g(x) (اختیاری):</label>
+    <div class="input-row">
+      <span class="prefix">g(x) =</span>
+      <input type="text" id="equation2" value="-x + 3" placeholder="-x + 3">
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+    
+    <label id="labelExamples" style="font-size: 0.8rem; opacity: 0.7;">نمونه‌های سریع:</label>
+    <div class="examples">
+      <span class="chip" onclick="setEqs('2x - 3', '-x + 3')">2x - 3 &amp; -x + 3</span>
+      <span class="chip" onclick="setEqs('x^2 - 4', '2*x')">x^2 - 4 &amp; 2x</span>
+      <span class="chip" onclick="setEqs('sin(x)', 'cos(x)')">sin(x) &amp; cos(x)</span>
+    </div>
+
+    <button class="action-btn" id="plotBtn" onclick="plot()">رسم نمودارها</button>
   </div>
 
   <div class="chart-container">
     <canvas id="mathChart"></canvas>
+  </div>
+
+  <div class="info-panel" id="infoPanel">
+    • محورهای X و Y در نقطه (0,0) همدیگر را قطع می‌کنند.<br>
+    • ریشه‌های توابع (تقاطع با محور X) و نقاط برخورد دو نمودار با نقطه‌چین‌های رنگی متمایز نشان داده می‌شوند.
   </div>
 
   <script>
@@ -170,24 +189,28 @@
 
     const translations = {
       fa: {
-        title: "📐 رسم‌گر توابع ریاضی",
-        labelEq: "عبارت تابع را وارد کنید:",
-        labelExamples: "نمونه‌های سریع (کلیک کنید):",
-        plotBtn: "رسم نمودار",
+        title: "📐 رسم‌گر پیشرفته توابع ریاضی",
+        labelEq1: "تابع اول f(x):",
+        labelEq2: "تابع دوم g(x) (اختیاری):",
+        labelExamples: "نمونه‌های سریع:",
+        plotBtn: "رسم نمودارها",
         langBtn: "English",
         axisX: "محور X",
         axisY: "محور Y",
-        error: "خطا در فرمول! لطفاً عبارت درستی وارد کنید (مثلا 3*x + 2)"
+        info: "• محورهای X و Y در نقطه (0,0) همدیگر را قطع می‌کنند.<br>• ریشه‌های توابع (تقاطع با محور X) و نقاط برخورد دو نمودار با نقطه‌چین‌های رنگی متمایز نشان داده می‌شوند.",
+        error: "خطا در فرمول! لطفاً عبارت درستی وارد کنید."
       },
       en: {
-        title: "📐 Math Function Plotter",
-        labelEq: "Enter function expression:",
-        labelExamples: "Quick examples (click to test):",
-        plotBtn: "Plot Function",
+        title: "📐 Advanced Math Function Plotter",
+        labelEq1: "First Function f(x):",
+        labelEq2: "Second Function g(x) (Optional):",
+        labelExamples: "Quick examples:",
+        plotBtn: "Plot Functions",
         langBtn: "فارسی",
         axisX: "X Axis",
         axisY: "Y Axis",
-        error: "Invalid formula! Please enter a valid expression (e.g. 3*x + 2)"
+        info: "• X and Y axes intersect at (0,0).<br>• Roots (X-intercepts) and intersection points are highlighted.",
+        error: "Invalid formula! Please enter a valid expression."
       }
     };
 
@@ -199,65 +222,151 @@
       document.getElementById('htmlRoot').setAttribute('dir', currentLang === 'fa' ? 'rtl' : 'ltr');
       document.getElementById('pageTitle').textContent = t.title;
       document.getElementById('appTitle').textContent = t.title;
-      document.getElementById('labelEq').textContent = t.labelEq;
+      document.getElementById('labelEq1').textContent = t.labelEq1;
+      document.getElementById('labelEq2').textContent = t.labelEq2;
       document.getElementById('labelExamples').textContent = t.labelExamples;
       document.getElementById('plotBtn').textContent = t.plotBtn;
       document.getElementById('langBtn').textContent = t.langBtn;
+      document.getElementById('infoPanel').innerHTML = t.info;
       
       plot();
     }
 
     let chart = null;
 
-    function setEq(eq) {
-      document.getElementById('equation').value = eq;
+    function setEqs(eq1, eq2) {
+      document.getElementById('equation1').value = eq1;
+      document.getElementById('equation2').value = eq2;
       plot();
     }
 
     function preprocessExpression(expr) {
+      if (!expr || !expr.trim()) return null;
       let jsExpr = expr
+        .toLowerCase()
         .replace(/\^/g, '**')
-        .replace(/(\d)([a-zA-Z\(])/g, '$1*$2') // 3x -> 3*x
-        .replace(/([x\)])(\d)/g, '$1*$2');   // x2 -> x*2
+        .replace(/sin/g, 'Math.sin')
+        .replace(/cos/g, 'Math.cos')
+        .replace(/tan/g, 'Math.tan')
+        .replace(/log/g, 'Math.log')
+        .replace(/sqrt/g, 'Math.sqrt')
+        .replace(/abs/g, 'Math.abs')
+        .replace(/pi/g, 'Math.PI')
+        .replace(/e/g, 'Math.E')
+        // handle 2x, 2X, 2(x), etc.
+        .replace(/(\d)([a-z\(])/g, '$1*$2')
+        .replace(/([x\)])(\d)/g, '$1*$2');
       return jsExpr;
     }
 
+    function evaluateFunction(rawExpr, x) {
+      const processed = preprocessExpression(rawExpr);
+      if (!processed) return null;
+      try {
+        const fn = new Function('x', `try { return ${processed}; } catch(e) { return NaN; }`);
+        let val = fn(x);
+        return isNaN(val) ? null : val;
+      } catch (e) {
+        return null;
+      }
+    }
+
     function plot() {
-      const rawInput = document.getElementById('equation').value;
+      const eq1Str = document.getElementById('equation1').value;
+      const eq2Str = document.getElementById('equation2').value;
       const errorEl = document.getElementById('errorMsg');
       errorEl.textContent = '';
 
       const xValues = [];
-      const yValues = [];
+      const y1Values = [];
+      const y2Values = [];
+      
+      const roots1 = [];
+      const roots2 = [];
+      const intersections = [];
 
       try {
-        const processed = preprocessExpression(rawInput);
-        const fn = new Function('x', `try { return ${processed}; } catch(e) { return NaN; }`);
-
-        for (let x = -10; x <= 10; x += 1) {
+        // Generate range from -10 to 10 with step 0.5 for smoother intersection check
+        for (let x = -10; x <= 10; x += 0.5) {
           xValues.push(x);
-          let y = fn(x);
-          yValues.push(isNaN(y) ? null : y);
+          
+          let y1 = evaluateFunction(eq1Str, x);
+          let y2 = evaluateFunction(eq2Str, x);
+          
+          y1Values.push(y1);
+          y2Values.push(y2);
+
+          // Check roots (y close to 0)
+          if (y1 !== null && Math.abs(y1) < 0.25) {
+            roots1.push({x: x, y: y1});
+          }
+          if (y2 !== null && Math.abs(y2) < 0.25) {
+            roots2.push({x: x, y: y2});
+          }
+
+          // Check intersection between y1 and y2 if both exist
+          if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.3) {
+            intersections.push({x: x, y: (y1 + y2) / 2});
+          }
         }
 
         if (chart) chart.destroy();
 
         const t = translations[currentLang];
         const ctx = document.getElementById('mathChart').getContext('2d');
+        
         chart = new Chart(ctx, {
           type: 'line',
           data: {
             labels: xValues,
-            datasets: [{
-              label: `y = ${rawInput}`,
-              data: yValues,
-              borderColor: '#5288c1',
-              backgroundColor: 'rgba(82, 136, 193, 0.1)',
-              borderWidth: 2.5,
-              pointRadius: 3,
-              fill: true,
-              tension: 0.2
-            }]
+            datasets: [
+              {
+                label: `f(x) = ${eq1Str}`,
+                data: y1Values,
+                borderColor: '#5288c1',
+                backgroundColor: 'rgba(82, 136, 193, 0.1)',
+                borderWidth: 2.5,
+                pointRadius: 2,
+                fill: false,
+                tension: 0.2
+              },
+              eq2Str.trim() ? {
+                label: `g(x) = ${eq2Str}`,
+                data: y2Values,
+                borderColor: '#e06c75',
+                backgroundColor: 'rgba(224, 108, 117, 0.1)',
+                borderWidth: 2.5,
+                pointRadius: 2,
+                fill: false,
+                tension: 0.2
+              } : null,
+              // Roots 1 dataset
+              {
+                label: 'ریشه f(x)',
+                data: xValues.map(x => {
+                  let match = roots1.find(r => Math.abs(r.x - x) < 0.3);
+                  return match ? match.y : null;
+                }),
+                borderColor: '#98c379',
+                backgroundColor: '#98c379',
+                pointRadius: 6,
+                pointStyle: 'circle',
+                showLine: false
+              },
+              // Intersections dataset
+              eq2Str.trim() ? {
+                label: 'نقطه برخورد',
+                data: xValues.map(x => {
+                  let match = intersections.find(i => Math.abs(i.x - x) < 0.3);
+                  return match ? match.y : null;
+                }),
+                borderColor: '#e5c07b',
+                backgroundColor: '#e5c07b',
+                pointRadius: 7,
+                pointStyle: 'rectRot',
+                showLine: false
+              } : null
+            ].filter(Boolean)
           },
           options: {
             responsive: true,
@@ -265,23 +374,28 @@
             scales: {
               x: {
                 title: { display: true, text: t.axisX, color: '#708499' },
-                grid: { color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.08)" },
+                grid: { 
+                  color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.08)",
+                  lineWidth: (context) => context.tick.value === 0 ? 2 : 1
+                },
                 ticks: { stepSize: 1, color: '#708499' }
               },
               y: {
                 title: { display: true, text: t.axisY, color: '#708499' },
-                grid: { color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.08)" },
+                grid: { 
+                  color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.08)",
+                  lineWidth: (context) => context.tick.value === 0 ? 2 : 1
+                },
                 ticks: { color: '#708499' }
               }
             }
           }
         });
       } catch (e) {
-        errorEl.textContent = translations[currentLang].error;
+        errorEl.textContent = t.error;
       }
     }
 
-    // Initial plot on load
     window.onload = function() {
       plot();
     };
