@@ -25,12 +25,9 @@
       width: 100vw;
       min-height: 100vh;
       overflow-x: hidden;
-      overflow-y: auto; /* Enable vertical scrolling for mobile */
+      overflow-y: auto;
     }
-    body {
-      display: flex;
-      flex-direction: column;
-    }
+    body { display: flex; flex-direction: column; }
     .header {
       display: flex;
       justify-content: space-between;
@@ -50,10 +47,10 @@
     }
     .canvas-container {
       width: 100%;
-      height: 380px; /* Fixed height for touch interaction */
+      height: 380px;
       position: relative;
       background: #11111b;
-      touch-action: none; /* Only canvas handles touch pan/zoom */
+      touch-action: none;
     }
     canvas { width: 100%; height: 100%; display: block; }
     .coords-overlay {
@@ -92,11 +89,7 @@
     }
     .tool-btn.active { background: var(--button-color); color: var(--button-text); border-color: transparent; }
     
-    .input-section {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .input-section { display: flex; flex-direction: column; gap: 6px; }
     .input-row {
       display: flex;
       align-items: center;
@@ -119,7 +112,7 @@
       direction: ltr;
     }
 
-    /* Math Keyboard (Scrollable & Responsive) */
+    /* Math Keyboard */
     .math-keyboard {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -146,7 +139,7 @@
     .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
     .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
 
-    /* Analysis Panel embedded naturally */
+    /* Analysis Panel */
     .analysis-panel {
       background: #181825;
       border: 1px solid rgba(255,255,255,0.15);
@@ -169,10 +162,12 @@
     }
     .analysis-content { font-family: monospace; font-size: 0.8rem; line-height: 1.5; }
     
-    /* Authentic Mathematical Sign Table */
+    /* Authentic Mathematical Sign Table (Direction LTR for math consistency) */
     .sign-table-wrapper {
       margin-top: 8px;
       overflow-x: auto;
+      direction: ltr; /* Keeps math tables left-to-right universally */
+      text-align: left;
     }
     .sign-table {
       width: 100%;
@@ -185,7 +180,7 @@
     }
     .sign-table th, .sign-table td {
       border: 1px solid rgba(255,255,255,0.2);
-      padding: 8px 12px;
+      padding: 8px 10px;
       font-weight: bold;
       white-space: nowrap;
     }
@@ -193,6 +188,7 @@
     .sign-plus { color: #a6e3a1; font-weight: bold; font-size: 1rem; }
     .sign-minus { color: #f38ba8; font-weight: bold; font-size: 1rem; }
     .sign-zero { color: #fab387; font-weight: bold; }
+    .sign-undef { color: #f9e2af; font-weight: bold; }
     .close-modal { background: #f38ba8; color: #111; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
   </style>
 </head>
@@ -216,7 +212,7 @@
       <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
     </div>
 
-    <!-- Analysis Panel (Scrollable below canvas) -->
+    <!-- Analysis Panel -->
     <div class="analysis-panel hidden" id="analysisPanel">
       <div class="analysis-header">
         <span id="analysisTitle">📊 جدول تعیین علامت و تحلیل</span>
@@ -292,7 +288,6 @@
     let startX, startY;
     let hoverPoint = null;
 
-    // Mobile Pinch Zoom state
     let initialPinchDistance = null;
     let initialScale = scale;
 
@@ -314,7 +309,8 @@
         intersectLabel: "نقاط برخورد (x,y): ",
         noRoots: "ریشه‌ای یافت نشد",
         noIntersect: "برخوردی یافت نشد",
-        signTableTitle: "جدول تعیین علامت ریاضی f(x):"
+        signTableTitle1: "جدول تعیین علامت برای f(x):",
+        signTableTitle2: "جدول تعیین علامت برای g(x):"
       },
       en: {
         title: "📐 GeoGebra Plus Pro",
@@ -329,7 +325,8 @@
         intersectLabel: "Intersections (x,y): ",
         noRoots: "No roots found",
         noIntersect: "No intersections found",
-        signTableTitle: "Mathematical Sign Table for f(x):"
+        signTableTitle1: "Sign Table for f(x):",
+        signTableTitle2: "Sign Table for g(x):"
       }
     };
 
@@ -423,7 +420,6 @@
 
     window.addEventListener('resize', resizeCanvas);
 
-    // Mouse Movement
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       const px = e.clientX - rect.left;
@@ -455,7 +451,6 @@
 
     window.addEventListener('mouseup', () => isDragging = false);
 
-    // Touch Support for Pan and Pinch Zoom
     function getTouchDistance(e) {
       return Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
@@ -481,7 +476,6 @@
         offsetX = e.touches[0].clientX - startX;
         offsetY = e.touches[0].clientY - startY;
 
-        // Hover coords for single touch
         const rect = canvas.getBoundingClientRect();
         const px = e.touches[0].clientX - rect.left;
         const py = e.touches[0].clientY - rect.top;
@@ -535,77 +529,126 @@
       } catch(e) { return null; }
     }
 
-    // Authentic Sign Table Generator (جدول تعیین علامت استاندارد)
-    function updateAnalysis() {
-      const eq1 = document.getElementById('eq1').value;
-      const eq2 = document.getElementById('eq2').value;
-      const t = translations[currentLang];
-
-      let html = `<b>f(x) = ${eq1}</b><br>`;
-      
+    function generateSignTableHTML(expr, titleText) {
       const rawRoots = [];
-      const intersections = [];
-      for (let mx = -15; mx <= 15; mx += 0.05) {
-        let y1 = evalFn(eq1, mx);
-        let y2 = evalFn(eq2, mx);
-        if (y1 !== null && Math.abs(y1) < 0.05) rawRoots.push(Number(mx.toFixed(2)));
-        if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.08) intersections.push(`(${mx.toFixed(2)}, ${y1.toFixed(2)})`);
+      const undefPoints = []; // Undefined points (e.g. division by zero or tan/cot singularities)
+      
+      for (let mx = -15; mx <= 15; mx += 0.02) {
+        let y = evalFn(expr, mx);
+        if (y === null) {
+          undefPoints.push(Number(mx.toFixed(2)));
+        } else if (Math.abs(y) < 0.05) {
+          rawRoots.push(Number(mx.toFixed(2)));
+        }
       }
 
       // Deduplicate roots
       const roots = [];
       rawRoots.forEach(r => {
-        if (!roots.some(existing => Math.abs(existing - r) < 0.2)) {
-          roots.push(r);
-        }
+        if (!roots.some(existing => Math.abs(existing - r) < 0.15)) roots.push(r);
       });
       roots.sort((a,b) => a - b);
 
-      html += `${t.rootsLabel} <b>${roots.length ? roots.join(', ') : t.noRoots}</b><br>`;
-      if (eq2.trim()) {
-        html += `${t.intersectLabel} <b>${[...new Set(intersections)].join(', ') || t.noIntersect}</b><br>`;
-      }
+      // Deduplicate undefined points (singularities)
+      const undefs = [];
+      undefPoints.forEach(u => {
+        if (!undefs.some(existing => Math.abs(existing - u) < 0.2)) undefs.push(u);
+      });
+      undefs.sort((a,b) => a - b);
 
-      // Build Math Sign Table (جدول تعیین علامت)
-      html += `<br><b>${t.signTableTitle}</b>`;
+      // Combine critical points (roots + undefined) sorted
+      let criticals = [...roots.map(r => ({val: r, type: 'root'})), ...undefs.map(u => ({val: u, type: 'undef'}))];
+      criticals.sort((a,b) => a.val - b.val);
+
+      // Filter out overlapping critical points
+      let filteredCriticals = [];
+      criticals.forEach(c => {
+        if (!filteredCriticals.some(fc => Math.abs(fc.val - c.val) < 0.2)) {
+          filteredCriticals.push(c);
+        }
+      });
+
+      let html = `<b>${titleText}</b><br>`;
       html += `<div class="sign-table-wrapper"><table class="sign-table">`;
       
       // Header row (x values)
       html += `<tr><th>x</th><td>-∞</td>`;
-      roots.forEach(r => {
-        html += `<td>${r}</td>`;
+      filteredCriticals.forEach(c => {
+        html += `<td>${c.val}</td>`;
       });
       html += `<td>+∞</td></tr>`;
 
-      // f(x) row
-      html += `<tr><th>f(x)</th>`;
-      
-      if (roots.length === 0) {
-        let sampleY = evalFn(eq1, 0);
+      // Function row (f(x) or g(x))
+      html += `<tr><th>expression</th>`; // universally LTR math header
+
+      if (filteredCriticals.length === 0) {
+        let sampleY = evalFn(expr, 0);
         let sign = (sampleY !== null && sampleY >= 0) ? '<span class="sign-plus">+</span>' : '<span class="sign-minus">-</span>';
         html += `<td>${sign}</td>`;
       } else {
-        // Evaluate sign intervals strictly
+        // Test intervals between critical points
         let intervals = [];
-        intervals.push((roots[0] - 100) < -1000 ? roots[0] - 1 : (roots[0] - 1));
-        for (let i = 0; i < roots.length - 1; i++) {
-          intervals.push((roots[i] + roots[i+1]) / 2);
+        intervals.push(filteredCriticals[0].val - 1);
+        for (let i = 0; i < filteredCriticals.length - 1; i++) {
+          intervals.push((filteredCriticals[i].val + filteredCriticals[i+1].val) / 2);
         }
-        intervals.push(roots[roots.length - 1] + 1);
+        intervals.push(filteredCriticals[filteredCriticals.length - 1].val + 1);
 
         for (let i = 0; i < intervals.length; i++) {
-          let y = evalFn(eq1, intervals[i]);
+          let y = evalFn(expr, intervals[i]);
           let signStr = (y !== null && y > 0) ? '<span class="sign-plus">+</span>' : (y !== null && y < 0 ? '<span class="sign-minus">-</span>' : '<span class="sign-plus">+</span>');
           html += `<td>${signStr}</td>`;
-          if (i < roots.length) {
-            html += `<td class="sign-zero">0</td>`;
+          
+          if (i < filteredCriticals.length) {
+            let fc = filteredCriticals[i];
+            if (fc.type === 'root') {
+              html += `<td class="sign-zero">0</td>`;
+            } else {
+              html += `<td class="sign-undef">||</td>`; // undefined / vertical asymptote
+            }
           }
         }
       }
 
-      html += `</tr></table></div>`;
+      html += `</tr></table></div><br>`;
+      return { html, roots };
+    }
 
-      document.getElementById('analysisContent').innerHTML = html;
+    function updateAnalysis() {
+      const eq1 = document.getElementById('eq1').value;
+      const eq2 = document.getElementById('eq2').value;
+      const t = translations[currentLang];
+
+      let fullHtml = "";
+
+      // Analyze f(x)
+      if (eq1.trim()) {
+        const res1 = generateSignTableHTML(eq1, t.signTableTitle1);
+        fullHtml += `${t.rootsLabel} <b>${res1.roots.length ? res1.roots.join(', ') : t.noRoots}</b><br>`;
+        fullHtml += res1.html;
+      }
+
+      // Analyze g(x) if present
+      if (eq2.trim()) {
+        const res2 = generateSignTableHTML(eq2, t.signTableTitle2);
+        fullHtml += `<br>${t.rootsLabel} <b>${res2.roots.length ? res2.roots.join(', ') : t.noRoots}</b><br>`;
+        fullHtml += res2.html;
+      }
+
+      // Intersections between f(x) and g(x)
+      if (eq1.trim() && eq2.trim()) {
+        const intersections = [];
+        for (let mx = -15; mx <= 15; mx += 0.05) {
+          let y1 = evalFn(eq1, mx);
+          let y2 = evalFn(eq2, mx);
+          if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.08) {
+            intersections.push(`(${mx.toFixed(2)}, ${y1.toFixed(2)})`);
+          }
+        }
+        fullHtml += `${t.intersectLabel} <b>${[...new Set(intersections)].join(', ') || t.noIntersect}</b>`;
+      }
+
+      document.getElementById('analysisContent').innerHTML = fullHtml;
     }
 
     function draw() {
