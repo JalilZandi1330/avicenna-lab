@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">مینی جئوجبرا | GeoGebra Mini</title>
+  <title id="pageTitle">مینی جئوجبرا پیشرفته | GeoGebra Mini Pro</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -129,12 +129,12 @@
       text-align: center;
       min-height: 16px;
     }
-    .features-row {
-      display: flex;
-      gap: 8px;
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
     }
     .feature-toggle {
-      flex: 1;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 6px;
@@ -148,11 +148,21 @@
       background: var(--button-color);
       border-color: transparent;
     }
+    .stats-panel {
+      font-size: 0.75rem;
+      color: var(--hint-color);
+      background: rgba(0,0,0,0.2);
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-family: monospace;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h2 id="appTitle">📐 مینی جئوجبرا | GeoGebra Mini</h2>
+    <h2 id="appTitle">📐 مینی جئوجبرا پیشرفته | GeoGebra Mini Pro</h2>
     <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">EN / فارسی</button>
   </div>
   
@@ -163,7 +173,6 @@
       <input type="text" id="equation1" value="a*xx - 4" placeholder="a*xx - 4">
     </div>
 
-    <!-- Slider for parameter 'a' -->
     <div class="slider-box">
       <div class="slider-header">
         <span id="sliderALabel">پارامتر a:</span>
@@ -178,9 +187,11 @@
       <input type="text" id="equation2" value="2x" placeholder="2x">
     </div>
 
-    <div class="features-row">
+    <div class="features-grid">
       <button class="feature-toggle active" id="btnDeriv" onclick="toggleFeature('deriv')">مشتق f'(x)</button>
       <button class="feature-toggle" id="btnIntegral" onclick="toggleFeature('integral')">انتگرال (مساحت)</button>
+      <button class="feature-toggle" id="btnExtrema" onclick="toggleFeature('extrema')">مینیمم / ماکزیمم</button>
+      <button class="feature-toggle active" id="btnRoots" onclick="toggleFeature('roots')">ریشه‌ها و تقاطع</button>
     </div>
 
     <div class="error-msg" id="errorMsg"></div>
@@ -189,6 +200,11 @@
 
   <div class="chart-container">
     <canvas id="mathChart"></canvas>
+  </div>
+
+  <div class="stats-panel" id="statsPanel">
+    <span id="statRoots">Roots: -</span>
+    <span id="statIntersections">Intersections: -</span>
   </div>
 
   <script>
@@ -200,31 +216,49 @@
     let currentLang = 'fa';
     let showDeriv = true;
     let showIntegral = false;
+    let showExtrema = false;
+    let showRoots = true;
     let paramA = 1;
 
     const translations = {
       fa: {
-        title: "📐 مینی جئوجبرا | GeoGebra Mini",
+        title: "📐 مینی جئوجبرا پیشرفته | GeoGebra Mini Pro",
         labelEq1: "تابع اول f(x):",
         labelEq2: "تابع دوم g(x) (اختیاری):",
+        sliderALabel: "پارامتر a:",
         plotBtn: "به‌روزرسانی نمودار",
         langBtn: "English",
         axisX: "محور X",
         axisY: "محور Y",
         btnDeriv: "مشتق f'(x)",
         btnIntegral: "انتگرال (مساحت)",
+        btnExtrema: "مینیمم / ماکزیمم",
+        btnRoots: "ریشه‌ها و تقاطع",
+        rootLabel: "ریشه f(x)",
+        intersectLabel: "نقطه برخورد",
+        extremaLabel: "اکسترمم (قله/دره)",
+        derivLabel: "مشتق f'(x)",
+        integralLabel: "انتگرال ∫ f(x)",
         error: "خطا در فرمول! لطفاً عبارت درستی وارد کنید."
       },
       en: {
-        title: "📐 GeoGebra Mini",
+        title: "📐 GeoGebra Mini Pro",
         labelEq1: "First Function f(x):",
         labelEq2: "Second Function g(x) (Optional):",
+        sliderALabel: "Parameter a:",
         plotBtn: "Update Plot",
         langBtn: "فارسی",
         axisX: "X Axis",
         axisY: "Y Axis",
         btnDeriv: "Derivative f'(x)",
         btnIntegral: "Integral (Area)",
+        btnExtrema: "Extrema (Min/Max)",
+        btnRoots: "Roots & Intersections",
+        rootLabel: "Root of f(x)",
+        intersectLabel: "Intersection",
+        extremaLabel: "Extrema",
+        derivLabel: "Derivative f'(x)",
+        integralLabel: "Integral ∫ f(x)",
         error: "Invalid formula! Please enter a valid expression."
       }
     };
@@ -239,10 +273,13 @@
       document.getElementById('appTitle').textContent = t.title;
       document.getElementById('labelEq1').textContent = t.labelEq1;
       document.getElementById('labelEq2').textContent = t.labelEq2;
+      document.getElementById('sliderALabel').textContent = t.sliderALabel;
       document.getElementById('plotBtn').textContent = t.plotBtn;
       document.getElementById('langBtn').textContent = t.langBtn;
       document.getElementById('btnDeriv').textContent = t.btnDeriv;
       document.getElementById('btnIntegral').textContent = t.btnIntegral;
+      document.getElementById('btnExtrema').textContent = t.btnExtrema;
+      document.getElementById('btnRoots').textContent = t.btnRoots;
       
       plot();
     }
@@ -260,6 +297,12 @@
       } else if (feat === 'integral') {
         showIntegral = !showIntegral;
         document.getElementById('btnIntegral').classList.toggle('active', showIntegral);
+      } else if (feat === 'extrema') {
+        showExtrema = !showExtrema;
+        document.getElementById('btnExtrema').classList.toggle('active', showExtrema);
+      } else if (feat === 'roots') {
+        showRoots = !showRoots;
+        document.getElementById('btnRoots').classList.toggle('active', showRoots);
       }
       plot();
     }
@@ -297,7 +340,6 @@
       }
     }
 
-    // Numerical derivative approximation: f'(x) = (f(x+h) - f(x-h)) / (2*h)
     function derivative(rawExpr, x, a) {
       const h = 0.001;
       let y1 = evaluateFunction(rawExpr, x + h, a);
@@ -320,9 +362,13 @@
       
       const roots1 = [];
       const intersections = [];
+      const extremas = [];
 
       try {
-        for (let x = -10; x <= 10; x += 0.5) {
+        let prevY = null;
+        let prevDeriv = null;
+
+        for (let x = -10; x <= 10; x += 0.25) {
           xValues.push(x);
           
           let y1 = evaluateFunction(eq1Str, x, paramA);
@@ -333,24 +379,38 @@
           y2Values.push(y2);
           derivValues.push(d1);
           
-          // Approximate integral (cumulative area from x = -10)
           if (showIntegral && y1 !== null) {
             integralValues.push(y1);
           } else {
             integralValues.push(null);
           }
 
-          if (y1 !== null && Math.abs(y1) < 0.25) {
-            roots1.push({x: x, y: y1});
+          // Roots
+          if (showRoots && y1 !== null && Math.abs(y1) < 0.2) {
+            roots1.push({x: Number(x.toFixed(2)), y: y1});
           }
-          if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.3) {
-            intersections.push({x: x, y: (y1 + y2) / 2});
+
+          // Intersections
+          if (showRoots && y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.25) {
+            intersections.push({x: Number(x.toFixed(2)), y: (y1 + y2) / 2});
           }
+
+          // Extrema (where derivative crosses zero)
+          if (showExtrema && prevDeriv !== null && d1 !== null) {
+            if (prevDeriv * d1 <= 0) {
+              extremas.push({x: Number(x.toFixed(2)), y: y1});
+            }
+          }
+          prevDeriv = d1;
         }
+
+        // Update stats panel
+        const t = translations[currentLang];
+        document.getElementById('statRoots').textContent = `Roots: ${roots1.map(r => r.x).join(', ') || 'None'}`;
+        document.getElementById('statIntersections').textContent = `Intersections: ${intersections.map(i => '('+i.x+','+i.y.toFixed(1)+')').join(', ') || 'None'}`;
 
         if (chart) chart.destroy();
 
-        const t = translations[currentLang];
         const ctx = document.getElementById('mathChart').getContext('2d');
         
         chart = new Chart(ctx, {
@@ -364,7 +424,7 @@
                 borderColor: '#5288c1',
                 backgroundColor: 'rgba(82, 136, 193, 0.1)',
                 borderWidth: 3,
-                pointRadius: 2,
+                pointRadius: 1,
                 fill: false,
                 tension: 0.2
               },
@@ -374,34 +434,34 @@
                 borderColor: '#e06c75',
                 backgroundColor: 'rgba(224, 108, 117, 0.1)',
                 borderWidth: 2.5,
-                pointRadius: 2,
+                pointRadius: 1,
                 fill: false,
                 tension: 0.2
               } : null,
               showDeriv ? {
-                label: `f'(x) [Derivative]`,
+                label: t.derivLabel,
                 data: derivValues,
                 borderColor: '#e5c07b',
                 borderWidth: 2,
-                borderDash: [5, 5],
+                borderDash: [4, 4],
                 pointRadius: 0,
                 fill: false,
                 tension: 0.2
               } : null,
               showIntegral ? {
-                label: `∫ f(x) [Integral Area]`,
+                label: t.integralLabel,
                 data: integralValues,
-                backgroundColor: 'rgba(152, 195, 121, 0.3)',
+                backgroundColor: 'rgba(152, 195, 121, 0.25)',
                 borderColor: 'transparent',
                 borderWidth: 0,
                 fill: true,
                 pointRadius: 0,
                 tension: 0.2
               } : null,
-              {
-                label: 'ریشه f(x)',
+              showRoots ? {
+                label: t.rootLabel,
                 data: xValues.map(x => {
-                  let match = roots1.find(r => Math.abs(r.x - x) < 0.3);
+                  let match = roots1.find(r => Math.abs(r.x - x) < 0.2);
                   return match ? match.y : null;
                 }),
                 borderColor: '#98c379',
@@ -409,17 +469,29 @@
                 pointRadius: 6,
                 pointStyle: 'circle',
                 showLine: false
-              },
-              eq2Str.trim() ? {
-                label: 'نقطه برخورد',
+              } : null,
+              showRoots && eq2Str.trim() ? {
+                label: t.intersectLabel,
                 data: xValues.map(x => {
-                  let match = intersections.find(i => Math.abs(i.x - x) < 0.3);
+                  let match = intersections.find(i => Math.abs(i.x - x) < 0.2);
                   return match ? match.y : null;
                 }),
                 borderColor: '#c678dd',
                 backgroundColor: '#c678dd',
                 pointRadius: 7,
                 pointStyle: 'rectRot',
+                showLine: false
+              } : null,
+              showExtrema ? {
+                label: t.extremaLabel,
+                data: xValues.map(x => {
+                  let match = extremas.find(e => Math.abs(e.x - x) < 0.2);
+                  return match ? match.y : null;
+                }),
+                borderColor: '#d19a66',
+                backgroundColor: '#d19a66',
+                pointRadius: 7,
+                pointStyle: 'triangle',
                 showLine: false
               } : null
             ].filter(Boolean)
