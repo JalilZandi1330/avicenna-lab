@@ -120,7 +120,7 @@
       padding: 10px;
       border-radius: 12px;
       position: relative;
-      height: 350px;
+      height: 360px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     .error-msg {
@@ -149,21 +149,21 @@
     <label id="labelEq1" for="equation1">تابع اول f(x):</label>
     <div class="input-row">
       <span class="prefix">f(x) =</span>
-      <input type="text" id="equation1" value="2x - 3" placeholder="2x - 3">
+      <input type="text" id="equation1" value="xx - 4" placeholder="xx - 4">
     </div>
 
     <label id="labelEq2" for="equation2" style="margin-top: 4px;">تابع دوم g(x) (اختیاری):</label>
     <div class="input-row">
       <span class="prefix">g(x) =</span>
-      <input type="text" id="equation2" value="-x + 3" placeholder="-x + 3">
+      <input type="text" id="equation2" value="2x" placeholder="2x">
     </div>
 
     <div class="error-msg" id="errorMsg"></div>
     
     <label id="labelExamples" style="font-size: 0.8rem; opacity: 0.7;">نمونه‌های سریع:</label>
     <div class="examples">
-      <span class="chip" onclick="setEqs('2x - 3', '-x + 3')">2x - 3 &amp; -x + 3</span>
-      <span class="chip" onclick="setEqs('x^2 - 4', '2*x')">x^2 - 4 &amp; 2x</span>
+      <span class="chip" onclick="setEqs('xx - 4', '2x')">xx - 4 &amp; 2x</span>
+      <span class="chip" onclick="setEqs('3x + 2', '-x + 3')">3x + 2 &amp; -x + 3</span>
       <span class="chip" onclick="setEqs('sin(x)', 'cos(x)')">sin(x) &amp; cos(x)</span>
     </div>
 
@@ -175,8 +175,9 @@
   </div>
 
   <div class="info-panel" id="infoPanel">
-    • محورهای X و Y در نقطه (0,0) همدیگر را قطع می‌کنند.<br>
-    • ریشه‌های توابع (تقاطع با محور X) و نقاط برخورد دو نمودار با نقطه‌چین‌های رنگی متمایز نشان داده می‌شوند.
+    • محورهای X و Y همدیگر را در مرکز (0,0) به صورت عمودمنصف قطع می‌کنند.<br>
+    • با نگه‌داشتن موس یا لمس نمودار، مختصات (x,y) نقطه نمایش داده می‌شود.<br>
+    • عبارت xx به عنوان توان دو (x^2) محاسبه می‌شود.
   </div>
 
   <script>
@@ -197,7 +198,7 @@
         langBtn: "English",
         axisX: "محور X",
         axisY: "محور Y",
-        info: "• محورهای X و Y در نقطه (0,0) همدیگر را قطع می‌کنند.<br>• ریشه‌های توابع (تقاطع با محور X) و نقاط برخورد دو نمودار با نقطه‌چین‌های رنگی متمایز نشان داده می‌شوند.",
+        info: "• محورهای X و Y همدیگر را در مرکز (0,0) به صورت عمودمنصف قطع می‌کنند.<br>• با نگه‌داشتن موس یا لمس نمودار، مختصات (x,y) نقطه نمایش داده می‌شود.<br>• عبارت xx به عنوان توان دو (x^2) محاسبه می‌شود.",
         error: "خطا در فرمول! لطفاً عبارت درستی وارد کنید."
       },
       en: {
@@ -209,7 +210,7 @@
         langBtn: "فارسی",
         axisX: "X Axis",
         axisY: "Y Axis",
-        info: "• X and Y axes intersect at (0,0).<br>• Roots (X-intercepts) and intersection points are highlighted.",
+        info: "• X and Y axes intersect symmetrically at (0,0).<br>• Hover/touch to see exact (x,y) coordinates.<br>• 'xx' is automatically parsed as x^2.",
         error: "Invalid formula! Please enter a valid expression."
       }
     };
@@ -244,6 +245,8 @@
       if (!expr || !expr.trim()) return null;
       let jsExpr = expr
         .toLowerCase()
+        // xx or XX -> x**2
+        .replace(/xx/g, 'x**2')
         .replace(/\^/g, '**')
         .replace(/sin/g, 'Math.sin')
         .replace(/cos/g, 'Math.cos')
@@ -286,7 +289,7 @@
       const intersections = [];
 
       try {
-        // Generate range from -10 to 10 with step 0.5 for smoother intersection check
+        // Generate range from -10 to 10 with step 0.5
         for (let x = -10; x <= 10; x += 0.5) {
           xValues.push(x);
           
@@ -296,7 +299,6 @@
           y1Values.push(y1);
           y2Values.push(y2);
 
-          // Check roots (y close to 0)
           if (y1 !== null && Math.abs(y1) < 0.25) {
             roots1.push({x: x, y: y1});
           }
@@ -304,7 +306,6 @@
             roots2.push({x: x, y: y2});
           }
 
-          // Check intersection between y1 and y2 if both exist
           if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.3) {
             intersections.push({x: x, y: (y1 + y2) / 2});
           }
@@ -340,7 +341,6 @@
                 fill: false,
                 tension: 0.2
               } : null,
-              // Roots 1 dataset
               {
                 label: 'ریشه f(x)',
                 data: xValues.map(x => {
@@ -353,7 +353,6 @@
                 pointStyle: 'circle',
                 showLine: false
               },
-              // Intersections dataset
               eq2Str.trim() ? {
                 label: 'نقطه برخورد',
                 data: xValues.map(x => {
@@ -371,11 +370,27 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                      label += `(${context.label}, ${context.parsed.y.toFixed(2)})`;
+                    }
+                    return label;
+                  }
+                }
+              }
+            },
             scales: {
               x: {
                 title: { display: true, text: t.axisX, color: '#708499' },
                 grid: { 
-                  color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.08)",
+                  color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.08)",
                   lineWidth: (context) => context.tick.value === 0 ? 2 : 1
                 },
                 ticks: { stepSize: 1, color: '#708499' }
@@ -383,7 +398,7 @@
               y: {
                 title: { display: true, text: t.axisY, color: '#708499' },
                 grid: { 
-                  color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.08)",
+                  color: (context) => context.tick.value === 0 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.08)",
                   lineWidth: (context) => context.tick.value === 0 ? 2 : 1
                 },
                 ticks: { color: '#708499' }
