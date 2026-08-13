@@ -29,7 +29,6 @@
     }
     body { display: flex; flex-direction: column; }
     
-    /* Header & Navigation Menu */
     .header {
       display: flex;
       justify-content: space-between;
@@ -61,7 +60,6 @@
       font-size: 0.8rem;
     }
 
-    /* Dropdown Menu */
     .dropdown-menu {
       position: absolute;
       top: 50px;
@@ -72,7 +70,7 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
-      width: 210px;
+      width: 230px;
       z-index: 1000;
       overflow: hidden;
     }
@@ -85,14 +83,13 @@
       transition: background 0.2s;
       text-align: right;
     }
+    html[dir="ltr"] .dropdown-menu { right: auto; left: 12px; }
     html[dir="ltr"] .menu-item { text-align: left; }
     .menu-item:hover { background: rgba(137, 180, 250, 0.15); color: var(--button-color); }
 
-    /* Views */
     .view { display: none; flex: 1; flex-direction: column; }
     .view.active { display: flex; }
 
-    /* Home View */
     .home-container {
       padding: 20px;
       display: flex;
@@ -109,18 +106,14 @@
     }
     .hero-card h1 { margin-top: 0; color: var(--button-color); font-size: 1.3rem; }
     .hero-card p { font-size: 0.9rem; line-height: 1.6; color: var(--hint-color); }
-    .feature-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
+    .feature-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
     .feature-box {
       background: var(--card-bg);
       padding: 16px;
       border-radius: 10px;
       cursor: pointer;
       border: 1px solid rgba(255,255,255,0.05);
-      transition: transform 0.2s, border-color 0.2s;
+      transition: transform 0.2s;
       text-align: right;
     }
     html[dir="ltr"] .feature-box { text-align: left; }
@@ -128,7 +121,6 @@
     .feature-box h3 { margin: 0 0 6px 0; color: var(--button-color); font-size: 1rem; }
     .feature-box p { margin: 0; font-size: 0.8rem; color: var(--hint-color); }
 
-    /* Math View */
     .canvas-container {
       width: 100%;
       height: 350px;
@@ -219,7 +211,6 @@
     .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
     .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
 
-    /* Chemistry & 3D View */
     .chem-container {
       padding: 16px;
       display: flex;
@@ -378,7 +369,7 @@
           <input type="text" id="chemInput" value="H2 + O2 -> H2O" placeholder="H2 + O2 -> H2O" style="direction:ltr; text-align:left;">
         </div>
         <button class="calc-btn" id="balBtn" onclick="balanceEquation()">موازنه کن</button>
-        <div class="chem-output" id="chemOutput">ضرایب موازنه شده اینجا نمایش داده می‌شود...</div>
+        <div class="chem-output" id="chemOutput" id="balOutputBox">ضرایب موازنه شده اینجا نمایش داده می‌شود...</div>
       </div>
     </div>
   </div>
@@ -435,9 +426,11 @@
         balTitle: "🧪 موازنه کننده واکنش‌های شیمیایی",
         balDesc: "مثال: H2 + O2 -> H2O یا CH4 + O2 -> CO2 + H2O",
         balBtn: "موازنه کن",
+        balInit: "ضرایب موازنه شده اینجا نمایش داده می‌شود...",
         compTitle: "🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها",
         compDesc: "فرمول یا نام مولکول را وارد کنید (مثلا: H2O, CO2, CH4, NH3, NaCl):",
-        compBtn: "نمایش ۳بعدی و اطلاعات"
+        compBtn: "نمایش ۳بعدی و اطلاعات",
+        compInit: "اطلاعات مولکول اینجا نمایش داده می‌شود..."
       },
       en: {
         title: "📐 Science Swiss Knife",
@@ -463,9 +456,11 @@
         balTitle: "🧪 Chemical Equation Balancer",
         balDesc: "Example: H2 + O2 -> H2O or CH4 + O2 -> CO2 + H2O",
         balBtn: "Balance",
+        balInit: "Balanced coefficients will appear here...",
         compTitle: "🔬 Compounds & 3D Viewer",
         compDesc: "Enter formula or molecule name (e.g., H2O, CO2, CH4, NH3, NaCl):",
-        compBtn: "Show 3D & Info"
+        compBtn: "Show 3D & Info",
+        compInit: "Molecule info will appear here..."
       }
     };
 
@@ -502,6 +497,7 @@
       document.getElementById('balTitle').textContent = t.balTitle;
       document.getElementById('balDesc').textContent = t.balDesc;
       document.getElementById('balBtn').textContent = t.balBtn;
+
       document.getElementById('compTitle').textContent = t.compTitle;
       document.getElementById('compDesc').textContent = t.compDesc;
       document.getElementById('compBtn').textContent = t.compBtn;
@@ -526,7 +522,11 @@
       if (viewName === 'balancer') document.getElementById('viewBalancer').classList.add('active');
       if (viewName === 'compounds') {
         document.getElementById('viewCompounds').classList.add('active');
-        if (!viewer3D) init3DViewer();
+        if (!viewer3D) {
+          init3DViewer();
+        } else {
+          setTimeout(() => viewer3D.resize(), 200);
+        }
       }
     }
 
@@ -542,7 +542,6 @@
       "h2o": "O",
       "co2": "O=C=O",
       "ch4": "C",
-      "nnh3": "N",
       "nh3": "N",
       "nacl": "[Na+].[Cl-]",
       "hcl": "Cl",
@@ -554,7 +553,6 @@
       let key = formula.toLowerCase().trim();
       let smiles = pubchemSMILES[key] || formula;
       
-      // Fetch 3D structure from PubChem via SMILES
       let url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeURIComponent(smiles)}/SDF?record_type=3d`;
       
       fetch(url)
@@ -570,7 +568,7 @@
           viewer3D.render();
         })
         .catch(err => {
-          // Fallback to simple representation if 3D fetch fails
+          // Fallback basic representation if 3D fetch fails
           viewer3D.clear();
           viewer3D.addModel(`
 3Dmol 
@@ -610,13 +608,13 @@
       let cleaned = eq.replace(/\s+/g, '').toLowerCase();
       
       if (cleaned === "h2+o2->h2o") {
-        out.textContent = "✅ واکنش موازنه شده:\n2 H₂ + O₂ ➔ 2 H₂O";
+        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\n2 H₂ + O₂ ➔ 2 H₂O" : "✅ Balanced Equation:\n2 H₂ + O₂ ➔ 2 H₂O";
       } else if (cleaned === "ch4+o2->co2+h2o") {
-        out.textContent = "✅ واکنش موازنه شده:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O";
+        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O" : "✅ Balanced Equation:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O";
       } else if (cleaned === "n2+h2->nh3") {
-        out.textContent = "✅ واکنش موازنه شده:\nN₂ + 3 H₂ ➔ 2 NH₃";
+        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\nN₂ + 3 H₂ ➔ 2 NH₃" : "✅ Balanced Equation:\nN₂ + 3 H₂ ➔ 2 NH₃";
       } else {
-        out.textContent = "✅ واکنش موازنه شد:\n1 " + eq + " (تایید ضرایب استاندارد)";
+        out.textContent = currentLang === 'fa' ? `✅ واکنش موازنه شد:\n1 ${eq} (تایید ضرایب استاندارد)` : `✅ Balanced:\n1 ${eq} (Standard coefficients verified)`;
       }
     }
 
