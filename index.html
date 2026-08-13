@@ -180,18 +180,19 @@
     <div class="toolbar">
       <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
       <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
-      <button class="tool-btn" id="btnInfo" onclick="toggleInfo()">🎯 ریشه‌های دقیق</button>
+      <button class="tool-btn" id="btnDeriv" onclick="toggleTool('deriv')">مشتق</button>
+      <button class="tool-btn" id="btnInfo" onclick="toggleInfo()">🎯 تحلیل دقیق</button>
       <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ صفحه کلید</button>
       <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
     </div>
 
-    <!-- Info Panel for Exact Roots -->
+    <!-- Info Panel for Exact Roots & Derivative -->
     <div class="info-panel hidden" id="infoPanel">
       <div class="info-header">
-        <span id="infoTitle">🎯 ریشه‌ها و نقاط برخورد دقیق</span>
+        <span id="infoTitle">🎯 تحلیل پیشرفته و ریشه‌ها</span>
         <button class="close-modal" onclick="toggleInfo()">✕</button>
       </div>
-      <div id="infoContent">در حال محاسبه دقیق...</div>
+      <div id="infoContent">در حال محاسبه...</div>
     </div>
     
     <div class="input-section">
@@ -248,6 +249,7 @@
     let currentLang = 'fa';
     let showGrid = true;
     let showRoots = true;
+    let showDerivative = false;
     let isKeyboardOpen = true;
     let isInfoOpen = false;
     let activeInputId = 'eq1';
@@ -272,13 +274,15 @@
         langBtn: "English",
         grid: "شبکه",
         roots: "ریشه‌ها/برخورد",
-        infoBtn: "🎯 ریشه‌های دقیق",
+        deriv: "مشتق",
+        infoBtn: "🎯 تحلیل دقیق",
         keyboard: "⌨️ صفحه کلید",
         reset: "مرکز",
-        infoTitle: "🎯 ریشه‌ها و نقاط برخورد دقیق",
+        infoTitle: "🎯 تحلیل پیشرفته و ریشه‌ها",
         rootsLabel: "ریشه‌های دقیق f(x): ",
         rootsLabel2: "ریشه‌های دقیق g(x): ",
         intersectLabel: "نقاط برخورد (x,y): ",
+        derivLabel: "مشتق تقریبی f'(x) در نقطه موس: ",
         noRoots: "ریشه‌ای یافت نشد",
         noIntersect: "برخوردی یافت نشد"
       },
@@ -287,13 +291,15 @@
         langBtn: "فارسی",
         grid: "Grid",
         roots: "Analysis",
-        infoBtn: "🎯 Exact Roots",
+        deriv: "Derivative",
+        infoBtn: "🎯 Exact Analysis",
         keyboard: "⌨️ Keyboard",
         reset: "Reset",
-        infoTitle: "🎯 Exact Roots & Intersections",
+        infoTitle: "🎯 Advanced Analysis & Roots",
         rootsLabel: "Exact roots of f(x): ",
         rootsLabel2: "Exact roots of g(x): ",
         intersectLabel: "Intersections (x,y): ",
+        derivLabel: "Approx derivative f'(x): ",
         noRoots: "No roots found",
         noIntersect: "No intersections found"
       }
@@ -308,6 +314,7 @@
       document.getElementById('langBtn').textContent = t.langBtn;
       document.getElementById('btnGrid').textContent = t.grid;
       document.getElementById('btnRoots').textContent = t.roots;
+      document.getElementById('btnDeriv').textContent = t.deriv;
       document.getElementById('btnInfo').textContent = t.infoBtn;
       document.getElementById('btnKeyboard').textContent = t.keyboard;
       document.getElementById('btnReset').textContent = t.reset;
@@ -372,6 +379,9 @@
       } else if (tool === 'roots') {
         showRoots = !showRoots;
         document.getElementById('btnRoots').classList.toggle('active', showRoots);
+      } else if (tool === 'deriv') {
+        showDerivative = !showDerivative;
+        document.getElementById('btnDeriv').classList.toggle('active', showDerivative);
       }
       draw();
     }
@@ -498,12 +508,10 @@
       } catch(e) { return null; }
     }
 
-    // High-precision Newton-Raphson root refinement
     function refineRoot(expr, x0) {
       let x = x0;
       const h = 1e-5;
-      const maxIter = 20;
-      for (let i = 0; i < maxIter; i++) {
+      for (let i = 0; i < 25; i++) {
         let y = evalFn(expr, x);
         if (y === null) break;
         if (Math.abs(y) < 1e-12) return Number(x.toFixed(4));
@@ -526,7 +534,6 @@
         let y1 = evalFn(expr, mx);
         let y2 = evalFn(expr, mx + step);
         if (y1 !== null && y2 !== null && y1 * y2 <= 0) {
-          // Sign change detected, refine root via Newton-Raphson
           let root = refineRoot(expr, mx);
           if (!found.some(r => Math.abs(r - root) < 1e-3)) {
             found.push(root);
@@ -549,7 +556,6 @@
         let d2 = (nextV1 !== null && nextV2 !== null) ? nextV1 - nextV2 : null;
 
         if (d1 !== null && d2 !== null && d1 * d2 <= 0) {
-          // Define difference function as expr1 - expr2
           let diffExpr = `(${expr1}) - (${expr2})`;
           let root = refineRoot(diffExpr, mx);
           let yVal = evalFn(expr1, root);
@@ -559,6 +565,14 @@
         }
       }
       return found;
+    }
+
+    function derivative(expr, x) {
+      const h = 0.001;
+      let y1 = evalFn(expr, x + h);
+      let y2 = evalFn(expr, x - h);
+      if (y1 === null || y2 === null) return null;
+      return (y1 - y2) / (2 * h);
     }
 
     function updateExactInfo() {
@@ -579,6 +593,12 @@
         const intersects = findExactIntersections(eq1, eq2);
         const formattedInts = intersects.map(it => `(${it.x}, ${it.y.toFixed(2)})`);
         html += `${t.intersectLabel} <b>${formattedInts.length ? formattedInts.join(', ') : t.noIntersect}</b>`;
+      }
+      if (hoverPoint && eq1.trim()) {
+        let deriv = derivative(eq1, hoverPoint.x);
+        if (deriv !== null) {
+          html += `<br><br>${t.derivLabel} <b>${deriv.toFixed(2)}</b> (at x=${hoverPoint.x.toFixed(2)})`;
+        }
       }
 
       document.getElementById('infoContent').innerHTML = html;
@@ -638,7 +658,24 @@
       plot(eq1, '#89b4fa');
       plot(eq2, '#f38ba8');
 
-      // Draw high-precision roots & intersections on canvas if requested
+      // Draw Derivative Tangent Line if toggled & hovering
+      if (showDerivative && hoverPoint && eq1.trim()) {
+        let m = derivative(eq1, hoverPoint.x);
+        if (m !== null) {
+          ctx.strokeStyle = '#fab387';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          // Draw tangent line y - y0 = m(x - x0)
+          let xStart = hoverPoint.x - 3;
+          let yStart = hoverPoint.y + m * (xStart - hoverPoint.x);
+          let xEnd = hoverPoint.x + 3;
+          let yEnd = hoverPoint.y + m * (xEnd - hoverPoint.x);
+          ctx.moveTo(cx + xStart * scale, cy - yStart * scale);
+          ctx.lineTo(cx + xEnd * scale, cy - yEnd * scale);
+          ctx.stroke();
+        }
+      }
+
       if (showRoots && eq1.trim()) {
         const roots1 = findExactRoots(eq1);
         ctx.fillStyle = '#a6e3a1';
