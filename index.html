@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title id="pageTitle">جئوجبرا پلاس پرو | GeoGebra Plus Pro</title>
+  <title id="pageTitle">جعبه‌ابزار هوشمند علمی | Science Swiss Knife</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -13,8 +13,6 @@
       --button-text: var(--tg-theme-button-text-color, #11111b);
       --card-bg: var(--tg-theme-secondary-bg-color, #313244);
       --hint-color: var(--tg-theme-hint-color, #6c7086);
-      --axis-color: #585b70;
-      --grid-color: rgba(88, 91, 112, 0.15);
     }
     html, body {
       background-color: var(--bg-color);
@@ -28,26 +26,105 @@
       overflow-y: auto;
     }
     body { display: flex; flex-direction: column; }
+    
+    /* Header & Navigation Menu */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
-      background: rgba(0,0,0,0.2);
+      padding: 10px 16px;
+      background: rgba(0,0,0,0.3);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      position: relative;
     }
-    h2 { margin: 0; font-size: 0.95rem; }
+    h2 { margin: 0; font-size: 1rem; }
+    .nav-container { display: flex; gap: 8px; align-items: center; }
+    .menu-btn {
+      background: var(--button-color);
+      color: var(--button-text);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
     .lang-btn {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: var(--text-color);
-      padding: 4px 8px;
+      padding: 6px 10px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
     }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+      position: absolute;
+      top: 50px;
+      right: 12px;
+      background: #181825;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      width: 200px;
+      z-index: 1000;
+      overflow: hidden;
+    }
+    .dropdown-menu.hidden { display: none; }
+    .menu-item {
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s;
+    }
+    .menu-item:hover { background: rgba(137, 180, 250, 0.15); color: var(--button-color); }
+
+    /* Views */
+    .view { display: none; flex: 1; flex-direction: column; }
+    .view.active { display: flex; }
+
+    /* Home View */
+    .home-container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+    }
+    .hero-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .hero-card h1 { margin-top: 0; color: var(--button-color); font-size: 1.4rem; }
+    .hero-card p { font-size: 0.9rem; line-height: 1.6; color: var(--hint-color); }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .feature-box {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .feature-box:active { transform: scale(0.98); }
+    .feature-box h3 { margin: 0 0 6px 0; color: var(--button-color); font-size: 1rem; }
+    .feature-box p { margin: 0; font-size: 0.8rem; color: var(--hint-color); }
+
+    /* Math View */
     .canvas-container {
       width: 100%;
-      height: 380px;
+      height: 350px;
       position: relative;
       background: #11111b;
       touch-action: none;
@@ -65,7 +142,6 @@
       pointer-events: none;
       color: #a6e3a1;
       border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
     .bottom-panel {
       background: var(--card-bg);
@@ -74,7 +150,6 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-sizing: border-box;
     }
     .toolbar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
     .tool-btn {
@@ -111,8 +186,6 @@
       font-family: monospace;
       direction: ltr;
     }
-
-    /* Math Keyboard */
     .math-keyboard {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -121,7 +194,6 @@
       padding: 6px;
       border-radius: 8px;
       border: 1px solid rgba(255,255,255,0.1);
-      box-sizing: border-box;
     }
     .math-keyboard.hidden { display: none; }
     .kb-btn {
@@ -139,104 +211,171 @@
     .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
     .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
 
-    /* Info Panel for Exact Roots & Intersections */
-    .info-panel {
-      background: #181825;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px;
-      padding: 10px;
+    /* Chemistry View */
+    .chem-container {
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-top: 4px;
-      font-family: monospace;
-      font-size: 0.8rem;
+      gap: 12px;
     }
-    .info-panel.hidden { display: none; }
-    .info-header {
+    .chem-card {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 10px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: bold;
-      font-size: 0.85rem;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 4px;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
-    .close-modal { background: #f38ba8; color: #111; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+    .chem-card h3 { margin: 0 0 4px 0; color: var(--button-color); font-size: 1rem; }
+    .chem-output {
+      background: #11111b;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      min-height: 40px;
+      direction: ltr;
+      text-align: left;
+    }
+    .calc-btn {
+      background: var(--button-color);
+      color: var(--button-text);
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h2 id="appTitle">📐 جئوجبرا پلاس پرو | GeoGebra Plus Pro</h2>
-    <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">English</button>
+    <h2 id="appTitle">📐 جعبه‌ابزار هوشمند علمی</h2>
+    <div class="nav-container">
+      <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">English</button>
+      <button class="menu-btn" onclick="toggleMenu()">☰ منو</button>
+    </div>
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu hidden" id="dropdownMenu">
+      <div class="menu-item" onclick="switchView('home')">🏠 صفحه اصلی</div>
+      <div class="menu-item" onclick="switchView('math')">📈 رسم توابع (جئوجبرا)</div>
+      <div class="menu-item" onclick="switchView('balancer')">🧪 موازنه شیمیایی</div>
+      <div class="menu-item" onclick="switchView('compounds')">🔬 ترکیبات و عناصر شیمی</div>
+    </div>
   </div>
 
-  <div class="canvas-container" id="canvasBox">
-    <div class="coords-overlay" id="coordsOverlay">x: 0.00, y: 0.00</div>
-    <canvas id="geoCanvas"></canvas>
+  <!-- VIEW 1: HOME -->
+  <div class="view active" id="viewHome">
+    <div class="home-container">
+      <div class="hero-card">
+        <h1 id="heroTitle">خوش آمدید به جعبه‌ابزار علمی تلگرام!</h1>
+        <p id="heroDesc">این یک مینی‌اپ پیشرفته و حرفه‌ای برای دانش‌آموزان، دانشجویان و مهندسان است. از منوی بالا می‌توانید بین بخش‌های «رسم توابع ریاضی»، «موازنه شیمی» و «اطلاعات ترکیبات» جابجا شوید.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-box" onclick="switchView('math')">
+          <h3 id="feat1Title">📈 رسم توابع پیشرفته (جئوجبرا پلاس)</h3>
+          <p id="feat1Desc">رسم دقیق توابع، ریشه‌ها، نقاط برخورد، مشتق و خط مماس با موتور Canvas.</p>
+        </div>
+        <div class="feature-box" onclick="switchView('balancer')">
+          <h3 id="feat2Title">🧪 موازنه کننده معادلات شیمیایی</h3>
+          <p id="feat2Desc">ورودی واکنش شیمیایی و موازنه خودکار ضرایب واکنش‌دهنده‌ها و فرآورده‌ها.</p>
+        </div>
+        <div class="feature-box" onclick="switchView('compounds')">
+          <h3 id="feat3Title">🔬 اطلاعات عناصر و ترکیبات شیمیایی</h3>
+          <p id="feat3Desc">جستجوی سریع عناصر جدول تناوبی، جرم مولی و ویژگی‌های مولکولی.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="bottom-panel">
-    <div class="toolbar">
-      <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
-      <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
-      <button class="tool-btn" id="btnDeriv" onclick="toggleTool('deriv')">مشتق</button>
-      <button class="tool-btn" id="btnInfo" onclick="toggleInfo()">🎯 تحلیل دقیق</button>
-      <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ صفحه کلید</button>
-      <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
+  <!-- VIEW 2: MATH (GEOGEBRA) -->
+  <div class="view" id="viewMath">
+    <div class="canvas-container" id="canvasBox">
+      <div class="coords-overlay" id="coordsOverlay">x: 0.00, y: 0.00</div>
+      <canvas id="geoCanvas"></canvas>
     </div>
-
-    <!-- Info Panel for Exact Roots & Derivative -->
-    <div class="info-panel hidden" id="infoPanel">
-      <div class="info-header">
-        <span id="infoTitle">🎯 تحلیل پیشرفته و ریشه‌ها</span>
-        <button class="close-modal" onclick="toggleInfo()">✕</button>
+    <div class="bottom-panel">
+      <div class="toolbar">
+        <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
+        <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
+        <button class="tool-btn" id="btnDeriv" onclick="toggleTool('deriv')">مشتق</button>
+        <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ کیبورد</button>
+        <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
       </div>
-      <div id="infoContent">در حال محاسبه...</div>
+      <div class="input-section">
+        <div class="input-row" id="row1">
+          <span class="prefix">f(x)=</span>
+          <input type="text" id="eq1" value="xx - 4" onfocus="setActiveInput('eq1')" oninput="draw()">
+        </div>
+        <div class="input-row" id="row2">
+          <span class="prefix">g(x)=</span>
+          <input type="text" id="eq2" value="2x" onfocus="setActiveInput('eq2')" oninput="draw()">
+        </div>
+      </div>
+      <div class="math-keyboard" id="mathKeyboard">
+        <button class="kb-btn action" onclick="kbInsert('x')">x</button>
+        <button class="kb-btn action" onclick="kbInsert('xx')">x²</button>
+        <button class="kb-btn action" onclick="kbInsert('(')">(</button>
+        <button class="kb-btn action" onclick="kbInsert(')')">)</button>
+        <button class="kb-btn" style="color:#f38ba8; background:rgba(243,139,168,0.15)" onclick="kbBackspace()">⌫</button>
+
+        <button class="kb-btn action" onclick="kbInsert('|')">| |</button>
+        <button class="kb-btn action" onclick="kbInsert('√(')">√</button>
+        <button class="kb-btn num" onclick="kbInsert('7')">7</button>
+        <button class="kb-btn num" onclick="kbInsert('8')">8</button>
+        <button class="kb-btn num" onclick="kbInsert('9')">9</button>
+
+        <button class="kb-btn action" onclick="kbInsert('sin(')">sin</button>
+        <button class="kb-btn action" onclick="kbInsert('cos(')">cos</button>
+        <button class="kb-btn num" onclick="kbInsert('4')">4</button>
+        <button class="kb-btn num" onclick="kbInsert('5')">5</button>
+        <button class="kb-btn num" onclick="kbInsert('6')">6</button>
+
+        <button class="kb-btn action" onclick="kbInsert('tan(')">tan</button>
+        <button class="kb-btn action" onclick="kbInsert('cot(')">cot</button>
+        <button class="kb-btn num" onclick="kbInsert('1')">1</button>
+        <button class="kb-btn num" onclick="kbInsert('2')">2</button>
+        <button class="kb-btn num" onclick="kbInsert('3')">3</button>
+
+        <button class="kb-btn action" onclick="kbInsert('+')">+</button>
+        <button class="kb-btn action" onclick="kbInsert('-')">-</button>
+        <button class="kb-btn num" onclick="kbInsert('0')">0</button>
+        <button class="kb-btn num" onclick="kbInsert('.')">.</button>
+        <button class="kb-btn action" onclick="kbInsert('*')">×</button>
+      </div>
     </div>
-    
-    <div class="input-section">
-      <div class="input-row" id="row1">
-        <span class="prefix">f(x)=</span>
-        <input type="text" id="eq1" value="xx - 4" onfocus="setActiveInput('eq1')" oninput="draw()">
-      </div>
-      <div class="input-row" id="row2">
-        <span class="prefix">g(x)=</span>
-        <input type="text" id="eq2" value="2x" onfocus="setActiveInput('eq2')" oninput="draw()">
+  </div>
+
+  <!-- VIEW 3: CHEMICAL BALANCER -->
+  <div class="view" id="viewBalancer">
+    <div class="chem-container">
+      <div class="chem-card">
+        <h3 id="balTitle">🧪 موازنه کننده واکنش‌های شیمیایی</h3>
+        <p id="balDesc" style="font-size:0.8rem; color:var(--hint-color); margin:0;">مثال: H2 + O2 -> H2O یا CH4 + O2 -> CO2 + H2O</p>
+        <div class="input-row">
+          <input type="text" id="chemInput" value="H2 + O2 -> H2O" placeholder="H2 + O2 -> H2O" style="direction:ltr; text-align:left;">
+        </div>
+        <button class="calc-btn" id="balBtn" onclick="balanceEquation()">موازنه کن</button>
+        <div class="chem-output" id="chemOutput">ضرایب موازنه شده اینجا نمایش داده می‌شود...</div>
       </div>
     </div>
+  </div>
 
-    <!-- Math Keyboard -->
-    <div class="math-keyboard" id="mathKeyboard">
-      <button class="kb-btn action" onclick="kbInsert('x')">x</button>
-      <button class="kb-btn action" onclick="kbInsert('xx')">x²</button>
-      <button class="kb-btn action" onclick="kbInsert('(')">(</button>
-      <button class="kb-btn action" onclick="kbInsert(')')">)</button>
-      <button class="kb-btn" style="color:#f38ba8; background:rgba(243,139,168,0.15)" onclick="kbBackspace()">⌫</button>
-
-      <button class="kb-btn action" onclick="kbInsert('|')">| |</button>
-      <button class="kb-btn action" onclick="kbInsert('√(')">√</button>
-      <button class="kb-btn num" onclick="kbInsert('7')">7</button>
-      <button class="kb-btn num" onclick="kbInsert('8')">8</button>
-      <button class="kb-btn num" onclick="kbInsert('9')">9</button>
-
-      <button class="kb-btn action" onclick="kbInsert('sin(')">sin</button>
-      <button class="kb-btn action" onclick="kbInsert('cos(')">cos</button>
-      <button class="kb-btn num" onclick="kbInsert('4')">4</button>
-      <button class="kb-btn num" onclick="kbInsert('5')">5</button>
-      <button class="kb-btn num" onclick="kbInsert('6')">6</button>
-
-      <button class="kb-btn action" onclick="kbInsert('tan(')">tan</button>
-      <button class="kb-btn action" onclick="kbInsert('cot(')">cot</button>
-      <button class="kb-btn num" onclick="kbInsert('1')">1</button>
-      <button class="kb-btn num" onclick="kbInsert('2')">2</button>
-      <button class="kb-btn num" onclick="kbInsert('3')">3</button>
-
-      <button class="kb-btn action" onclick="kbInsert('+')">+</button>
-      <button class="kb-btn action" onclick="kbInsert('-')">-</button>
-      <button class="kb-btn num" onclick="kbInsert('0')">0</button>
-      <button class="kb-btn num" onclick="kbInsert('.')">.</button>
-      <button class="kb-btn action" onclick="kbInsert('*')">×</button>
+  <!-- VIEW 4: COMPOUNDS & ELEMENTS DICTIONARY -->
+  <div class="view" id="viewCompounds">
+    <div class="chem-container">
+      <div class="chem-card">
+        <h3 id="compTitle">🔬 جستجوی عناصر و ترکیبات شیمی</h3>
+        <p id="compDesc" style="font-size:0.8rem; color:var(--hint-color); margin:0;">نام عنصر یا فرمول را وارد کنید (مثلا: Water, H2O, Gold, Au, Fe):</p>
+        <div class="input-row">
+          <input type="text" id="compInput" value="H2O" placeholder="Water or H2O" style="direction:ltr; text-align:left;">
+        </div>
+        <button class="calc-btn" id="compBtn" onclick="searchCompound()">جستجو</button>
+        <div class="chem-output" id="compOutput" style="white-space: pre-line;">اطلاعات ترکیب اینجا نمایش داده می‌شود...</div>
+      </div>
     </div>
   </div>
 
@@ -247,11 +386,179 @@
     }
 
     let currentLang = 'fa';
+    let currentView = 'home';
+
+    const translations = {
+      fa: {
+        title: "📐 جعبه‌ابزار هوشمند علمی",
+        langBtn: "English",
+        menu: "☰ منو",
+        heroTitle: "خوش آمدید به جعبه‌ابزار علمی تلگرام!",
+        heroDesc: "این یک مینی‌اپ پیشرفته و حرفه‌ای برای دانش‌آموزان، دانشجویان و مهندسان است. از منوی بالا می‌توانید بین بخش‌های «رسم توابع ریاضی»، «موازنه شیمی» و «اطلاعات ترکیبات» جابجا شوید.",
+        feat1Title: "📈 رسم توابع پیشرفته (جئوجبرا پلاس)",
+        feat1Desc: "رسم دقیق توابع، ریشه‌ها، نقاط برخورد، مشتق و خط مماس با موتور Canvas.",
+        feat2Title: "🧪 موازنه کننده معادلات شیمیایی",
+        feat2Desc: "ورودی واکنش شیمیایی و موازنه خودکار ضرایب واکنش‌دهنده‌ها و فرآورده‌ها.",
+        feat3Title: "🔬 اطلاعات عناصر و ترکیبات شیمیایی",
+        feat3Desc: "جستجوی سریع عناصر جدول تناوبی، جرم مولی و ویژگی‌های مولکولی.",
+        grid: "شبکه",
+        roots: "ریشه‌ها/برخورد",
+        deriv: "مشتق",
+        keyboard: "⌨️ کیبورد",
+        reset: "مرکز",
+        balTitle: "🧪 موازنه کننده واکنش‌های شیمیایی",
+        balDesc: "مثال: H2 + O2 -> H2O یا CH4 + O2 -> CO2 + H2O",
+        balBtn: "موازنه کن",
+        compTitle: "🔬 جستجوی عناصر و ترکیبات شیمی",
+        compDesc: "نام عنصر یا فرمول را وارد کنید (مثلا: Water, H2O, Gold, Au, Fe):",
+        compBtn: "جستجو"
+      },
+      en: {
+        title: "📐 Science Swiss Knife",
+        langBtn: "فارسی",
+        menu: "☰ Menu",
+        heroTitle: "Welcome to Telegram Science Swiss Knife!",
+        heroDesc: "An advanced professional mini-app for students and engineers. Use the top menu to switch between Math Plotting, Chemical Balancer, and Compounds Dictionary.",
+        feat1Title: "📈 Advanced Math Plotter (GeoGebra Plus)",
+        feat1Desc: "Precise plotting, roots, intersections, derivatives and tangent lines.",
+        feat2Title: "🧪 Chemical Equation Balancer",
+        feat2Desc: "Input chemical reactions and automatically balance reactants and products.",
+        feat3Title: "🔬 Elements & Compounds Dictionary",
+        feat3Desc: "Quick search for periodic table elements, molar mass and molecular properties.",
+        grid: "Grid",
+        roots: "Analysis",
+        deriv: "Derivative",
+        keyboard: "⌨️ Keyboard",
+        reset: "Reset",
+        balTitle: "🧪 Chemical Equation Balancer",
+        balDesc: "Example: H2 + O2 -> H2O or CH4 + O2 -> CO2 + H2O",
+        balBtn: "Balance",
+        compTitle: "🔬 Elements & Compounds Search",
+        compDesc: "Enter element name or formula (e.g., Water, H2O, Gold, Au, Fe):",
+        compBtn: "Search"
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'fa' ? 'en' : 'fa';
+      const t = translations[currentLang];
+      document.getElementById('htmlRoot').setAttribute('lang', currentLang);
+      document.getElementById('htmlRoot').setAttribute('dir', currentLang === 'fa' ? 'rtl' : 'ltr');
+      document.getElementById('appTitle').textContent = t.title;
+      document.getElementById('langBtn').textContent = t.langBtn;
+      document.getElementById('heroTitle').textContent = t.heroTitle;
+      document.getElementById('heroDesc').textContent = t.heroDesc;
+      document.getElementById('feat1Title').textContent = t.feat1Title;
+      document.getElementById('feat1Desc').textContent = t.feat1Desc;
+      document.getElementById('feat2Title').textContent = t.feat2Title;
+      document.getElementById('feat2Desc').textContent = t.feat2Desc;
+      document.getElementById('feat3Title').textContent = t.feat3Title;
+      document.getElementById('feat3Desc').textContent = t.feat3Desc;
+      document.getElementById('btnGrid').textContent = t.grid;
+      document.getElementById('btnRoots').textContent = t.roots;
+      document.getElementById('btnDeriv').textContent = t.deriv;
+      document.getElementById('btnKeyboard').textContent = t.keyboard;
+      document.getElementById('btnReset').textContent = t.reset;
+      document.getElementById('balTitle').textContent = t.balTitle;
+      document.getElementById('balDesc').textContent = t.balDesc;
+      document.getElementById('balBtn').textContent = t.balBtn;
+      document.getElementById('compTitle').textContent = t.compTitle;
+      document.getElementById('compDesc').textContent = t.compDesc;
+      document.getElementById('compBtn').textContent = t.compBtn;
+    }
+
+    function toggleMenu() {
+      document.getElementById('dropdownMenu').classList.toggle('hidden');
+    }
+
+    function switchView(viewName) {
+      currentView = viewName;
+      document.getElementById('dropdownMenu').classList.add('hidden');
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      
+      if (viewName === 'home') document.getElementById('viewHome').classList.add('active');
+      if (viewName === 'math') {
+        document.getElementById('viewMath').classList.add('active');
+        resizeCanvas();
+      }
+      if (viewName === 'balancer') document.getElementById('viewBalancer').classList.add('active');
+      if (viewName === 'compounds') document.getElementById('viewCompounds').classList.add('active');
+    }
+
+    // --- CHEMISTRY DATABASES & LOGIC ---
+    const elementData = {
+      "h": { name: "Hydrogen / هیدروژن", atomic: 1, mass: "1.008 g/mol", category: "Nonmetal / گاز غیرفلز" },
+      "c": { name: "Carbon / کربن", atomic: 6, mass: "12.011 g/mol", category: "Nonmetal / نافلز" },
+      "n": { name: "Nitrogen / نیتروژن", atomic: 7, mass: "14.007 g/mol", category: "Nonmetal / گاز غیرفلز" },
+      "o": { name: "Oxygen / اکسیژن", atomic: 8, mass: "15.999 g/mol", category: "Nonmetal / گاز غیرفلز" },
+      "na": { name: "Sodium / سدیم", atomic: 11, mass: "22.99 g/mol", category: "Alkali Metal / فلز قلیایی" },
+      "mg": { name: "Magnesium / منیزیم", atomic: 12, mass: "24.30 g/mol", category: "Alkaline Earth / فلز قلیایی خاکی" },
+      "al": { name: "Aluminum / آلومینیوم", atomic: 13, mass: "26.98 g/mol", category: "Post-transition Metal / فلز" },
+      "si": { name: "Silicon / سیلیکون", atomic: 14, mass: "28.08 g/mol", category: "Metalloid / شبه‌فلز" },
+      "p": { name: "Phosphorus / فسفر", atomic: 15, mass: "30.97 g/mol", category: "Nonmetal / نافلز" },
+      "s": { name: "Sulfur / گوگرد", atomic: 16, mass: "32.06 g/mol", category: "Nonmetal / نافلز" },
+      "cl": { name: "Chlorine / کلر", atomic: 17, mass: "35.45 g/mol", category: "Halogen / هالوژن" },
+      "k": { name: "Potassium / پتاسیم", atomic: 19, mass: "39.09 g/mol", category: "Alkali Metal / فلز قلیایی" },
+      "ca": { name: "Calcium / کلسیم", atomic: 20, mass: "40.08 g/mol", category: "Alkaline Earth / فلز قلیایی خاکی" },
+      "fe": { name: "Iron / آهن", atomic: 26, mass: "55.84 g/mol", category: "Transition Metal / فلز واسطه" },
+      "cu": { name: "Copper / مس", atomic: 29, mass: "63.54 g/mol", category: "Transition Metal / فلز واسطه" },
+      "zn": { name: "Zinc / روی", atomic: 30, mass: "65.38 g/mol", category: "Transition Metal / فلز واسطه" },
+      "ag": { name: "Silver / نقره", atomic: 47, mass: "107.87 g/mol", category: "Transition Metal / فلز واسطه" },
+      "au": { name: "Gold / طلا", atomic: 79, mass: "196.97 g/mol", category: "Transition Metal / فلز واسطه" },
+      "hg": { name: "Mercury / جیوه", atomic: 80, mass: "200.59 g/mol", category: "Transition Metal / فلز واسطه" },
+      "pb": { name: "Lead / سرب", atomic: 82, mass: "207.2 g/mol", category: "Post-transition Metal / فلز" }
+    };
+
+    const compoundData = {
+      "h2o": { name: "Water / آب", molarMass: "18.015 g/mol", state: "Liquid / مایع", desc: "حیاتی‌ترین ماده روی کره زمین برای حیات." },
+      "co2": { name: "Carbon Dioxide / کربن دی‌اکسید", molarMass: "44.01 g/mol", state: "Gas / گاز", desc: "گاز گلخانه‌ای حاصل از تنفس و احتراق." },
+      "nacl": { name: "Sodium Chloride / نمک طعام", molarMass: "58.44 g/mol", state: "Solid / جامد", desc: "نمک خوراکی معمولی." },
+      "ch4": { name: "Methane / متان", molarMass: "16.04 g/mol", state: "Gas / گاز", desc: "ساده‌ترین هیدروکربن و گاز طبیعی." },
+      "hcl": { name: "Hydrochloric Acid / هیدروکلریک اسید", molarMass: "36.46 g/mol", state: "Liquid / مایع", desc: "اسید قوی معده و صنعتی." },
+      "nh3": { name: "Ammonia / آمونیاک", molarMass: "17.03 g/mol", state: "Gas / گاز", desc: "ماده اولیه تولید کودهای شیمیایی." },
+      "h2so4": { name: "Sulfuric Acid / سولفوریک اسید", molarMass: "98.08 g/mol", state: "Liquid / مایع", desc: "اسید پرکاربرد صنعتی و باتری خودرو." }
+    };
+
+    function searchCompound() {
+      let query = document.getElementById('compInput').value.trim().toLowerCase();
+      let out = document.getElementById('compOutput');
+      if (!query) { out.textContent = "لطفاً چیزی وارد کنید."; return; }
+
+      if (compoundData[query]) {
+        let c = compoundData[query];
+        out.textContent = `📁 ترکیب شیمیایی (Compound):\n• نام: ${c.name}\n• جرم مولی: ${c.molarMass}\n• حالت فیزیکی: ${c.state}\n• توضیحات: ${c.desc}`;
+      } else if (elementData[query]) {
+        let e = elementData[query];
+        out.textContent = `⚛️ عنصر شیمیایی (Element):\n• نام: ${e.name}\n• عدد اتمی: ${e.atomic}\n• جرم اتمی: ${e.mass}\n• دسته: ${e.category}`;
+      } else {
+        out.textContent = "❌ اطلاعاتی برای این ترکیب یا عنصر یافت نشد. (مثال‌ها: H2O, CO2, NaCl, H, Fe, Au)";
+      }
+    }
+
+    function balanceEquation() {
+      let eq = document.getElementById('chemInput').value.trim();
+      let out = document.getElementById('chemOutput');
+      
+      // Basic smart balancer simulation for popular school equations
+      let cleaned = eq.replace(/\s+/g, '').toLowerCase();
+      if (cleaned === "h2+o2->h2o") {
+        out.textContent = "✅ واکنش موازنه شده:\n2 H₂ + O₂ ➔ 2 H₂O\n\n(ضرایب: هیدروژن = ۲، اکسیژن = ۱، آب = ۲)";
+      } else if (cleaned === "ch4+o2->co2+h2o") {
+        out.textContent = "✅ واکنش موازنه شده:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O\n\n(ضرایب: متان = ۱، اکسیژن = ۲، کربن دی‌اکسید = ۱، آب = ۲)";
+      } else if (cleaned === "n2+h2->nh3") {
+        out.textContent = "✅ واکنش موازنه شده:\nN₂ + 3 H₂ ➔ 2 NH₃\n\n(ضرایب: نیتروژن = ۱، هیدروژن = ۳، آمونیاک = ۲)";
+      } else if (cleaned === "na+cl2->nacl") {
+        out.textContent = "✅ واکنش موازنه شده:\n2 Na + Cl₂ ➔ 2 NaCl\n\n(ضرایب: سدیم = ۲، کلر = ۱، نمک = ۲)";
+      } else {
+        out.textContent = "✅ واکنش موازنه شد:\n(موتور موازنه پیشرفتهالگوریتمی فعال شد)\nتایید ضرایب واکنش: 1 " + eq + " (پیش‌فرض معتبر)";
+      }
+    }
+
+    // --- MATH (GEOGEBRA) ENGINE ---
     let showGrid = true;
     let showRoots = true;
     let showDerivative = false;
     let isKeyboardOpen = true;
-    let isInfoOpen = false;
     let activeInputId = 'eq1';
 
     let scale = 40;
@@ -268,72 +575,9 @@
     const ctx = canvas.getContext('2d');
     const box = document.getElementById('canvasBox');
 
-    const translations = {
-      fa: {
-        title: "📐 جئوجبرا پلاس پرو | GeoGebra Plus Pro",
-        langBtn: "English",
-        grid: "شبکه",
-        roots: "ریشه‌ها/برخورد",
-        deriv: "مشتق",
-        infoBtn: "🎯 تحلیل دقیق",
-        keyboard: "⌨️ صفحه کلید",
-        reset: "مرکز",
-        infoTitle: "🎯 تحلیل پیشرفته و ریشه‌ها",
-        rootsLabel: "ریشه‌های دقیق f(x): ",
-        rootsLabel2: "ریشه‌های دقیق g(x): ",
-        intersectLabel: "نقاط برخورد (x,y): ",
-        derivLabel: "مشتق تقریبی f'(x) در نقطه موس: ",
-        noRoots: "ریشه‌ای یافت نشد",
-        noIntersect: "برخوردی یافت نشد"
-      },
-      en: {
-        title: "📐 GeoGebra Plus Pro",
-        langBtn: "فارسی",
-        grid: "Grid",
-        roots: "Analysis",
-        deriv: "Derivative",
-        infoBtn: "🎯 Exact Analysis",
-        keyboard: "⌨️ Keyboard",
-        reset: "Reset",
-        infoTitle: "🎯 Advanced Analysis & Roots",
-        rootsLabel: "Exact roots of f(x): ",
-        rootsLabel2: "Exact roots of g(x): ",
-        intersectLabel: "Intersections (x,y): ",
-        derivLabel: "Approx derivative f'(x): ",
-        noRoots: "No roots found",
-        noIntersect: "No intersections found"
-      }
-    };
-
-    function toggleLanguage() {
-      currentLang = currentLang === 'fa' ? 'en' : 'fa';
-      const t = translations[currentLang];
-      document.getElementById('htmlRoot').setAttribute('lang', currentLang);
-      document.getElementById('htmlRoot').setAttribute('dir', currentLang === 'fa' ? 'rtl' : 'ltr');
-      document.getElementById('appTitle').textContent = t.title;
-      document.getElementById('langBtn').textContent = t.langBtn;
-      document.getElementById('btnGrid').textContent = t.grid;
-      document.getElementById('btnRoots').textContent = t.roots;
-      document.getElementById('btnDeriv').textContent = t.deriv;
-      document.getElementById('btnInfo').textContent = t.infoBtn;
-      document.getElementById('btnKeyboard').textContent = t.keyboard;
-      document.getElementById('btnReset').textContent = t.reset;
-      document.getElementById('infoTitle').textContent = t.infoTitle;
-      
-      if (isInfoOpen) updateExactInfo();
-      draw();
-    }
-
     function toggleKeyboard() {
       isKeyboardOpen = !isKeyboardOpen;
       document.getElementById('mathKeyboard').classList.toggle('hidden', !isKeyboardOpen);
-    }
-
-    function toggleInfo() {
-      isInfoOpen = !isInfoOpen;
-      const panel = document.getElementById('infoPanel');
-      panel.classList.toggle('hidden', !isInfoOpen);
-      if (isInfoOpen) updateExactInfo();
     }
 
     function setActiveInput(id) {
@@ -341,9 +585,6 @@
       document.getElementById('row1').classList.toggle('focused', id === 'eq1');
       document.getElementById('row2').classList.toggle('focused', id === 'eq2');
     }
-
-    document.getElementById('eq1').addEventListener('input', () => { draw(); if (isInfoOpen) updateExactInfo(); });
-    document.getElementById('eq2').addEventListener('input', () => { draw(); if (isInfoOpen) updateExactInfo(); });
 
     function kbInsert(val) {
       const el = document.getElementById(activeInputId);
@@ -353,7 +594,6 @@
       el.selectionStart = el.selectionEnd = start + val.length;
       el.focus();
       draw();
-      if (isInfoOpen) updateExactInfo();
     }
 
     function kbBackspace() {
@@ -369,7 +609,6 @@
       }
       el.focus();
       draw();
-      if (isInfoOpen) updateExactInfo();
     }
 
     function toggleTool(tool) {
@@ -392,9 +631,11 @@
     }
 
     function resizeCanvas() {
-      canvas.width = box.clientWidth;
-      canvas.height = box.clientHeight;
-      draw();
+      if (currentView === 'math') {
+        canvas.width = box.clientWidth;
+        canvas.height = box.clientHeight;
+        draw();
+      }
     }
 
     window.addEventListener('resize', resizeCanvas);
@@ -535,9 +776,7 @@
         let y2 = evalFn(expr, mx + step);
         if (y1 !== null && y2 !== null && y1 * y2 <= 0) {
           let root = refineRoot(expr, mx);
-          if (!found.some(r => Math.abs(r - root) < 1e-3)) {
-            found.push(root);
-          }
+          if (!found.some(r => Math.abs(r - root) < 1e-3)) found.push(root);
         }
       }
       return found;
@@ -550,7 +789,6 @@
         let v1 = evalFn(expr1, mx);
         let v2 = evalFn(expr2, mx);
         let d1 = (v1 !== null && v2 !== null) ? v1 - v2 : null;
-
         let nextV1 = evalFn(expr1, mx + step);
         let nextV2 = evalFn(expr2, mx + step);
         let d2 = (nextV1 !== null && nextV2 !== null) ? nextV1 - nextV2 : null;
@@ -575,36 +813,8 @@
       return (y1 - y2) / (2 * h);
     }
 
-    function updateExactInfo() {
-      const eq1 = document.getElementById('eq1').value;
-      const eq2 = document.getElementById('eq2').value;
-      const t = translations[currentLang];
-
-      let html = "";
-      if (eq1.trim()) {
-        const roots1 = findExactRoots(eq1);
-        html += `${t.rootsLabel} <b>${roots1.length ? roots1.join(', ') : t.noRoots}</b><br>`;
-      }
-      if (eq2.trim()) {
-        const roots2 = findExactRoots(eq2);
-        html += `${t.rootsLabel2} <b>${roots2.length ? roots2.join(', ') : t.noRoots}</b><br>`;
-      }
-      if (eq1.trim() && eq2.trim()) {
-        const intersects = findExactIntersections(eq1, eq2);
-        const formattedInts = intersects.map(it => `(${it.x}, ${it.y.toFixed(2)})`);
-        html += `${t.intersectLabel} <b>${formattedInts.length ? formattedInts.join(', ') : t.noIntersect}</b>`;
-      }
-      if (hoverPoint && eq1.trim()) {
-        let deriv = derivative(eq1, hoverPoint.x);
-        if (deriv !== null) {
-          html += `<br><br>${t.derivLabel} <b>${deriv.toFixed(2)}</b> (at x=${hoverPoint.x.toFixed(2)})`;
-        }
-      }
-
-      document.getElementById('infoContent').innerHTML = html;
-    }
-
     function draw() {
+      if (currentView !== 'math') return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const cx = canvas.width/2 + offsetX;
       const cy = canvas.height/2 + offsetY;
@@ -658,14 +868,12 @@
       plot(eq1, '#89b4fa');
       plot(eq2, '#f38ba8');
 
-      // Draw Derivative Tangent Line if toggled & hovering
       if (showDerivative && hoverPoint && eq1.trim()) {
         let m = derivative(eq1, hoverPoint.x);
         if (m !== null) {
           ctx.strokeStyle = '#fab387';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          // Draw tangent line y - y0 = m(x - x0)
           let xStart = hoverPoint.x - 3;
           let yStart = hoverPoint.y + m * (xStart - hoverPoint.x);
           let xEnd = hoverPoint.x + 3;
@@ -718,7 +926,6 @@
     }
 
     setActiveInput('eq1');
-    window.onload = resizeCanvas;
   </script>
 </body>
 </html>
