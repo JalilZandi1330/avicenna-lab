@@ -112,7 +112,7 @@
       direction: ltr;
     }
 
-    /* Math Keyboard */
+    /* Math Keyboard with Parentheses */
     .math-keyboard {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -162,11 +162,11 @@
     }
     .analysis-content { font-family: monospace; font-size: 0.8rem; line-height: 1.5; }
     
-    /* Authentic Mathematical Sign Table (Direction LTR for math consistency) */
+    /* Authentic Mathematical Sign Table */
     .sign-table-wrapper {
       margin-top: 8px;
       overflow-x: auto;
-      direction: ltr; /* Keeps math tables left-to-right universally */
+      direction: ltr;
       text-align: left;
     }
     .sign-table {
@@ -234,37 +234,37 @@
       </div>
     </div>
 
-    <!-- Math Keyboard -->
+    <!-- Math Keyboard with Parentheses -->
     <div class="math-keyboard" id="mathKeyboard">
       <button class="kb-btn action" onclick="kbInsert('x')">x</button>
       <button class="kb-btn action" onclick="kbInsert('xx')">x²</button>
+      <button class="kb-btn action" onclick="kbInsert('(')">(</button>
+      <button class="kb-btn action" onclick="kbInsert(')')">)</button>
+      <button class="kb-btn" style="color:#f38ba8; background:rgba(243,139,168,0.15)" onclick="kbBackspace()">⌫</button>
+
+      <button class="kb-btn action" onclick="kbInsert('|')">| |</button>
+      <button class="kb-btn action" onclick="kbInsert('√(')">√</button>
       <button class="kb-btn num" onclick="kbInsert('7')">7</button>
       <button class="kb-btn num" onclick="kbInsert('8')">8</button>
       <button class="kb-btn num" onclick="kbInsert('9')">9</button>
 
-      <button class="kb-btn action" onclick="kbInsert('|')">| |</button>
-      <button class="kb-btn action" onclick="kbInsert('√(')">√</button>
+      <button class="kb-btn action" onclick="kbInsert('sin(')">sin</button>
+      <button class="kb-btn action" onclick="kbInsert('cos(')">cos</button>
       <button class="kb-btn num" onclick="kbInsert('4')">4</button>
       <button class="kb-btn num" onclick="kbInsert('5')">5</button>
       <button class="kb-btn num" onclick="kbInsert('6')">6</button>
 
-      <button class="kb-btn action" onclick="kbInsert('sin(')">sin</button>
-      <button class="kb-btn action" onclick="kbInsert('cos(')">cos</button>
+      <button class="kb-btn action" onclick="kbInsert('tan(')">tan</button>
+      <button class="kb-btn action" onclick="kbInsert('cot(')">cot</button>
       <button class="kb-btn num" onclick="kbInsert('1')">1</button>
       <button class="kb-btn num" onclick="kbInsert('2')">2</button>
       <button class="kb-btn num" onclick="kbInsert('3')">3</button>
 
-      <button class="kb-btn action" onclick="kbInsert('tan(')">tan</button>
-      <button class="kb-btn action" onclick="kbInsert('cot(')">cot</button>
+      <button class="kb-btn action" onclick="kbInsert('+')">+</button>
+      <button class="kb-btn action" onclick="kbInsert('-')">-</button>
       <button class="kb-btn num" onclick="kbInsert('0')">0</button>
       <button class="kb-btn num" onclick="kbInsert('.')">.</button>
-      <button class="kb-btn action" onclick="kbInsert('+')">+</button>
-
-      <button class="kb-btn action" onclick="kbInsert('-')">-</button>
       <button class="kb-btn action" onclick="kbInsert('*')">×</button>
-      <button class="kb-btn action" onclick="kbInsert('/')">/</button>
-      <button class="kb-btn action" onclick="kbInsert('^')">^</button>
-      <button class="kb-btn" style="color:#f38ba8; background:rgba(243,139,168,0.15)" onclick="kbBackspace()">⌫</button>
     </div>
   </div>
 
@@ -529,41 +529,38 @@
       } catch(e) { return null; }
     }
 
+    // Robust sign table sampling across entire domain
     function generateSignTableHTML(expr, titleText) {
       const rawRoots = [];
-      const undefPoints = []; // Undefined points (e.g. division by zero or tan/cot singularities)
+      const undefPoints = [];
       
-      for (let mx = -15; mx <= 15; mx += 0.02) {
+      for (let mx = -20; mx <= 20; mx += 0.02) {
         let y = evalFn(expr, mx);
         if (y === null) {
           undefPoints.push(Number(mx.toFixed(2)));
-        } else if (Math.abs(y) < 0.05) {
+        } else if (Math.abs(y) < 0.08) {
           rawRoots.push(Number(mx.toFixed(2)));
         }
       }
 
-      // Deduplicate roots
       const roots = [];
       rawRoots.forEach(r => {
-        if (!roots.some(existing => Math.abs(existing - r) < 0.15)) roots.push(r);
+        if (!roots.some(existing => Math.abs(existing - r) < 0.2)) roots.push(r);
       });
       roots.sort((a,b) => a - b);
 
-      // Deduplicate undefined points (singularities)
       const undefs = [];
       undefPoints.forEach(u => {
-        if (!undefs.some(existing => Math.abs(existing - u) < 0.2)) undefs.push(u);
+        if (!undefs.some(existing => Math.abs(existing - u) < 0.25)) undefs.push(u);
       });
       undefs.sort((a,b) => a - b);
 
-      // Combine critical points (roots + undefined) sorted
       let criticals = [...roots.map(r => ({val: r, type: 'root'})), ...undefs.map(u => ({val: u, type: 'undef'}))];
       criticals.sort((a,b) => a.val - b.val);
 
-      // Filter out overlapping critical points
       let filteredCriticals = [];
       criticals.forEach(c => {
-        if (!filteredCriticals.some(fc => Math.abs(fc.val - c.val) < 0.2)) {
+        if (!filteredCriticals.some(fc => Math.abs(fc.val - c.val) < 0.25)) {
           filteredCriticals.push(c);
         }
       });
@@ -571,22 +568,19 @@
       let html = `<b>${titleText}</b><br>`;
       html += `<div class="sign-table-wrapper"><table class="sign-table">`;
       
-      // Header row (x values)
       html += `<tr><th>x</th><td>-∞</td>`;
       filteredCriticals.forEach(c => {
         html += `<td>${c.val}</td>`;
       });
       html += `<td>+∞</td></tr>`;
 
-      // Function row (f(x) or g(x))
-      html += `<tr><th>expression</th>`; // universally LTR math header
+      html += `<tr><th>expression</th>`;
 
       if (filteredCriticals.length === 0) {
         let sampleY = evalFn(expr, 0);
         let sign = (sampleY !== null && sampleY >= 0) ? '<span class="sign-plus">+</span>' : '<span class="sign-minus">-</span>';
         html += `<td>${sign}</td>`;
       } else {
-        // Test intervals between critical points
         let intervals = [];
         intervals.push(filteredCriticals[0].val - 1);
         for (let i = 0; i < filteredCriticals.length - 1; i++) {
@@ -604,7 +598,7 @@
             if (fc.type === 'root') {
               html += `<td class="sign-zero">0</td>`;
             } else {
-              html += `<td class="sign-undef">||</td>`; // undefined / vertical asymptote
+              html += `<td class="sign-undef">||</td>`;
             }
           }
         }
@@ -621,21 +615,18 @@
 
       let fullHtml = "";
 
-      // Analyze f(x)
       if (eq1.trim()) {
         const res1 = generateSignTableHTML(eq1, t.signTableTitle1);
         fullHtml += `${t.rootsLabel} <b>${res1.roots.length ? res1.roots.join(', ') : t.noRoots}</b><br>`;
         fullHtml += res1.html;
       }
 
-      // Analyze g(x) if present
       if (eq2.trim()) {
         const res2 = generateSignTableHTML(eq2, t.signTableTitle2);
         fullHtml += `<br>${t.rootsLabel} <b>${res2.roots.length ? res2.roots.join(', ') : t.noRoots}</b><br>`;
         fullHtml += res2.html;
       }
 
-      // Intersections between f(x) and g(x)
       if (eq1.trim() && eq2.trim()) {
         const intersections = [];
         for (let mx = -15; mx <= 15; mx += 0.05) {
@@ -682,7 +673,7 @@
       ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
 
-      const eq1 = document.getElementById('eq1').value;
+      const eq1 = document.getElementById('eq1'.trim()).value;
       const eq2 = document.getElementById('eq2').value;
 
       function plot(expr, color) {
@@ -739,7 +730,7 @@
 
         ctx.fillStyle = '#fab387';
         ctx.font = 'bold 11px monospace';
-        ctx.fillText(`(${hoverPoint.x.toFixed(2)}, ${hoverPoint.y.toFixed(2)})`, px + 14, py - 10);
+        ctx.fillText(`(${hoverPoint.x.toFixed(2)}, ${hoverPoint.y.verted ? '' : hoverPoint.y.toFixed(2)})`, px + 14, py - 10);
       }
     }
 
