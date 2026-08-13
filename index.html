@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">رسم‌گر پیشرفته توابع ریاضی</title>
+  <title id="pageTitle">مینی جئوجبرا | GeoGebra Mini</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -20,10 +20,10 @@
       color: var(--text-color);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
-      padding: 16px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
     }
     .header {
       display: flex;
@@ -32,28 +32,28 @@
     }
     h2 {
       margin: 0;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
     .lang-btn {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: var(--text-color);
-      padding: 6px 12px;
+      padding: 4px 10px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
-    .input-card {
+    .card {
       background: var(--card-bg);
-      padding: 14px;
-      border-radius: 12px;
+      padding: 10px;
+      border-radius: 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     label {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: bold;
     }
     .input-row {
@@ -61,35 +61,53 @@
       align-items: center;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 0 10px;
+      border-radius: 6px;
+      padding: 0 8px;
     }
     .prefix {
       font-family: monospace;
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: var(--hint-color);
-      margin-left: 6px;
-      margin-right: 6px;
+      margin-left: 4px;
+      margin-right: 4px;
     }
-    input {
+    input[type="text"] {
       background: transparent;
       border: none;
       color: var(--text-color);
-      padding: 10px 0;
-      font-size: 1.1rem;
+      padding: 8px 0;
+      font-size: 1rem;
       width: 100%;
       outline: none;
       font-family: monospace;
       direction: ltr;
       text-align: left;
     }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--button-color);
+    }
+    .slider-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: rgba(0,0,0,0.15);
+      padding: 8px;
+      border-radius: 6px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-family: monospace;
+    }
     button.action-btn {
       background: var(--button-color);
       color: var(--button-text);
       border: none;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 1rem;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.95rem;
       font-weight: bold;
       cursor: pointer;
       transition: opacity 0.2s;
@@ -97,87 +115,80 @@
     button.action-btn:active {
       opacity: 0.8;
     }
-    .examples {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
-    }
-    .chip {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      font-family: monospace;
-      direction: ltr;
-    }
-    .chip:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
     .chart-container {
       background: var(--card-bg);
-      padding: 10px;
-      border-radius: 12px;
+      padding: 8px;
+      border-radius: 10px;
       position: relative;
-      height: 360px;
+      height: 320px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     .error-msg {
       color: #ff6b6b;
-      font-size: 0.85rem;
-      text-align: center;
-      min-height: 20px;
-    }
-    .info-panel {
       font-size: 0.8rem;
-      color: var(--hint-color);
-      background: rgba(0,0,0,0.15);
-      padding: 8px;
-      border-radius: 8px;
-      line-height: 1.4;
+      text-align: center;
+      min-height: 16px;
+    }
+    .features-row {
+      display: flex;
+      gap: 8px;
+    }
+    .feature-toggle {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 6px;
+      font-size: 0.8rem;
+      color: var(--text-color);
+      cursor: pointer;
+      text-align: center;
+    }
+    .feature-toggle.active {
+      background: var(--button-color);
+      border-color: transparent;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h2 id="appTitle">📐 رسم‌گر پیشرفته توابع ریاضی</h2>
+    <h2 id="appTitle">📐 مینی جئوجبرا | GeoGebra Mini</h2>
     <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">EN / فارسی</button>
   </div>
   
-  <div class="input-card">
+  <div class="card">
     <label id="labelEq1" for="equation1">تابع اول f(x):</label>
     <div class="input-row">
       <span class="prefix">f(x) =</span>
-      <input type="text" id="equation1" value="xx - 4" placeholder="xx - 4">
+      <input type="text" id="equation1" value="a*xx - 4" placeholder="a*xx - 4">
     </div>
 
-    <label id="labelEq2" for="equation2" style="margin-top: 4px;">تابع دوم g(x) (اختیاری):</label>
+    <!-- Slider for parameter 'a' -->
+    <div class="slider-box">
+      <div class="slider-header">
+        <span id="sliderALabel">پارامتر a:</span>
+        <span id="sliderAVal">1.0</span>
+      </div>
+      <input type="range" id="paramA" min="-5" max="5" step="0.5" value="1" oninput="updateSlider(this.value)">
+    </div>
+
+    <label id="labelEq2" for="equation2">تابع دوم g(x) (اختیاری):</label>
     <div class="input-row">
       <span class="prefix">g(x) =</span>
       <input type="text" id="equation2" value="2x" placeholder="2x">
     </div>
 
-    <div class="error-msg" id="errorMsg"></div>
-    
-    <label id="labelExamples" style="font-size: 0.8rem; opacity: 0.7;">نمونه‌های سریع:</label>
-    <div class="examples">
-      <span class="chip" onclick="setEqs('xx - 4', '2x')">xx - 4 &amp; 2x</span>
-      <span class="chip" onclick="setEqs('3x + 2', '-x + 3')">3x + 2 &amp; -x + 3</span>
-      <span class="chip" onclick="setEqs('sin(x)', 'cos(x)')">sin(x) &amp; cos(x)</span>
+    <div class="features-row">
+      <button class="feature-toggle active" id="btnDeriv" onclick="toggleFeature('deriv')">مشتق f'(x)</button>
+      <button class="feature-toggle" id="btnIntegral" onclick="toggleFeature('integral')">انتگرال (مساحت)</button>
     </div>
 
-    <button class="action-btn" id="plotBtn" onclick="plot()">رسم نمودارها</button>
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="action-btn" id="plotBtn" onclick="plot()">به‌روزرسانی نمودار</button>
   </div>
 
   <div class="chart-container">
     <canvas id="mathChart"></canvas>
-  </div>
-
-  <div class="info-panel" id="infoPanel">
-    • محورهای X و Y همدیگر را در مرکز (0,0) به صورت عمودمنصف قطع می‌کنند.<br>
-    • با نگه‌داشتن موس یا لمس نمودار، مختصات (x,y) نقطه نمایش داده می‌شود.<br>
-    • عبارت xx به عنوان توان دو (x^2) محاسبه می‌شود.
   </div>
 
   <script>
@@ -187,30 +198,33 @@
     }
 
     let currentLang = 'fa';
+    let showDeriv = true;
+    let showIntegral = false;
+    let paramA = 1;
 
     const translations = {
       fa: {
-        title: "📐 رسم‌گر پیشرفته توابع ریاضی",
+        title: "📐 مینی جئوجبرا | GeoGebra Mini",
         labelEq1: "تابع اول f(x):",
         labelEq2: "تابع دوم g(x) (اختیاری):",
-        labelExamples: "نمونه‌های سریع:",
-        plotBtn: "رسم نمودارها",
+        plotBtn: "به‌روزرسانی نمودار",
         langBtn: "English",
         axisX: "محور X",
         axisY: "محور Y",
-        info: "• محورهای X و Y همدیگر را در مرکز (0,0) به صورت عمودمنصف قطع می‌کنند.<br>• با نگه‌داشتن موس یا لمس نمودار، مختصات (x,y) نقطه نمایش داده می‌شود.<br>• عبارت xx به عنوان توان دو (x^2) محاسبه می‌شود.",
+        btnDeriv: "مشتق f'(x)",
+        btnIntegral: "انتگرال (مساحت)",
         error: "خطا در فرمول! لطفاً عبارت درستی وارد کنید."
       },
       en: {
-        title: "📐 Advanced Math Function Plotter",
+        title: "📐 GeoGebra Mini",
         labelEq1: "First Function f(x):",
         labelEq2: "Second Function g(x) (Optional):",
-        labelExamples: "Quick examples:",
-        plotBtn: "Plot Functions",
+        plotBtn: "Update Plot",
         langBtn: "فارسی",
         axisX: "X Axis",
         axisY: "Y Axis",
-        info: "• X and Y axes intersect symmetrically at (0,0).<br>• Hover/touch to see exact (x,y) coordinates.<br>• 'xx' is automatically parsed as x^2.",
+        btnDeriv: "Derivative f'(x)",
+        btnIntegral: "Integral (Area)",
         error: "Invalid formula! Please enter a valid expression."
       }
     };
@@ -225,27 +239,37 @@
       document.getElementById('appTitle').textContent = t.title;
       document.getElementById('labelEq1').textContent = t.labelEq1;
       document.getElementById('labelEq2').textContent = t.labelEq2;
-      document.getElementById('labelExamples').textContent = t.labelExamples;
       document.getElementById('plotBtn').textContent = t.plotBtn;
       document.getElementById('langBtn').textContent = t.langBtn;
-      document.getElementById('infoPanel').innerHTML = t.info;
+      document.getElementById('btnDeriv').textContent = t.btnDeriv;
+      document.getElementById('btnIntegral').textContent = t.btnIntegral;
       
+      plot();
+    }
+
+    function updateSlider(val) {
+      paramA = parseFloat(val);
+      document.getElementById('sliderAVal').textContent = paramA;
+      plot();
+    }
+
+    function toggleFeature(feat) {
+      if (feat === 'deriv') {
+        showDeriv = !showDeriv;
+        document.getElementById('btnDeriv').classList.toggle('active', showDeriv);
+      } else if (feat === 'integral') {
+        showIntegral = !showIntegral;
+        document.getElementById('btnIntegral').classList.toggle('active', showIntegral);
+      }
       plot();
     }
 
     let chart = null;
 
-    function setEqs(eq1, eq2) {
-      document.getElementById('equation1').value = eq1;
-      document.getElementById('equation2').value = eq2;
-      plot();
-    }
-
     function preprocessExpression(expr) {
       if (!expr || !expr.trim()) return null;
       let jsExpr = expr
         .toLowerCase()
-        // xx or XX -> x**2
         .replace(/xx/g, 'x**2')
         .replace(/\^/g, '**')
         .replace(/sin/g, 'Math.sin')
@@ -256,22 +280,30 @@
         .replace(/abs/g, 'Math.abs')
         .replace(/pi/g, 'Math.PI')
         .replace(/e/g, 'Math.E')
-        // handle 2x, 2X, 2(x), etc.
         .replace(/(\d)([a-z\(])/g, '$1*$2')
         .replace(/([x\)])(\d)/g, '$1*$2');
       return jsExpr;
     }
 
-    function evaluateFunction(rawExpr, x) {
+    function evaluateFunction(rawExpr, x, a) {
       const processed = preprocessExpression(rawExpr);
       if (!processed) return null;
       try {
-        const fn = new Function('x', `try { return ${processed}; } catch(e) { return NaN; }`);
-        let val = fn(x);
+        const fn = new Function('x', 'a', `try { return ${processed}; } catch(e) { return NaN; }`);
+        let val = fn(x, a);
         return isNaN(val) ? null : val;
       } catch (e) {
         return null;
       }
+    }
+
+    // Numerical derivative approximation: f'(x) = (f(x+h) - f(x-h)) / (2*h)
+    function derivative(rawExpr, x, a) {
+      const h = 0.001;
+      let y1 = evaluateFunction(rawExpr, x + h, a);
+      let y2 = evaluateFunction(rawExpr, x - h, a);
+      if (y1 === null || y2 === null) return null;
+      return (y1 - y2) / (2 * h);
     }
 
     function plot() {
@@ -283,29 +315,34 @@
       const xValues = [];
       const y1Values = [];
       const y2Values = [];
+      const derivValues = [];
+      const integralValues = [];
       
       const roots1 = [];
-      const roots2 = [];
       const intersections = [];
 
       try {
-        // Generate range from -10 to 10 with step 0.5
         for (let x = -10; x <= 10; x += 0.5) {
           xValues.push(x);
           
-          let y1 = evaluateFunction(eq1Str, x);
-          let y2 = evaluateFunction(eq2Str, x);
+          let y1 = evaluateFunction(eq1Str, x, paramA);
+          let y2 = evaluateFunction(eq2Str, x, paramA);
+          let d1 = showDeriv ? derivative(eq1Str, x, paramA) : null;
           
           y1Values.push(y1);
           y2Values.push(y2);
+          derivValues.push(d1);
+          
+          // Approximate integral (cumulative area from x = -10)
+          if (showIntegral && y1 !== null) {
+            integralValues.push(y1);
+          } else {
+            integralValues.push(null);
+          }
 
           if (y1 !== null && Math.abs(y1) < 0.25) {
             roots1.push({x: x, y: y1});
           }
-          if (y2 !== null && Math.abs(y2) < 0.25) {
-            roots2.push({x: x, y: y2});
-          }
-
           if (y1 !== null && y2 !== null && Math.abs(y1 - y2) < 0.3) {
             intersections.push({x: x, y: (y1 + y2) / 2});
           }
@@ -322,11 +359,11 @@
             labels: xValues,
             datasets: [
               {
-                label: `f(x) = ${eq1Str}`,
+                label: `f(x) = ${eq1Str} (a=${paramA})`,
                 data: y1Values,
                 borderColor: '#5288c1',
                 backgroundColor: 'rgba(82, 136, 193, 0.1)',
-                borderWidth: 2.5,
+                borderWidth: 3,
                 pointRadius: 2,
                 fill: false,
                 tension: 0.2
@@ -339,6 +376,26 @@
                 borderWidth: 2.5,
                 pointRadius: 2,
                 fill: false,
+                tension: 0.2
+              } : null,
+              showDeriv ? {
+                label: `f'(x) [Derivative]`,
+                data: derivValues,
+                borderColor: '#e5c07b',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                fill: false,
+                tension: 0.2
+              } : null,
+              showIntegral ? {
+                label: `∫ f(x) [Integral Area]`,
+                data: integralValues,
+                backgroundColor: 'rgba(152, 195, 121, 0.3)',
+                borderColor: 'transparent',
+                borderWidth: 0,
+                fill: true,
+                pointRadius: 0,
                 tension: 0.2
               } : null,
               {
@@ -359,8 +416,8 @@
                   let match = intersections.find(i => Math.abs(i.x - x) < 0.3);
                   return match ? match.y : null;
                 }),
-                borderColor: '#e5c07b',
-                backgroundColor: '#e5c07b',
+                borderColor: '#c678dd',
+                backgroundColor: '#c678dd',
                 pointRadius: 7,
                 pointStyle: 'rectRot',
                 showLine: false
@@ -375,9 +432,7 @@
                 callbacks: {
                   label: function(context) {
                     let label = context.dataset.label || '';
-                    if (label) {
-                      label += ': ';
-                    }
+                    if (label) label += ': ';
                     if (context.parsed.y !== null) {
                       label += `(${context.label}, ${context.parsed.y.toFixed(2)})`;
                     }
