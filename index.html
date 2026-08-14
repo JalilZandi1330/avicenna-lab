@@ -9,24 +9,30 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
   <style>
     :root {
-      --bg-color: var(--tg-theme-bg-color, #ffffff);
-      --text-color: var(--tg-theme-text-color, #000000);
-      --button-color: var(--tg-theme-button-color, #2481cc);
-      --button-text: var(--tg-theme-button-text-color, #ffffff);
-      --card-bg: var(--tg-theme-secondary-bg-color, #f1f1f2);
-      --hint-color: var(--tg-theme-hint-color, #707579);
-      --input-bg: var(--tg-theme-bg-color, #ffffff);
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --button-color: #2481cc;
+      --button-text: #ffffff;
+      --card-bg: #f1f1f2;
+      --hint-color: #707579;
+      --input-bg: #ffffff;
+      --canvas-bg: #fafafa;
+      --grid-color: rgba(0,0,0,0.1);
+      --axis-color: #333333;
+      --axis-label: #555555;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-color: var(--tg-theme-bg-color, #1e1e2e);
-        --text-color: var(--tg-theme-text-color, #cdd6f4);
-        --button-color: var(--tg-theme-button-color, #89b4fa);
-        --button-text: var(--tg-theme-button-text-color, #11111b);
-        --card-bg: var(--tg-theme-secondary-bg-color, #313244);
-        --hint-color: var(--tg-theme-hint-color, #6c7086);
-        --input-bg: var(--tg-theme-bg-color, #181825);
-      }
+    .dark {
+      --bg-color: #1e1e2e;
+      --text-color: #cdd6f4;
+      --button-color: #89b4fa;
+      --button-text: #11111b;
+      --card-bg: #313244;
+      --hint-color: #6c7086;
+      --input-bg: #181825;
+      --canvas-bg: #11111b;
+      --grid-color: rgba(88,91,112,0.15);
+      --axis-color: #a6adc8;
+      --axis-label: #6c7086;
     }
     html, body {
       background-color: var(--bg-color);
@@ -126,7 +132,7 @@
       width: 100%;
       height: 350px;
       position: relative;
-      background: var(--bg-color);
+      background: var(--canvas-bg);
       touch-action: none;
       border-bottom: 1px solid rgba(128,128,128,0.2);
     }
@@ -256,7 +262,7 @@
     }
     .chem-card h3 { margin: 0 0 4px 0; color: var(--button-color); font-size: 1rem; }
     .chem-output {
-      background: var(--input-bg);
+      background: var(--card-bg);
       color: var(--text-color);
       padding: 12px;
       border-radius: 6px;
@@ -453,6 +459,30 @@
     if (window.Telegram && window.Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
+
+    // Telegram Theme detection
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      if (tg.colorScheme === "light") {
+        document.documentElement.classList.remove("dark");
+      } else {
+        document.documentElement.classList.add("dark");
+      }
+      tg.onEvent("themeChanged", function() {
+        if (window.Telegram.WebApp.colorScheme === "light") {
+          document.documentElement.classList.remove("dark");
+        } else {
+          document.documentElement.classList.add("dark");
+        }
+        draw();
+      });
+    } else {
+      // Default to dark or check system
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.classList.add("dark");
+      }
+    }
+
     }
 
     let currentView = 'home';
