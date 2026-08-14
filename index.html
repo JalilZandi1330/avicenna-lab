@@ -621,6 +621,7 @@
           viewer3D.addModel(sdf, "sdf");
           viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.35 } });
           viewer3D.zoomTo();
+          viewer3D.resize();
           viewer3D.render();
         })
         .catch(err => {
@@ -651,6 +652,7 @@
         `, "sdf");
         viewer3D.setStyle({}, { sphere: { scale: 0.6 } });
         viewer3D.zoomTo();
+        viewer3D.resize();
         viewer3D.render();
         return;
       }
