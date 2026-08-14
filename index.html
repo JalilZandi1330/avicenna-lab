@@ -9,12 +9,24 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
   <style>
     :root {
-      --bg-color: var(--tg-theme-bg-color, #1e1e2e);
-      --text-color: var(--tg-theme-text-color, #cdd6f4);
-      --button-color: var(--tg-theme-button-color, #89b4fa);
-      --button-text: var(--tg-theme-button-text-color, #11111b);
-      --card-bg: var(--tg-theme-secondary-bg-color, #313244);
-      --hint-color: var(--tg-theme-hint-color, #6c7086);
+      --bg-color: var(--tg-theme-bg-color, #ffffff);
+      --text-color: var(--tg-theme-text-color, #000000);
+      --button-color: var(--tg-theme-button-color, #2481cc);
+      --button-text: var(--tg-theme-button-text-color, #ffffff);
+      --card-bg: var(--tg-theme-secondary-bg-color, #f1f1f2);
+      --hint-color: var(--tg-theme-hint-color, #707579);
+      --input-bg: var(--tg-theme-bg-color, #ffffff);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: var(--tg-theme-bg-color, #1e1e2e);
+        --text-color: var(--tg-theme-text-color, #cdd6f4);
+        --button-color: var(--tg-theme-button-color, #89b4fa);
+        --button-text: var(--tg-theme-button-text-color, #11111b);
+        --card-bg: var(--tg-theme-secondary-bg-color, #313244);
+        --hint-color: var(--tg-theme-hint-color, #6c7086);
+        --input-bg: var(--tg-theme-bg-color, #181825);
+      }
     }
     html, body {
       background-color: var(--bg-color);
@@ -35,11 +47,11 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 16px;
-      background: rgba(0,0,0,0.3);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      background: var(--card-bg);
+      border-bottom: 1px solid rgba(128,128,128,0.2);
       position: relative;
     }
-    h2 { margin: 0; font-size: 1rem; }
+    h2 { margin: 0; font-size: 1rem; color: var(--text-color); }
     .nav-container { display: flex; gap: 8px; align-items: center; }
     .menu-btn {
       background: var(--button-color);
@@ -56,10 +68,10 @@
       position: absolute;
       top: 50px;
       left: 12px;
-      background: #181825;
-      border: 1px solid rgba(255,255,255,0.2);
+      background: var(--card-bg);
+      border: 1px solid rgba(128,128,128,0.3);
       border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
       display: flex;
       flex-direction: column;
       width: 230px;
@@ -71,11 +83,12 @@
       padding: 12px 16px;
       font-size: 0.9rem;
       cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: var(--text-color);
+      border-bottom: 1px solid rgba(128,128,128,0.1);
       transition: background 0.2s;
       text-align: left;
     }
-    .menu-item:hover { background: rgba(137, 180, 250, 0.15); color: var(--button-color); }
+    .menu-item:hover { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
 
     .view { display: none; flex: 1; flex-direction: column; }
     .view.active { display: flex; }
@@ -91,7 +104,7 @@
       background: var(--card-bg);
       padding: 24px;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
     .hero-card h1 { margin-top: 0; color: var(--button-color); font-size: 1.3rem; }
     .hero-card p { font-size: 0.9rem; line-height: 1.6; color: var(--hint-color); }
@@ -101,7 +114,7 @@
       padding: 16px;
       border-radius: 10px;
       cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(128,128,128,0.1);
       transition: transform 0.2s;
       text-align: left;
     }
@@ -113,26 +126,27 @@
       width: 100%;
       height: 350px;
       position: relative;
-      background: #11111b;
+      background: var(--bg-color);
       touch-action: none;
+      border-bottom: 1px solid rgba(128,128,128,0.2);
     }
     canvas { width: 100%; height: 100%; display: block; }
     .coords-overlay {
       position: absolute;
       top: 10px;
       left: 10px;
-      background: rgba(17, 17, 27, 0.85);
+      background: var(--card-bg);
       padding: 6px 10px;
       border-radius: 6px;
       font-family: monospace;
       font-size: 0.8rem;
       pointer-events: none;
-      color: #a6e3a1;
-      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-color);
+      border: 1px solid rgba(128,128,128,0.2);
     }
     .bottom-panel {
       background: var(--card-bg);
-      border-top: 1px solid rgba(255,255,255,0.1);
+      border-top: 1px solid rgba(128,128,128,0.1);
       padding: 10px;
       display: flex;
       flex-direction: column;
@@ -140,8 +154,8 @@
     }
     .toolbar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
     .tool-btn {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--card-bg);
+      border: 1px solid rgba(128,128,128,0.3);
       border-radius: 6px;
       padding: 6px 10px;
       font-size: 0.75rem;
@@ -155,8 +169,8 @@
     .input-row {
       display: flex;
       align-items: center;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--input-bg);
+      border: 1px solid rgba(128,128,128,0.3);
       border-radius: 6px;
       padding: 0 8px;
     }
@@ -178,15 +192,15 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 4px;
-      background: #181825;
+      background: var(--card-bg);
       padding: 6px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(128,128,128,0.2);
     }
     .math-keyboard.hidden { display: none; }
     .kb-btn {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--input-bg);
+      border: 1px solid rgba(128,128,128,0.2);
       color: var(--text-color);
       border-radius: 4px;
       padding: 10px 0;
@@ -196,12 +210,12 @@
       text-align: center;
     }
     .kb-btn:active { background: var(--button-color); color: var(--button-text); }
-    .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
-    .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
+    .kb-btn.num { font-weight: bold; }
+    .kb-btn.action { color: var(--button-color); }
 
     .info-panel {
-      background: #181825;
-      border: 1px solid rgba(255,255,255,0.15);
+      background: var(--card-bg);
+      border: 1px solid rgba(128,128,128,0.3);
       border-radius: 8px;
       padding: 10px;
       display: flex;
@@ -210,6 +224,7 @@
       margin-top: 4px;
       font-family: monospace;
       font-size: 0.8rem;
+      color: var(--text-color);
     }
     .info-panel.hidden { display: none; }
     .info-header {
@@ -218,7 +233,7 @@
       align-items: center;
       font-weight: bold;
       font-size: 0.85rem;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(128,128,128,0.2);
       padding-bottom: 4px;
     }
     .close-modal { background: #f38ba8; color: #111; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
@@ -237,16 +252,17 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .chem-card h3 { margin: 0 0 4px 0; color: var(--button-color); font-size: 1rem; }
     .chem-output {
-      background: #11111b;
+      background: var(--input-bg);
+      color: var(--text-color);
       padding: 12px;
       border-radius: 6px;
       font-family: monospace;
       font-size: 0.85rem;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(128,128,128,0.2);
       min-height: 50px;
       direction: ltr;
       text-align: left;
@@ -264,16 +280,15 @@
     .viewer-3d {
       width: 100%;
       height: 280px;
-      background: #09090f;
+      background: #11111b;
       border-radius: 8px;
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.15);
+      border: 1px solid rgba(128,128,128,0.2);
     }
-    /* Loading Progress Bar */
     .loading-bar-container {
       width: 100%;
-      background: rgba(255,255,255,0.1);
+      background: rgba(128,128,128,0.2);
       border-radius: 4px;
       height: 6px;
       overflow: hidden;
@@ -290,7 +305,7 @@
 </head>
 <body>
   <div class="header">
-    <h2>📜 Avicenna Lab (آزمایشگاه ابن سینا)</h2>
+    <h2>📜 Avicenna Lab</h2>
     <div class="nav-container">
       <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
     </div>
