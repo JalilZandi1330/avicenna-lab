@@ -1068,17 +1068,8 @@
 
     setActiveInput('eq1');
 
-    // Simple Analytics Counter API
-    function trackAnalytics() {
-      try {
-        fetch("https://api.counterapi.dev/v2/avicenna_lab_bot/visits/up")
-          .then(res => res.json())
-          .then(data => {
-            console.log("Visits count:", data.count);
-          }).catch(e => {});
-      } catch(e) {}
-    }
-    trackAnalytics();
+
+    
 
   </script>
 </body>
