@@ -1078,7 +1078,14 @@
 
         ctx.fillStyle = '#fab387';
         ctx.font = 'bold 11px monospace';
-        ctx.fillText(`(${hoverPoint.x.toFixed(2)}, ${hoverPoint.y.toFixed(2)})`, px + 14, py - 10);
+        let hoverText = `(${hoverPoint.x.toFixed(2)}, ${hoverPoint.y.toFixed(2)})`;
+        if (showDerivative && eq1.trim()) {
+          let mVal = derivative(eq1, hoverPoint.x);
+          if (mVal !== null) {
+            hoverText += ` | m: ${mVal.toFixed(2)}`;
+          }
+        }
+        ctx.fillText(hoverText, px + 14, py - 10);
       }
     }
 
