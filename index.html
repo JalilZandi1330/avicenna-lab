@@ -538,9 +538,13 @@
     // --- 3D MOLECULE VIEWER (3Dmol.js) ---
     function init3DViewer() {
       let element = document.getElementById('container3D');
-      let config = { backgroundColor: '#09090f' };
+      let config = { backgroundColor: '#09090f', antialias: true };
       viewer3D = $3Dmol.createViewer(element, config);
       loadMolecule('H2O');
+      setTimeout(() => {
+        viewer3D.resize();
+        viewer3D.render();
+      }, 100);
     }
 
     const pubchemSMILES = {
