@@ -332,6 +332,7 @@
       <div class="menu-item" onclick="switchView('balancer')">🧪 Chemical Balancer</div>
       <div class="menu-item" onclick="switchView('compounds')">🔬 Compounds & 3D Viewer</div>
       <div class="menu-item" onclick="switchView('biology')">🧬 Biology & Genetics Lab</div>
+      <div class="menu-item" onclick="switchView('matrix')">🔢 Matrix & Vector Lab</div>
     </div>
   </div>
 
@@ -439,6 +440,59 @@
         </div>
         <button class="calc-btn" onclick="balanceEquation()">Balance</button>
         <div class="chem-output" id="chemOutput">Balanced coefficients will appear here...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 6: MATRIX & VECTOR LAB -->
+  <div class="view" id="viewMatrix">
+    <div class="chem-container">
+      <div class="chem-card">
+        <h3>🔢 Matrix Calculator (2x2 & 3x3)</h3>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">Determinant, Inverse, Addition & Multiplication for 2x2 or 3x3 matrices.</p>
+        
+        <div style="display:flex; gap:12px; margin-bottom:12px;">
+          <!-- Matrix A -->
+          <div style="flex:1;">
+            <div style="font-weight:bold; margin-bottom:4px; font-size:0.85rem;">Matrix A (3x3):</div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:4px;">
+              <input type="number" id="a00" value="1" style="text-align:center; padding:4px;">
+              <input type="number" id="a01" value="2" style="text-align:center; padding:4px;">
+              <input type="number" id="a02" value="3" style="text-align:center; padding:4px;">
+              <input type="number" id="a10" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="a11" value="1" style="text-align:center; padding:4px;">
+              <input type="number" id="a12" value="4" style="text-align:center; padding:4px;">
+              <input type="number" id="a20" value="5" style="text-align:center; padding:4px;">
+              <input type="number" id="a21" value="6" style="text-align:center; padding:4px;">
+              <input type="number" id="a22" value="0" style="text-align:center; padding:4px;">
+            </div>
+          </div>
+          
+          <!-- Matrix B -->
+          <div style="flex:1;">
+            <div style="font-weight:bold; margin-bottom:4px; font-size:0.85rem;">Matrix B (3x3):</div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:4px;">
+              <input type="number" id="b00" value="1" style="text-align:center; padding:4px;">
+              <input type="number" id="b01" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b02" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b10" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b11" value="1" style="text-align:center; padding:4px;">
+              <input type="number" id="b12" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b20" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b21" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b22" value="1" style="text-align:center; padding:4px;">
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+          <button class="calc-btn" onclick="calcMatrix('detA')">det(A)</button>
+          <button class="calc-btn" onclick="calcMatrix('invA')">A⁻¹ (Inverse)</button>
+          <button class="calc-btn" onclick="calcMatrix('add')">A + B</button>
+          <button class="calc-btn" onclick="calcMatrix('mult')">A × B</button>
+        </div>
+
+        <div class="chem-output" id="matrixOutput" style="white-space: pre-line;">Matrix calculation results will appear here...</div>
       </div>
     </div>
   </div>
@@ -551,6 +605,7 @@
       }
       if (viewName === 'balancer') document.getElementById('viewBalancer').classList.add('active');
       if (viewName === 'biology') document.getElementById('viewBiology').classList.add('active');
+      if (viewName === 'matrix') document.getElementById('viewMatrix').classList.add('active');
       if (viewName === 'compounds') {
         document.getElementById('viewCompounds').classList.add('active');
         if (!viewer3D) {
@@ -1210,6 +1265,96 @@
       }
 
       out.innerHTML = resText;
+    }
+
+    // --- MATRIX CALCULATOR ENGINE ---
+    function getMatrixValues(prefix) {
+      let m = [];
+      for (let r = 0; r < 3; r++) {
+        let row = [];
+        for (let c = 0; c < 3; c++) {
+          let val = parseFloat(document.getElementById(`${prefix}${r}${c}`).value) || 0;
+          row.push(val);
+        }
+        m.push(row);
+      }
+      return m;
+    }
+
+    function det3x3(m) {
+      return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+           - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+           + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    }
+
+    function formatMatrixHTML(m, title) {
+      let html = `<b>${title}:</b>
+┌                         ┐
+`;
+      for (let r = 0; r < 3; r++) {
+        let rowStr = m[r].map(v => (Math.round(v * 100) / 100).toString().padStart(6, ' ')).join(' ');
+        html += `│ ${rowStr} │
+`;
+      }
+      html += `└                         ┘`;
+      return html;
+    }
+
+    function calcMatrix(op) {
+      let out = document.getElementById('matrixOutput');
+      let A = getMatrixValues('a');
+      let B = getMatrixValues('b');
+
+      if (op === 'detA') {
+        let d = det3x3(A);
+        out.innerHTML = `📐 <b>Determinant of Matrix A:</b>
+` +
+                        `<code>det(A) = ${d}</code>
+` +
+                        (d === 0 ? `⚠️ Matrix A is singular (no inverse exists).` : `✅ Matrix A is non-singular.`);
+      } else if (op === 'add') {
+        let C = [
+          [A[0][0]+B[0][0], A[0][1]+B[0][1], A[0][2]+B[0][2]],
+          [A[1][0]+B[1][0], A[1][1]+B[1][1], A[1][2]+B[1][2]],
+          [A[2][0]+B[2][0], A[2][1]+B[2][1], A[2][2]+B[2][2]]
+        ];
+        out.innerHTML = formatMatrixHTML(C, '➕ Matrix Addition (A + B)');
+      } else if (op === 'mult') {
+        let C = [[0,0,0],[0,0,0],[0,0,0]];
+        for (let r = 0; r < 3; r++) {
+          for (let c = 0; c < 3; c++) {
+            for (let k = 0; k < 3; k++) {
+              C[r][c] += A[r][k] * B[k][c];
+            }
+          }
+        }
+        out.innerHTML = formatMatrixHTML(C, '✖️ Matrix Multiplication (A × B)');
+      } else if (op === 'invA') {
+        let d = det3x3(A);
+        if (d === 0) {
+          out.innerHTML = `⚠️ <b>Inverse does not exist!</b> (det(A) = 0)`;
+          return;
+        }
+        // Adjugate matrix / det
+        let inv = [
+          [
+             (A[1][1]*A[2][2] - A[1][2]*A[2][1]) / d,
+            -(A[0][1]*A[2][2] - A[0][2]*A[2][1]) / d,
+             (A[0][1]*A[1][2] - A[0][2]*A[1][1]) / d
+          ],
+          [
+            -(A[1][0]*A[2][2] - A[1][2]*A[2][0]) / d,
+             (A[0][0]*A[2][2] - A[0][2]*A[2][0]) / d,
+            -(A[0][0]*A[1][2] - A[0][2]*A[1][0]) / d
+          ],
+          [
+             (A[1][0]*A[2][1] - A[1][1]*A[2][0]) / d,
+            -(A[0][0]*A[2][1] - A[0][1]*A[2][0]) / d,
+             (A[0][0]*A[1][1] - A[0][1]*A[1][0]) / d
+          ]
+        ];
+        out.innerHTML = formatMatrixHTML(inv, '🔄 Inverse Matrix (A⁻¹)');
+      }
     }
 
     setActiveInput('eq1');
