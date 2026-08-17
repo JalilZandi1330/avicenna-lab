@@ -331,6 +331,7 @@
       <div class="menu-item" onclick="switchView('math')">📈 Math Plotter (GeoGebra)</div>
       <div class="menu-item" onclick="switchView('balancer')">🧪 Chemical Balancer</div>
       <div class="menu-item" onclick="switchView('compounds')">🔬 Compounds & 3D Viewer</div>
+      <div class="menu-item" onclick="switchView('biology')">🧬 Biology & Genetics Lab</div>
     </div>
   </div>
 
@@ -442,6 +443,33 @@
     </div>
   </div>
 
+  <!-- VIEW 5: BIOLOGY & GENETICS LAB -->
+  <div class="view" id="viewBiology">
+    <div class="chem-container">
+      <div class="chem-card">
+        <h3>🧬 DNA to mRNA & Protein Transcriber</h3>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">Enter a DNA strand (e.g., TACGGC) to get mRNA, Codons, and Amino Acids.</p>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input type="text" id="dnaInput" value="TACGGC" placeholder="TACGGCAT..." style="direction:ltr; text-align:left; flex:1;">
+          <button class="calc-btn" onclick="transcribeDNA()">Transcribe</button>
+        </div>
+        <div class="chem-output" id="dnaOutput" style="white-space: pre-line;">Transcription results will appear here...</div>
+      </div>
+
+      <div class="chem-card">
+        <h3>🧬 Mendelian Genetics (Monohybrid Cross)</h3>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">Enter parent genotypes (e.g., Aa x Aa or BB x bb).</p>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input type="text" id="parent1" value="Aa" placeholder="Parent 1 (e.g. Aa)" style="direction:ltr; text-align:center; width:100px;">
+          <span style="align-self:center; font-weight:bold;">×</span>
+          <input type="text" id="parent2" value="Aa" placeholder="Parent 2 (e.g. Aa)" style="direction:ltr; text-align:center; width:100px;">
+          <button class="calc-btn" onclick="calcGenetics()" style="flex:1;">Calculate Cross</button>
+        </div>
+        <div class="chem-output" id="geneticsOutput" style="white-space: pre-line;">Genotypic and phenotypic ratios will appear here...</div>
+      </div>
+    </div>
+  </div>
+
   <!-- VIEW 4: COMPOUNDS & 3D VIEWER -->
   <div class="view" id="viewCompounds">
     <div class="chem-container">
@@ -522,6 +550,7 @@
         setTimeout(() => resizeCanvas(), 100);
       }
       if (viewName === 'balancer') document.getElementById('viewBalancer').classList.add('active');
+      if (viewName === 'biology') document.getElementById('viewBiology').classList.add('active');
       if (viewName === 'compounds') {
         document.getElementById('viewCompounds').classList.add('active');
         if (!viewer3D) {
@@ -1087,6 +1116,100 @@
         }
         ctx.fillText(hoverText, px + 14, py - 10);
       }
+    }
+
+    // --- BIOLOGY & GENETICS ENGINE ---
+    const aminoAcidTable = {
+      "UUU": "Phe", "UUC": "Phe", "UUA": "Leu", "UUG": "Leu",
+      "UCU": "Ser", "UCC": "Ser", "UCA": "Ser", "UCG": "Ser",
+      "UAU": "Tyr", "UAC": "Tyr", "UAA": "Stop", "UAG": "Stop",
+      "UGU": "Cys", "UGC": "Cys", "UGA": "Stop", "UGG": "Trp",
+      "CUU": "Leu", "CUC": "Leu", "CUA": "Leu", "CUG": "Leu",
+      "CCU": "Pro", "CCC": "Pro", "CCA": "Pro", "CCG": "Pro",
+      "CAU": "His", "CAC": "His", "CAA": "Gln", "CAG": "Gln",
+      "CGU": "Arg", "CGC": "Arg", "CGA": "Arg", "CGG": "Arg",
+      "AUU": "Ile", "AUC": "Ile", "AUA": "Ile", "AUG": "Met (Start)",
+      "ACU": "Thr", "ACC": "Thr", "ACA": "Thr", "ACG": "Thr",
+      "AAU": "Asn", "AAC": "Asn", "AAA": "Lys", "AAG": "Lys",
+      "AGU": "Ser", "AGC": "Ser", "AGA": "Arg", "AGG": "Arg",
+      "GUU": "Val", "GUC": "Val", "GUA": "Val", "GUG": "Val",
+      "GCU": "Ala", "GCC": "Ala", "GCA": "Ala", "GCG": "Ala",
+      "GAU": "Asp", "GAC": "Asp", "GAA": "Glu", "GAG": "Glu",
+      "GGU": "Gly", "GGC": "Gly", "GGA": "Gly", "GGG": "Gly"
+    };
+
+    function transcribeDNA() {
+      let dna = document.getElementById('dnaInput').value.toUpperCase().replace(/[^ATCG]/g, '');
+      let out = document.getElementById('dnaOutput');
+      if (!dna) {
+        out.textContent = "Please enter a valid DNA sequence containing A, T, C, G.";
+        return;
+      }
+
+      // Transcribe DNA to mRNA (A->U, T->A, C->G, G->C)
+      let mrna = "";
+      for (let char of dna) {
+        if (char === 'A') mrna += 'U';
+        else if (char === 'T') mrna += 'A';
+        else if (char === 'G') mrna += 'C';
+        else if (char === 'C') mrna += 'G';
+      }
+
+      // Break into codons
+      let codons = [];
+      for (let i = 0; i < mrna.length; i += 3) {
+        let codon = mrna.substr(i, 3);
+        if (codon.length === 3) codons.push(codon);
+      }
+
+      let aminoAcids = codons.map(c => aminoAcidTable[c] || "Unknown");
+
+      out.innerHTML = `🧬 **DNA Input:** <code>${dna}</code>
+` +
+                      `📜 **mRNA Strand:** <code>${mrna}</code>
+` +
+                      `🔖 **Codons:** ${codons.join(' - ')}
+` +
+                      `🧪 **Amino Acids:** <b>${aminoAcids.join(' ➔ ')}</b>`;
+    }
+
+    function calcGenetics() {
+      let p1 = document.getElementById('parent1').value.trim();
+      let p2 = document.getElementById('parent2').value.trim();
+      let out = document.getElementById('geneticsOutput');
+
+      if (p1.length !== 1 && p1.length !== 2 || p2.length !== 1 && p2.length !== 2) {
+        out.textContent = "Please enter valid allele pairs like 'Aa' or 'BB'.";
+        return;
+      }
+
+      // Simple monohybrid cross for 1 gene (e.g., Aa x Aa)
+      let alleles1 = [p1[0], p1[p1.length - 1]];
+      let alleles2 = [p2[0], p2[p2.length - 1]];
+
+      let offspring = [];
+      for (let a1 of alleles1) {
+        for (let a2 of alleles2) {
+          // Sort alphabetically (e.g. aA -> Aa)
+          let comb = [a1, a2].sort((x, y) => x.localeCompare(y)).join('');
+          offspring.push(comb);
+        }
+      }
+
+      let counts = {};
+      offspring.forEach(o => counts[o] = (counts[o] || 0) + 1);
+
+      let resText = `🌱 **Parents:** ${p1} × ${p2}
+
+📊 **Offspring Genotypic Ratios (Out of 4):**
+`;
+      for (let [genotype, count] of Object.entries(counts)) {
+        let pct = (count / 4) * 100;
+        resText += `• <b>${genotype}</b>: ${count}/4 (${pct}%)
+`;
+      }
+
+      out.innerHTML = resText;
     }
 
     setActiveInput('eq1');
