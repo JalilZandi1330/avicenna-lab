@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title id="pageTitle">Avicenna Lab | Pro Math & Chemistry</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- 3D Molecule Viewer via 3Dmol.js -->
@@ -96,7 +96,7 @@
     }
     .menu-item:hover { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
 
-    .view { display: none; flex: 1; flex-direction: column; }
+    .view { display: none; flex: 1; flex-direction: column; min-height: 0; }
     .view.active { display: flex; }
 
     .home-container {
@@ -130,7 +130,9 @@
 
     .canvas-container {
       width: 100%;
-      height: 350px;
+      flex: 1 1 auto;
+      min-height: 220px;
+      max-height: 55vh;
       position: relative;
       background: var(--canvas-bg);
       touch-action: none;
@@ -154,20 +156,26 @@
       background: var(--card-bg);
       border-top: 1px solid rgba(128,128,128,0.1);
       padding: 10px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
       display: flex;
       flex-direction: column;
       gap: 8px;
+      flex-shrink: 0;
+      max-height: 45vh;
+      overflow-y: auto;
     }
-    .toolbar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+    .toolbar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .toolbar::-webkit-scrollbar { display: none; }
     .tool-btn {
       background: var(--card-bg);
       border: 1px solid rgba(128,128,128,0.3);
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 8px 12px;
       font-size: 0.75rem;
       color: var(--text-color);
       cursor: pointer;
       white-space: nowrap;
+      touch-action: manipulation;
     }
     .tool-btn.active { background: var(--button-color); color: var(--button-text); border-color: transparent; }
     
@@ -209,11 +217,13 @@
       border: 1px solid rgba(128,128,128,0.2);
       color: var(--text-color);
       border-radius: 4px;
-      padding: 10px 0;
+      padding: 12px 0;
       font-size: 0.9rem;
       cursor: pointer;
       font-family: monospace;
       text-align: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .kb-btn:active { background: var(--button-color); color: var(--button-text); }
     .kb-btn.num { font-weight: bold; }
@@ -874,6 +884,15 @@
 
     window.addEventListener('resize', resizeCanvas);
 
+    // Telegram viewport changes (keyboard open/close, collapse/expand) — keeps canvas
+    // and bottom panel correctly sized instead of leaving stale dimensions.
+    if (window.Telegram && window.Telegram.WebApp) {
+      Telegram.WebApp.onEvent('viewportChanged', () => {
+        setTimeout(resizeCanvas, 50);
+        setTimeout(resizeCanvas, 350);
+      });
+    }
+
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       const px = e.clientX - rect.left;
@@ -943,19 +962,29 @@
 
     function preprocess(expr) {
       if (!expr || !expr.trim()) return null;
-      return expr.toLowerCase()
+      let e = expr.toLowerCase()
         .replace(/xx/g, 'x**2')
         .replace(/\^/g, '**')
         .replace(/√\(([^)]+)\)/g, 'Math.sqrt($1)')
         .replace(/√(\w+)/g, 'Math.sqrt($1)')
-        .replace(/\|([^|]+)\|/g, 'Math.abs($1)')
-        .replace(/cot\(([^)]+)\)/g, '(1 / Math.tan($1))')
-        .replace(/cot(\w+)/g, '(1 / Math.tan($1))')
-        .replace(/sin/g, 'Math.sin')
-        .replace(/cos/g, 'Math.cos')
-        .replace(/tan/g, 'Math.tan')
-        .replace(/(\d)([a-z\(|])/g, '$1*$2')
-        .replace(/([x\)])(\d)/g, '$1*$2');
+        .replace(/\|([^|]+)\|/g, 'Math.abs($1)');
+      // cot via placeholder so the later tan substitution can't corrupt it
+      e = e.replace(/cot\(([^)]+)\)/g, '@@COT@@($1)').replace(/cot(\w+)/g, '@@COT@@($1)');
+      e = e.replace(/sin/g, 'Math.sin').replace(/cos/g, 'Math.cos').replace(/tan/g, 'Math.tan');
+      e = e.replace(/@@COT@@\(([^)]+)\)/g, '@@COT@@($1)');
+      // shield injected JS tokens from the implicit-multiplication rules below
+      e = e.replace(/Math\./g, '@@M@@');
+      // cot: '@@COT@@(expr)' -> '(1/@@M@@tan(expr))'  (balanced)
+      e = e.replace(/@@COT@@\(([^()]*)\)/g, '(1/@@M@@tan($1))');
+      // fix JS illegal unary minus before ** : -x**2 -> -(x**2)  [matches math convention]
+      e = e.replace(/-([a-z0-9.]+|\([^()]*\))\*\*([0-9.]+)/g, '-($1**$2)');
+      // implicit multiplication: 2x, 2sin(...), x(x+1), (x+1)(x-1), )x, )2
+      e = e.replace(/(\d)(?=[a-z@\(])/g, '$1*')
+           .replace(/x(?=\()/g, 'x*')
+           .replace(/\)(?=\(|@)/g, ')*')
+           .replace(/\)(?=[\dx])/g, ')*');
+      // unshield
+      return e.replace(/@@M@@/g, 'Math.');
     }
 
     function evalFn(expr, x) {
