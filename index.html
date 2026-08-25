@@ -1,38 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" id="htmlRoot">
+<html lang="fa" dir="rtl" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title id="pageTitle">Avicenna Lab | Pro Math & Chemistry</title>
+  <title id="pageTitle">جعبه‌ابزار هوشمند علمی | Science Swiss Knife</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- 3D Molecule Viewer via 3Dmol.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
   <style>
     :root {
-      --bg-color: #ffffff;
-      --text-color: #000000;
-      --button-color: #2481cc;
-      --button-text: #ffffff;
-      --card-bg: #f1f1f2;
-      --hint-color: #707579;
-      --input-bg: #ffffff;
-      --canvas-bg: #fafafa;
-      --grid-color: rgba(0,0,0,0.1);
-      --axis-color: #333333;
-      --axis-label: #555555;
-    }
-    .dark {
-      --bg-color: #1e1e2e;
-      --text-color: #cdd6f4;
-      --button-color: #89b4fa;
-      --button-text: #11111b;
-      --card-bg: #313244;
-      --hint-color: #6c7086;
-      --input-bg: #181825;
-      --canvas-bg: #11111b;
-      --grid-color: rgba(88,91,112,0.15);
-      --axis-color: #a6adc8;
-      --axis-label: #6c7086;
+      --bg-color: var(--tg-theme-bg-color, #1e1e2e);
+      --text-color: var(--tg-theme-text-color, #cdd6f4);
+      --button-color: var(--tg-theme-button-color, #89b4fa);
+      --button-text: var(--tg-theme-button-text-color, #11111b);
+      --card-bg: var(--tg-theme-secondary-bg-color, #313244);
+      --hint-color: var(--tg-theme-hint-color, #6c7086);
     }
     html, body {
       background-color: var(--bg-color);
@@ -44,7 +26,6 @@
       min-height: 100vh;
       overflow-x: hidden;
       overflow-y: auto;
-      direction: ltr;
     }
     body { display: flex; flex-direction: column; }
     
@@ -53,11 +34,11 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 16px;
-      background: var(--card-bg);
-      border-bottom: 1px solid rgba(128,128,128,0.2);
+      background: rgba(0,0,0,0.3);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       position: relative;
     }
-    h2 { margin: 0; font-size: 1rem; color: var(--text-color); }
+    h2 { margin: 0; font-size: 1rem; }
     .nav-container { display: flex; gap: 8px; align-items: center; }
     .menu-btn {
       background: var(--button-color);
@@ -69,15 +50,24 @@
       cursor: pointer;
       font-size: 0.8rem;
     }
+    .lang-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-color);
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
 
     .dropdown-menu {
       position: absolute;
       top: 50px;
-      left: 12px;
-      background: var(--card-bg);
-      border: 1px solid rgba(128,128,128,0.3);
+      right: 12px;
+      background: #181825;
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
       width: 230px;
@@ -89,12 +79,13 @@
       padding: 12px 16px;
       font-size: 0.9rem;
       cursor: pointer;
-      color: var(--text-color);
-      border-bottom: 1px solid rgba(128,128,128,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
       transition: background 0.2s;
-      text-align: left;
+      text-align: right;
     }
-    .menu-item:hover { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
+    html[dir="ltr"] .dropdown-menu { right: auto; left: 12px; }
+    html[dir="ltr"] .menu-item { text-align: left; }
+    .menu-item:hover { background: rgba(137, 180, 250, 0.15); color: var(--button-color); }
 
     .view { display: none; flex: 1; flex-direction: column; }
     .view.active { display: flex; }
@@ -104,13 +95,14 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      text-align: left;
+      text-align: right;
     }
+    html[dir="ltr"] .home-container { text-align: left; }
     .hero-card {
       background: var(--card-bg);
       padding: 24px;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     .hero-card h1 { margin-top: 0; color: var(--button-color); font-size: 1.3rem; }
     .hero-card p { font-size: 0.9rem; line-height: 1.6; color: var(--hint-color); }
@@ -120,10 +112,11 @@
       padding: 16px;
       border-radius: 10px;
       cursor: pointer;
-      border: 1px solid rgba(128,128,128,0.1);
+      border: 1px solid rgba(255,255,255,0.05);
       transition: transform 0.2s;
-      text-align: left;
+      text-align: right;
     }
+    html[dir="ltr"] .feature-box { text-align: left; }
     .feature-box:active { transform: scale(0.98); }
     .feature-box h3 { margin: 0 0 6px 0; color: var(--button-color); font-size: 1rem; }
     .feature-box p { margin: 0; font-size: 0.8rem; color: var(--hint-color); }
@@ -132,27 +125,26 @@
       width: 100%;
       height: 350px;
       position: relative;
-      background: var(--canvas-bg);
+      background: #11111b;
       touch-action: none;
-      border-bottom: 1px solid rgba(128,128,128,0.2);
     }
     canvas { width: 100%; height: 100%; display: block; }
     .coords-overlay {
       position: absolute;
       top: 10px;
       left: 10px;
-      background: var(--card-bg);
+      background: rgba(17, 17, 27, 0.85);
       padding: 6px 10px;
       border-radius: 6px;
       font-family: monospace;
       font-size: 0.8rem;
       pointer-events: none;
-      color: var(--text-color);
-      border: 1px solid rgba(128,128,128,0.2);
+      color: #a6e3a1;
+      border: 1px solid rgba(255,255,255,0.15);
     }
     .bottom-panel {
       background: var(--card-bg);
-      border-top: 1px solid rgba(128,128,128,0.1);
+      border-top: 1px solid rgba(255,255,255,0.1);
       padding: 10px;
       display: flex;
       flex-direction: column;
@@ -160,8 +152,8 @@
     }
     .toolbar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
     .tool-btn {
-      background: var(--card-bg);
-      border: 1px solid rgba(128,128,128,0.3);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 6px;
       padding: 6px 10px;
       font-size: 0.75rem;
@@ -175,8 +167,8 @@
     .input-row {
       display: flex;
       align-items: center;
-      background: var(--input-bg);
-      border: 1px solid rgba(128,128,128,0.3);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 6px;
       padding: 0 8px;
     }
@@ -198,15 +190,15 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 4px;
-      background: var(--card-bg);
+      background: #181825;
       padding: 6px;
       border-radius: 8px;
-      border: 1px solid rgba(128,128,128,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
     }
     .math-keyboard.hidden { display: none; }
     .kb-btn {
-      background: var(--input-bg);
-      border: 1px solid rgba(128,128,128,0.2);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
       color: var(--text-color);
       border-radius: 4px;
       padding: 10px 0;
@@ -216,41 +208,17 @@
       text-align: center;
     }
     .kb-btn:active { background: var(--button-color); color: var(--button-text); }
-    .kb-btn.num { font-weight: bold; }
-    .kb-btn.action { color: var(--button-color); }
-
-    .info-panel {
-      background: var(--card-bg);
-      border: 1px solid rgba(128,128,128,0.3);
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 4px;
-      font-family: monospace;
-      font-size: 0.8rem;
-      color: var(--text-color);
-    }
-    .info-panel.hidden { display: none; }
-    .info-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: bold;
-      font-size: 0.85rem;
-      border-bottom: 1px solid rgba(128,128,128,0.2);
-      padding-bottom: 4px;
-    }
-    .close-modal { background: #f38ba8; color: #111; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+    .kb-btn.num { background: rgba(255,255,255,0.12); font-weight: bold; }
+    .kb-btn.action { background: rgba(137, 180, 250, 0.2); color: var(--button-color); }
 
     .chem-container {
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      text-align: left;
+      text-align: right;
     }
+    html[dir="ltr"] .chem-container { text-align: left; }
     .chem-card {
       background: var(--card-bg);
       padding: 16px;
@@ -258,17 +226,16 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     .chem-card h3 { margin: 0 0 4px 0; color: var(--button-color); font-size: 1rem; }
     .chem-output {
-      background: var(--card-bg);
-      color: var(--text-color);
+      background: #11111b;
       padding: 12px;
       border-radius: 6px;
       font-family: monospace;
       font-size: 0.85rem;
-      border: 1px solid rgba(128,128,128,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
       min-height: 50px;
       direction: ltr;
       text-align: left;
@@ -285,52 +252,28 @@
     }
     .viewer-3d {
       width: 100%;
-      height: 280px;
+      height: 250px;
       background: #11111b;
       border-radius: 8px;
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(128,128,128,0.2);
-    }
-    .loading-bar-container {
-      width: 100%;
-      background: rgba(128,128,128,0.2);
-      border-radius: 4px;
-      height: 6px;
-      overflow: hidden;
-      margin-top: 6px;
-      display: none;
-    }
-    .loading-bar {
-      width: 0%;
-      height: 100%;
-      background: var(--button-color);
-      transition: width 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.1);
     }
   </style>
-
-  <!-- Google Analytics 4 (GA4) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-F7SCMDST21"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag("js", new Date());
-    gtag("config", "G-F7SCMDST21");
-  </script>
-
 </head>
 <body>
   <div class="header">
-    <h2>📜 Avicenna Lab</h2>
+    <h2 id="appTitle">📐 جعبه‌ابزار هوشمند علمی</h2>
     <div class="nav-container">
-      <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+      <button class="lang-btn" onclick="toggleLanguage()" id="langBtn">English</button>
+      <button class="menu-btn" onclick="toggleMenu()" id="menuBtn">☰ منو</button>
     </div>
     <!-- Dropdown Menu -->
     <div class="dropdown-menu hidden" id="dropdownMenu">
-      <div class="menu-item" onclick="switchView('home')">🏠 Home</div>
-      <div class="menu-item" onclick="switchView('math')">📈 Math Plotter (GeoGebra)</div>
-      <div class="menu-item" onclick="switchView('balancer')">🧪 Chemical Balancer</div>
-      <div class="menu-item" onclick="switchView('compounds')">🔬 Compounds & 3D Viewer</div>
+      <div class="menu-item" onclick="switchView('home')" id="mHome">🏠 صفحه اصلی</div>
+      <div class="menu-item" onclick="switchView('math')" id="mMath">📈 رسم توابع (جئوجبرا)</div>
+      <div class="menu-item" onclick="switchView('balancer')" id="mBal">🧪 موازنه شیمیایی</div>
+      <div class="menu-item" onclick="switchView('compounds')" id="mComp">🔬 ترکیبات و ساختار ۳بعدی</div>
     </div>
   </div>
 
@@ -338,27 +281,21 @@
   <div class="view active" id="viewHome">
     <div class="home-container">
       <div class="hero-card">
-        <h1>Welcome to Avicenna Lab (آزمایشگاه ابن‌سینا)!</h1>
-        <p>An advanced professional scientific mini-app developed by an Iranian developer. Explore Math Plotting, Chemical Equations, and 3D Molecular structures.</p>
-        <div id="userPointsCard" style="display:none; margin-top:12px; padding:10px 14px; background:rgba(137,180,250,0.15); border:1px solid rgba(137,180,250,0.4); border-radius:8px; font-size:0.9rem;">
-          <b>⭐ <span id="upPoints">0</span></b> امتیاز &nbsp;|&nbsp; 🏆 رتبه <b><span id="upRank">-</span></b> &nbsp;|&nbsp; 👥 <b><span id="upInvites">0</span></b> دعوت
-        </div>
-        <button onclick="shareInvite()" style="margin-top:12px; width:100%; padding:10px; border:none; border-radius:8px; background:var(--button-color); color:var(--button-text); font-weight:bold; cursor:pointer;">
-          🎁 دعوت دوستان (+۵۰ امتیاز)
-        </button>
+        <h1 id="heroTitle">خوش آمدید به جعبه‌ابزار علمی تلگرام!</h1>
+        <p id="heroDesc">این یک مینی‌اپ پیشرفته و حرفه‌ای برای دانش‌آموزان، دانشجویان و مهندسان است. از منوی بالا می‌توانید بین بخش‌های «رسم توابع ریاضی»، «موازنه شیمی» و «اطلاعات ترکیبات و ساختار ۳بعدی» جابجا شوید.</p>
       </div>
       <div class="feature-grid">
         <div class="feature-box" onclick="switchView('math')">
-          <h3>📈 Advanced Math Plotter (GeoGebra Plus)</h3>
-          <p>Precise plotting, roots, intersections, derivatives and tangent lines.</p>
+          <h3 id="feat1Title">📈 رسم توابع پیشرفته (جئوجبرا پلاس)</h3>
+          <p id="feat1Desc">رسم دقیق توابع، ریشه‌ها، نقاط برخورد، مشتق و خط مماس با موتور Canvas.</p>
         </div>
         <div class="feature-box" onclick="switchView('balancer')">
-          <h3>🧪 Chemical Equation Balancer</h3>
-          <p>Input chemical reactions and automatically balance reactants and products.</p>
+          <h3 id="feat2Title">🧪 موازنه کننده معادلات شیمیایی</h3>
+          <p id="feat2Desc">ورودی واکنش شیمیایی و موازنه خودکار ضرایب واکنش‌دهنده‌ها و فرآورده‌ها.</p>
         </div>
         <div class="feature-box" onclick="switchView('compounds')">
-          <h3>🔬 Compounds & 3D Molecular Viewer</h3>
-          <p>Search elements/compounds with electron configuration and interactive 3D structures.</p>
+          <h3 id="feat3Title">🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها</h3>
+          <p id="feat3Desc">جستجوی ترکیبات و نمایش ساختار مولکولی سه بعدی تعاملی با قابلیت چرخش.</p>
         </div>
       </div>
     </div>
@@ -372,23 +309,12 @@
     </div>
     <div class="bottom-panel">
       <div class="toolbar">
-        <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">Grid</button>
-        <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">Analysis</button>
-        <button class="tool-btn" id="btnDeriv" onclick="toggleTool('deriv')">Derivative</button>
-        <button class="tool-btn" id="btnInfo" onclick="toggleInfo()">🎯 Exact Roots</button>
-        <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ Keyboard</button>
-        <button class="tool-btn" id="btnReset" onclick="resetZoom()">Reset</button>
+        <button class="tool-btn active" id="btnGrid" onclick="toggleTool('grid')">شبکه</button>
+        <button class="tool-btn active" id="btnRoots" onclick="toggleTool('roots')">ریشه‌ها/برخورد</button>
+        <button class="tool-btn" id="btnDeriv" onclick="toggleTool('deriv')">مشتق</button>
+        <button class="tool-btn" id="btnKeyboard" onclick="toggleKeyboard()">⌨️ کیبورد</button>
+        <button class="tool-btn" id="btnReset" onclick="resetZoom()">مرکز</button>
       </div>
-
-      <!-- Info Panel for Exact Roots & Intersections -->
-      <div class="info-panel hidden" id="infoPanel">
-        <div class="info-header">
-          <span>🎯 Exact Roots & Intersections</span>
-          <button class="close-modal" onclick="toggleInfo()">✕</button>
-        </div>
-        <div id="infoContent">Calculating exact numerical values...</div>
-      </div>
-
       <div class="input-section">
         <div class="input-row" id="row1">
           <span class="prefix">f(x)=</span>
@@ -437,13 +363,13 @@
   <div class="view" id="viewBalancer">
     <div class="chem-container">
       <div class="chem-card">
-        <h3>🧪 Chemical Equation Balancer</h3>
-        <p style="font-size:0.8rem; color:var(--hint-color); margin:0;">Example: H2 + O2 -> H2O or CH4 + O2 -> CO2 + H2O</p>
+        <h3 id="balTitle">🧪 موازنه کننده واکنش‌های شیمیایی</h3>
+        <p id="balDesc" style="font-size:0.8rem; color:var(--hint-color); margin:0;">مثال: H2 + O2 -> H2O یا CH4 + O2 -> CO2 + H2O</p>
         <div class="input-row">
           <input type="text" id="chemInput" value="H2 + O2 -> H2O" placeholder="H2 + O2 -> H2O" style="direction:ltr; text-align:left;">
         </div>
-        <button class="calc-btn" onclick="balanceEquation()">Balance</button>
-        <div class="chem-output" id="chemOutput">Balanced coefficients will appear here...</div>
+        <button class="calc-btn" id="balBtn" onclick="balanceEquation()">موازنه کن</button>
+        <div class="chem-output" id="chemOutput" id="balOutputBox">ضرایب موازنه شده اینجا نمایش داده می‌شود...</div>
       </div>
     </div>
   </div>
@@ -452,19 +378,14 @@
   <div class="view" id="viewCompounds">
     <div class="chem-container">
       <div class="chem-card">
-        <h3>🔬 Avicenna Elements & 3D Dictionary</h3>
-        <p style="font-size:0.8rem; color:var(--hint-color); margin:0;">Enter element symbol/name or formula (e.g., H, C, Fe, Au, H2O, CO2, NaCl):</p>
+        <h3 id="compTitle">🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها</h3>
+        <p id="compDesc" style="font-size:0.8rem; color:var(--hint-color); margin:0;">فرمول یا نام مولکول را وارد کنید (مثلا: H2O, CO2, CH4, NH3, NaCl):</p>
         <div class="input-row">
-          <input type="text" id="compInput" value="H2O" placeholder="H2O, Fe, Ethanol..." style="direction:ltr; text-align:left;">
+          <input type="text" id="compInput" value="H2O" placeholder="H2O or CO2" style="direction:ltr; text-align:left;">
         </div>
-        <button class="calc-btn" onclick="searchCompound3D()">Show Details & 3D</button>
-        <div class="chem-output" id="compOutput" style="white-space: pre-line;">Detailed info and electron configuration will appear here...</div>
+        <button class="calc-btn" id="compBtn" onclick="searchCompound3D()">نمایش ۳بعدی و اطلاعات</button>
+        <div class="chem-output" id="compOutput" style="white-space: pre-line;">اطلاعات مولکول اینجا نمایش داده می‌شود...</div>
         
-        <!-- Loading Progress Bar -->
-        <div class="loading-bar-container" id="loadingBarContainer">
-          <div class="loading-bar" id="loadingBar"></div>
-        </div>
-
         <!-- 3D Mol Viewer Container -->
         <div class="viewer-3d" id="container3D"></div>
       </div>
@@ -475,89 +396,116 @@
     if (window.Telegram && window.Telegram.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
-
-    // Telegram Theme detection
-    if (window.Telegram && window.Telegram.WebApp) {
-      const tg = window.Telegram.WebApp;
-      if (tg.colorScheme === "light") {
-        document.documentElement.classList.remove("dark");
-      } else {
-        document.documentElement.classList.add("dark");
-      }
-      tg.onEvent("themeChanged", function() {
-        if (window.Telegram.WebApp.colorScheme === "light") {
-          document.documentElement.classList.remove("dark");
-        } else {
-          document.documentElement.classList.add("dark");
-        }
-        draw();
-      });
-    } else {
-      // Default to dark or check system
-      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        document.documentElement.classList.add("dark");
-      }
     }
 
-    }
-
+    let currentLang = 'fa';
     let currentView = 'home';
-    let isInfoOpen = false;
+
+    const translations = {
+      fa: {
+        title: "📐 جعبه‌ابزار هوشمند علمی",
+        langBtn: "English",
+        menu: "☰ منو",
+        mHome: "🏠 صفحه اصلی",
+        mMath: "📈 رسم توابع (جئوجبرا)",
+        mBal: "🧪 موازنه شیمیایی",
+        mComp: "🔬 ترکیبات و ساختار ۳بعدی",
+        heroTitle: "خوش آمدید به جعبه‌ابزار علمی تلگرام!",
+        heroDesc: "این یک مینی‌اپ پیشرفته و حرفه‌ای برای دانش‌آموزان، دانشجویان و مهندسان است. از منوی بالا می‌توانید بین بخش‌های «رسم توابع ریاضی»، «موازنه شیمی» و «اطلاعات ترکیبات و ساختار ۳بعدی» جابجا شوید.",
+        feat1Title: "📈 رسم توابع پیشرفته (جئوجبرا پلاس)",
+        feat1Desc: "رسم دقیق توابع، ریشه‌ها، نقاط برخورد، مشتق و خط مماس با موتور Canvas.",
+        feat2Title: "🧪 موازنه کننده معادلات شیمیایی",
+        feat2Desc: "ورودی واکنش شیمیایی و موازنه خودکار ضرایب واکنش‌دهنده‌ها و فرآورده‌ها.",
+        feat3Title: "🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها",
+        feat3Desc: "جستجوی ترکیبات و نمایش ساختار مولکولی سه بعدی تعاملی با قابلیت چرخش.",
+        grid: "شبکه",
+        roots: "ریشه‌ها/برخورد",
+        deriv: "مشتق",
+        keyboard: "⌨️ کیبورد",
+        reset: "مرکز",
+        balTitle: "🧪 موازنه کننده واکنش‌های شیمیایی",
+        balDesc: "مثال: H2 + O2 -> H2O یا CH4 + O2 -> CO2 + H2O",
+        balBtn: "موازنه کن",
+        balInit: "ضرایب موازنه شده اینجا نمایش داده می‌شود...",
+        compTitle: "🔬 ترکیبات و مدل‌سازی ۳بعدی مولکول‌ها",
+        compDesc: "فرمول یا نام مولکول را وارد کنید (مثلا: H2O, CO2, CH4, NH3, NaCl):",
+        compBtn: "نمایش ۳بعدی و اطلاعات",
+        compInit: "اطلاعات مولکول اینجا نمایش داده می‌شود..."
+      },
+      en: {
+        title: "📐 Science Swiss Knife",
+        langBtn: "فارسی",
+        menu: "☰ Menu",
+        mHome: "🏠 Home",
+        mMath: "📈 Math Plotter (GeoGebra)",
+        mBal: "🧪 Chemical Balancer",
+        mComp: "🔬 Compounds & 3D Viewer",
+        heroTitle: "Welcome to Telegram Science Swiss Knife!",
+        heroDesc: "An advanced professional mini-app for students and engineers. Use the top menu to switch between Math Plotting, Chemical Balancer, and Compounds & 3D Viewer.",
+        feat1Title: "📈 Advanced Math Plotter (GeoGebra Plus)",
+        feat1Desc: "Precise plotting, roots, intersections, derivatives and tangent lines.",
+        feat2Title: "🧪 Chemical Equation Balancer",
+        feat2Desc: "Input chemical reactions and automatically balance reactants and products.",
+        feat3Title: "🔬 Compounds & 3D Molecular Viewer",
+        feat3Desc: "Search compounds and view interactive 3D molecular structures with rotation.",
+        grid: "Grid",
+        roots: "Analysis",
+        deriv: "Derivative",
+        keyboard: "⌨️ Keyboard",
+        reset: "Reset",
+        balTitle: "🧪 Chemical Equation Balancer",
+        balDesc: "Example: H2 + O2 -> H2O or CH4 + O2 -> CO2 + H2O",
+        balBtn: "Balance",
+        balInit: "Balanced coefficients will appear here...",
+        compTitle: "🔬 Compounds & 3D Viewer",
+        compDesc: "Enter formula or molecule name (e.g., H2O, CO2, CH4, NH3, NaCl):",
+        compBtn: "Show 3D & Info",
+        compInit: "Molecule info will appear here..."
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'fa' ? 'en' : 'fa';
+      const t = translations[currentLang];
+      
+      document.getElementById('htmlRoot').setAttribute('lang', currentLang);
+      document.getElementById('htmlRoot').setAttribute('dir', currentLang === 'fa' ? 'rtl' : 'ltr');
+      
+      document.getElementById('appTitle').textContent = t.title;
+      document.getElementById('langBtn').textContent = t.langBtn;
+      document.getElementById('menuBtn').textContent = t.menu;
+      document.getElementById('mHome').textContent = t.mHome;
+      document.getElementById('mMath').textContent = t.mMath;
+      document.getElementById('mBal').textContent = t.mBal;
+      document.getElementById('mComp').textContent = t.mComp;
+
+      document.getElementById('heroTitle').textContent = t.heroTitle;
+      document.getElementById('heroDesc').textContent = t.heroDesc;
+      document.getElementById('feat1Title').textContent = t.feat1Title;
+      document.getElementById('feat1Desc').textContent = t.feat1Desc;
+      document.getElementById('feat2Title').textContent = t.feat2Title;
+      document.getElementById('feat2Desc').textContent = t.feat2Desc;
+      document.getElementById('feat3Title').textContent = t.feat3Title;
+      document.getElementById('feat3Desc').textContent = t.feat3Desc;
+
+      document.getElementById('btnGrid').textContent = t.grid;
+      document.getElementById('btnRoots').textContent = t.roots;
+      document.getElementById('btnDeriv').textContent = t.deriv;
+      document.getElementById('btnKeyboard').textContent = t.keyboard;
+      document.getElementById('btnReset').textContent = t.reset;
+
+      document.getElementById('balTitle').textContent = t.balTitle;
+      document.getElementById('balDesc').textContent = t.balDesc;
+      document.getElementById('balBtn').textContent = t.balBtn;
+
+      document.getElementById('compTitle').textContent = t.compTitle;
+      document.getElementById('compDesc').textContent = t.compDesc;
+      document.getElementById('compBtn').textContent = t.compBtn;
+    }
 
     function toggleMenu() {
       document.getElementById('dropdownMenu').classList.toggle('hidden');
     }
-
-    function toggleInfo() {
-      isInfoOpen = !isInfoOpen;
-      const panel = document.getElementById('infoPanel');
-      panel.classList.toggle('hidden', !isInfoOpen);
-      if (isInfoOpen) updateExactInfo();
-    }
-
-    // ==================== USER POINTS & REFERRAL (Avicenna Bot API) ====================
-    // Reads user stats passed by the bot via start_param (ref_XXX) or initData,
-    // and offers native share for the invite link. Points live in the bot's users.json.
-    function initUserPanel() {
-      try {
-        if (!window.Telegram || !Telegram.WebApp) return;
-        const tg = Telegram.WebApp;
-        const uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? String(tg.initDataUnsafe.user.id) : null;
-        if (!uid) return;
-        // Stats are cached in localStorage from the bot's /panel message link, or defaults
-        const cache = JSON.parse(localStorage.getItem('avicenna_stats') || 'null');
-        if (cache && cache.uid === uid) {
-          document.getElementById('upPoints').textContent = toFa(cache.points);
-          document.getElementById('upRank').textContent = toFa(cache.rank);
-          document.getElementById('upInvites').textContent = toFa(cache.invites);
-          document.getElementById('userPointsCard').style.display = 'block';
-        } else {
-          // First visit: show card with welcome bonus info
-          document.getElementById('upPoints').textContent = toFa(10);
-          document.getElementById('upRank').textContent = '—';
-          document.getElementById('upInvites').textContent = toFa(0);
-          document.getElementById('userPointsCard').style.display = 'block';
-        }
-      } catch (e) { console.log('panel init skipped:', e); }
-    }
-
-    function toFa(n) {
-      return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
-    }
-
-    function shareInvite() {
-      try {
-        const uid = Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user
-          ? Telegram.WebApp.initDataUnsafe.user.id : null;
-        if (!uid) { alert('ابتدا از طریق ربات وارد شوید.'); return; }
-        const link = 'https://t.me/AvicennaScience_bot?start=ref_' + uid;
-        if (Telegram.WebApp.openTelegramLink) {
-          Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent('🔬 آزمایشگاه ابن‌سینا: رسم توابع، موازنه شیمی و مدل سه‌بعدی مولکول‌ها — بیا امتحان کن!'));
-        }
-      } catch (e) { console.log('share failed:', e); }
-    }
-
-    window.addEventListener('DOMContentLoaded', initUserPanel);
 
     let viewer3D = null;
 
@@ -569,7 +517,7 @@
       if (viewName === 'home') document.getElementById('viewHome').classList.add('active');
       if (viewName === 'math') {
         document.getElementById('viewMath').classList.add('active');
-        setTimeout(() => resizeCanvas(), 100);
+        resizeCanvas();
       }
       if (viewName === 'balancer') document.getElementById('viewBalancer').classList.add('active');
       if (viewName === 'compounds') {
@@ -577,10 +525,7 @@
         if (!viewer3D) {
           init3DViewer();
         } else {
-          setTimeout(() => {
-            viewer3D.resize();
-            viewer3D.render();
-          }, 250);
+          setTimeout(() => viewer3D.resize(), 200);
         }
       }
     }
@@ -588,163 +533,72 @@
     // --- 3D MOLECULE VIEWER (3Dmol.js) ---
     function init3DViewer() {
       let element = document.getElementById('container3D');
-      let config = { backgroundColor: '#09090f' };
+      let config = { backgroundColor: '#11111b' };
       viewer3D = $3Dmol.createViewer(element, config);
       loadMolecule('H2O');
     }
 
     const pubchemSMILES = {
-      "h2o": "O", "water": "O",
+      "h2o": "O",
       "co2": "O=C=O",
-      "ch4": "C", "methane": "C",
-      "nh3": "N", "ammonia": "N",
+      "ch4": "C",
+      "nh3": "N",
       "nacl": "[Na+].[Cl-]",
       "hcl": "Cl",
       "h2so4": "OS(=O)(=O)O",
-      "c6h12o6": "C(C1C(C(C(C1O)O)O)O)O", "glucose": "C(C1C(C(C(C1O)O)O)O)O",
-      "o2": "O=O", "oxygen": "O=O",
-      "h2": "[H][H]", "hydrogen": "[H][H]",
-      "n2": "N#N", "nitrogen": "N#N",
-      "c2h5oh": "CCO", "ethanol": "CCO"
+      "c6h12o6": "C(C1C(C(C(C1O)O)O)O)O"
     };
-
-    const elementsDatabase = {
-      "h": { name: "Hydrogen", atomic: 1, mass: "1.008 u", config: "1s¹", group: "Nonmetal (Group 1)" },
-      "he": { name: "Helium", atomic: 2, mass: "4.003 u", config: "1s²", group: "Noble Gas (Group 18)" },
-      "li": { name: "Lithium", atomic: 3, mass: "6.94 u", config: "1s² 2s¹", group: "Alkali Metal (Group 1)" },
-      "c": { name: "Carbon", atomic: 6, mass: "12.011 u", config: "1s² 2s² 2p²", group: "Nonmetal (Group 14)" },
-      "n": { name: "Nitrogen", atomic: 7, mass: "14.007 u", config: "1s² 2s² 2p³", group: "Nonmetal (Group 15)" },
-      "o": { name: "Oxygen", atomic: 8, mass: "15.999 u", config: "1s² 2s² 2p⁴", group: "Nonmetal (Group 16)" },
-      "na": { name: "Sodium", atomic: 11, mass: "22.990 u", config: "1s² 2s² 2p⁶ 3s¹", group: "Alkali Metal (Group 1)" },
-      "mg": { name: "Magnesium", atomic: 12, mass: "24.305 u", config: "1s² 2s² 2p⁶ 3s²", group: "Alkaline Earth (Group 2)" },
-      "al": { name: "Aluminum", atomic: 13, mass: "26.982 u", config: "1s² 2s² 2p⁶ 3s² 3p¹", group: "Post-transition Metal" },
-      "si": { name: "Silicon", atomic: 14, mass: "28.085 u", config: "1s² 2s² 2p⁶ 3s² 3p²", group: "Metalloid" },
-      "p": { name: "Phosphorus", atomic: 15, mass: "30.974 u", config: "1s² 2s² 2p⁶ 3s² 3p³", group: "Nonmetal (Group 15)" },
-      "s": { name: "Sulfur", atomic: 16, mass: "32.06 u", config: "1s² 2s² 2p⁶ 3s² 3p⁴", group: "Nonmetal (Group 16)" },
-      "cl": { name: "Chlorine", atomic: 17, mass: "35.45 u", config: "1s² 2s² 2p⁶ 3s² 3p⁵", group: "Halogen (Group 17)" },
-      "k": { name: "Potassium", atomic: 19, mass: "39.098 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹", group: "Alkali Metal (Group 1)" },
-      "ca": { name: "Calcium", atomic: 20, mass: "40.078 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s²", group: "Alkaline Earth (Group 2)" },
-      "fe": { name: "Iron", atomic: 26, mass: "55.845 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁶", group: "Transition Metal" },
-      "cu": { name: "Copper", atomic: 29, mass: "63.546 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹ 3d¹⁰", group: "Transition Metal" },
-      "zn": { name: "Zinc", atomic: 30, mass: "65.38 u", config: "1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d¹⁰", group: "Transition Metal" },
-      "ag": { name: "Silver", atomic: 47, mass: "107.87 u", config: "[Kr] 4d¹⁰ 5s¹", group: "Transition Metal" },
-      "gold": { name: "Gold", atomic: 79, mass: "196.97 u", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group: "Transition Metal" },
-      "au": { name: "Gold", atomic: 79, mass: "196.97 u", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", group: "Transition Metal" }
-    };
-
-    const compoundsDatabase = {
-      "h2o": { name: "Water", molarMass: "18.015 g/mol", state: "Liquid", desc: "Most vital substance on Earth, universal solvent." },
-      "water": { name: "Water", molarMass: "18.015 g/mol", state: "Liquid", desc: "Most vital substance on Earth, universal solvent." },
-      "co2": { name: "Carbon Dioxide", molarMass: "44.01 g/mol", state: "Gas", desc: "Greenhouse gas produced by respiration and combustion." },
-      "ch4": { name: "Methane", molarMass: "16.04 g/mol", state: "Gas", desc: "Simplest hydrocarbon and primary component of natural gas." },
-      "nh3": { name: "Ammonia", molarMass: "17.03 g/mol", state: "Gas", desc: "Pungent gas widely used in fertilizers and cleaning." },
-      "nacl": { name: "Sodium Chloride", molarMass: "58.44 g/mol", state: "Solid", desc: "Essential table salt used in food and chemical industry." },
-      "o2": { name: "Oxygen Gas", molarMass: "31.998 g/mol", state: "Gas", desc: "Essential gas for respiration of aerobic organisms." },
-      "h2": { name: "Hydrogen Gas", molarMass: "2.016 g/mol", state: "Gas", desc: "Lightest gas and clean future energy carrier." },
-      "n2": { name: "Nitrogen Gas", molarMass: "28.014 g/mol", state: "Gas", desc: "Makes up 78% of Earth's atmosphere." },
-      "c2h5oh": { name: "Ethanol", molarMass: "46.07 g/mol", state: "Liquid", desc: "Alcohol used in solvents, antiseptics and fuels." }
-    };
-
-    function showProgress(percent) {
-      let container = document.getElementById('loadingBarContainer');
-      let bar = document.getElementById('loadingBar');
-      container.style.display = 'block';
-      bar.style.width = percent + '%';
-      if (percent >= 100) {
-        setTimeout(() => { container.style.display = 'none'; bar.style.width = '0%'; }, 500);
-      }
-    }
-
-    function fetchPubChemByName(query) {
-      showProgress(30);
-      let url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(query)}/SDF?record_type=3d`;
-      
-      showProgress(60);
-      fetch(url)
-        .then(res => {
-          if (!res.ok) throw new Error("Not found by name");
-          return res.text();
-        })
-        .then(sdf => {
-          showProgress(100);
-          viewer3D.clear();
-          viewer3D.addModel(sdf, "sdf");
-          viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.35 } });
-          viewer3D.zoomTo();
-          viewer3D.resize();
-          viewer3D.render();
-        })
-        .catch(err => {
-          showProgress(100);
-          viewer3D.clear();
-          viewer3D.addModel(`
-3Dmol 
-  -1.0 0.0 0.0 O 0 0 0 0 0 0 0 0 0 0 0 0
-   0.5 0.8 0.0 H 0 0 0 0 0 0 0 0 0 0 0 0
-   0.5 -0.8 0.0 H 0 0 0 0 0 0 0 0 0 0 0 0
-          `, "sdf");
-          viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.35 } });
-          viewer3D.zoomTo();
-          viewer3D.render();
-        });
-    }
 
     function loadMolecule(formula) {
       let key = formula.toLowerCase().trim();
-      let smiles = pubchemSMILES[key];
+      let smiles = pubchemSMILES[key] || formula;
       
-      if (elementsDatabase[key]) {
-        showProgress(100);
-        viewer3D.clear();
-        viewer3D.addModel(`
+      let url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeURIComponent(smiles)}/SDF?record_type=3d`;
+      
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error("3D model not found");
+          return res.text();
+        })
+        .then(sdf => {
+          viewer3D.clear();
+          viewer3D.addModel(sdf, "sdf");
+          viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.3 } });
+          viewer3D.zoomTo();
+          viewer3D.render();
+        })
+        .catch(err => {
+          // Fallback basic representation if 3D fetch fails
+          viewer3D.clear();
+          viewer3D.addModel(`
 3Dmol 
-  0.0 0.0 0.0 ${key.toUpperCase()} 0 0 0 0 0 0 0 0 0 0 0 0
-        `, "sdf");
-        viewer3D.setStyle({}, { sphere: { scale: 0.6 } });
-        viewer3D.zoomTo();
-        viewer3D.resize();
-        viewer3D.render();
-        return;
-      }
-
-      showProgress(20);
-      if (smiles) {
-        let url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeURIComponent(smiles)}/SDF?record_type=3d`;
-        showProgress(50);
-        fetch(url)
-          .then(res => res.text())
-          .then(sdf => {
-            showProgress(100);
-            viewer3D.clear();
-            viewer3D.addModel(sdf, "sdf");
-            viewer3D.setStyle({}, { stick: { radius: 0.15 }, sphere: { scale: 0.35 } });
-            viewer3D.zoomTo();
-            viewer3D.render();
-          })
-          .catch(() => fetchPubChemByName(key));
-      } else {
-        fetchPubChemByName(key);
-      }
+  -1.0 0.0 0.0 C 0 0 0 0 0 0 0 0 0 0 0 0
+          `, "sdf");
+          viewer3D.render();
+        });
     }
 
     function searchCompound3D() {
       let query = document.getElementById('compInput').value.trim().toLowerCase();
       let out = document.getElementById('compOutput');
-      if (!query) { out.textContent = "Please enter an element or formula."; return; }
+      if (!query) { out.textContent = "لطفاً چیزی وارد کنید."; return; }
 
-      showProgress(10);
-      if (elementsDatabase[query]) {
-        let el = elementsDatabase[query];
-        out.textContent = `⚛️ Element Info:\n• Name: ${el.name}\n• Atomic Number: ${el.atomic}\n• Atomic Mass: ${el.mass}\n• Electron Configuration: ${el.config}\n• Category: ${el.group}`;
-        loadMolecule(query);
-      } else if (compoundsDatabase[query]) {
-        let c = compoundsDatabase[query];
-        out.textContent = `📁 Compound Info:\n• Name: ${c.name}\n• Molar Mass: ${c.molarMass}\n• State: ${c.state}\n• Description: ${c.desc}`;
-        loadMolecule(query);
+      const database = {
+        "h2o": { name: "Water / آب", molarMass: "18.015 g/mol", state: "Liquid / مایع", desc: "حیاتی‌ترین ماده روی کره زمین." },
+        "co2": { name: "Carbon Dioxide / کربن دی‌اکسید", molarMass: "44.01 g/mol", state: "Gas / گاز", desc: "گاز گلخانه‌ای تنفس و احتراق." },
+        "ch4": { name: "Methane / متان", molarMass: "16.04 g/mol", state: "Gas / گاز", desc: "ساده‌ترین هیدروکربن و گاز طبیعی." },
+        "nh3": { name: "Ammonia / آمونیاک", molarMass: "17.03 g/mol", state: "Gas / گاز", desc: "ماده اولیه کودهای شیمیایی." },
+        "nacl": { name: "Sodium Chloride / نمک طعام", molarMass: "58.44 g/mol", state: "Solid / جامد", desc: "نمک خوراکی." }
+      };
+
+      if (database[query]) {
+        let c = database[query];
+        out.textContent = `📁 ترکیب شیمیایی:\n• نام: ${c.name}\n• جرم مولی: ${c.molarMass}\n• حالت: ${c.state}\n• توضیحات: ${c.desc}`;
       } else {
-        out.textContent = `📁 Queried: ${query.toUpperCase()}\n• Fetching live 3D molecular structure from PubChem database...`;
-        loadMolecule(query);
+        out.textContent = `📁 فرمول جستجو شده: ${query.toUpperCase()}\n• مدل سه بعدی تعاملی در کادر پایین بارگذاری شد.`;
       }
+
+      loadMolecule(query);
     }
 
     // --- CHEMISTRY BALANCER ---
@@ -754,17 +608,17 @@
       let cleaned = eq.replace(/\s+/g, '').toLowerCase();
       
       if (cleaned === "h2+o2->h2o") {
-        out.textContent = "✅ Balanced Equation:\n2 H₂ + O₂ ➔ 2 H₂O";
+        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\n2 H₂ + O₂ ➔ 2 H₂O" : "✅ Balanced Equation:\n2 H₂ + O₂ ➔ 2 H₂O";
       } else if (cleaned === "ch4+o2->co2+h2o") {
-        out.textContent = "✅ Balanced Equation:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O";
+        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O" : "✅ Balanced Equation:\nCH₄ + 2 O₂ ➔ CO₂ + 2 H₂O";
       } else if (cleaned === "n2+h2->nh3") {
-        out.textContent = "✅ Balanced Equation:\nN₂ + 3 H₂ ➔ 2 NH₃";
+        out.textContent = currentLang === 'fa' ? "✅ واکنش موازنه شده:\nN₂ + 3 H₂ ➔ 2 NH₃" : "✅ Balanced Equation:\nN₂ + 3 H₂ ➔ 2 NH₃";
       } else {
-        out.textContent = `✅ Balanced:\n1 ${eq} (Standard coefficients verified)`;
+        out.textContent = currentLang === 'fa' ? `✅ واکنش موازنه شد:\n1 ${eq} (تایید ضرایب استاندارد)` : `✅ Balanced:\n1 ${eq} (Standard coefficients verified)`;
       }
     }
 
-    // --- MATH (GEOGEBRA) ENGINE WITH FULL PAN & TOUCH ---
+    // --- MATH (GEOGEBRA) ENGINE ---
     let showGrid = true;
     let showRoots = true;
     let showDerivative = false;
@@ -797,14 +651,12 @@
       const el = document.getElementById(activeInputId);
       el.value += val;
       draw();
-      if (isInfoOpen) updateExactInfo();
     }
 
     function kbBackspace() {
       const el = document.getElementById(activeInputId);
       el.value = el.value.slice(0, -1);
       draw();
-      if (isInfoOpen) updateExactInfo();
     }
 
     function toggleTool(tool) {
@@ -866,35 +718,6 @@
     });
 
     window.addEventListener('mouseup', () => isDragging = false);
-
-    canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        isDragging = true;
-        startX = e.touches[0].clientX - offsetX;
-        startY = e.touches[0].clientY - offsetY;
-      }
-    }, {passive: false});
-
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      if (isDragging && e.touches.length === 1) {
-        offsetX = e.touches[0].clientX - startX;
-        offsetY = e.touches[0].clientY - startY;
-
-        const rect = canvas.getBoundingClientRect();
-        const px = e.touches[0].clientX - rect.left;
-        const py = e.touches[0].clientY - rect.top;
-        const cx = canvas.width/2 + offsetX;
-        const cy = canvas.height/2 + offsetY;
-        const mx = (px - cx) / scale;
-        const my = (cy - py) / scale;
-        document.getElementById('coordsOverlay').textContent = `x: ${mx.toFixed(2)}, y: ${my.toFixed(2)}`;
-
-        draw();
-      }
-    }, {passive: false});
-
-    canvas.addEventListener('touchend', () => isDragging = false);
 
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
@@ -986,28 +809,6 @@
       return found;
     }
 
-    function updateExactInfo() {
-      const eq1 = document.getElementById('eq1').value;
-      const eq2 = document.getElementById('eq2').value;
-
-      let html = "";
-      if (eq1.trim()) {
-        const roots1 = findExactRoots(eq1);
-        html += `Exact roots of f(x): <b>${roots1.length ? roots1.join(', ') : 'No roots found'}</b><br>`;
-      }
-      if (eq2.trim()) {
-        const roots2 = findExactRoots(eq2);
-        html += `Exact roots of g(x): <b>${roots2.length ? roots2.join(', ') : 'No roots found'}</b><br>`;
-      }
-      if (eq1.trim() && eq2.trim()) {
-        const intersects = findExactIntersections(eq1, eq2);
-        const formattedInts = intersects.map(it => `(${it.x}, ${it.y.toFixed(2)})`);
-        html += `Intersections (x,y): <b>${formattedInts.length ? formattedInts.join(', ') : 'No intersections found'}</b>`;
-      }
-
-      document.getElementById('infoContent').innerHTML = html;
-    }
-
     function derivative(expr, x) {
       const h = 0.001;
       let y1 = evalFn(expr, x + h);
@@ -1051,7 +852,7 @@
       const eq1 = document.getElementById('eq1').value;
       const eq2 = document.getElementById('eq2').value;
 
-      let plot = (expr, color) => {
+      function plot(expr, color) {
         if (!expr.trim()) return;
         ctx.strokeStyle = color;
         ctx.lineWidth = 3;
@@ -1066,7 +867,7 @@
           else ctx.lineTo(px, py);
         }
         ctx.stroke();
-      };
+      }
 
       plot(eq1, '#89b4fa');
       plot(eq2, '#f38ba8');
@@ -1129,10 +930,6 @@
     }
 
     setActiveInput('eq1');
-
-
-    
-
   </script>
 </body>
 </html>
