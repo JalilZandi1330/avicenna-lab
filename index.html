@@ -331,6 +331,8 @@
       <div class="menu-item" onclick="switchView('math')">📈 Math Plotter (GeoGebra)</div>
       <div class="menu-item" onclick="switchView('balancer')">🧪 Chemical Balancer</div>
       <div class="menu-item" onclick="switchView('compounds')">🔬 Compounds & 3D Viewer</div>
+      <div class="menu-item" onclick="switchView('biology')">🧬 Biology & Genetics Lab</div>
+      <div class="menu-item" onclick="switchView('matrix')">🔢 Matrix & Vector Lab</div>
     </div>
   </div>
 
@@ -340,12 +342,6 @@
       <div class="hero-card">
         <h1>Welcome to Avicenna Lab (آزمایشگاه ابن‌سینا)!</h1>
         <p>An advanced professional scientific mini-app developed by an Iranian developer. Explore Math Plotting, Chemical Equations, and 3D Molecular structures.</p>
-        <div id="userPointsCard" style="display:none; margin-top:12px; padding:10px 14px; background:rgba(137,180,250,0.15); border:1px solid rgba(137,180,250,0.4); border-radius:8px; font-size:0.9rem;">
-          <b>⭐ <span id="upPoints">0</span></b> امتیاز &nbsp;|&nbsp; 🏆 رتبه <b><span id="upRank">-</span></b> &nbsp;|&nbsp; 👥 <b><span id="upInvites">0</span></b> دعوت
-        </div>
-        <button onclick="shareInvite()" style="margin-top:12px; width:100%; padding:10px; border:none; border-radius:8px; background:var(--button-color); color:var(--button-text); font-weight:bold; cursor:pointer;">
-          🎁 دعوت دوستان (+۵۰ امتیاز)
-        </button>
       </div>
       <div class="feature-grid">
         <div class="feature-box" onclick="switchView('math')">
@@ -448,6 +444,86 @@
     </div>
   </div>
 
+  <!-- VIEW 6: MATRIX & VECTOR LAB -->
+  <div class="view" id="viewMatrix">
+    <div class="chem-container">
+      <div class="chem-card">
+        <h3>🔢 Matrix Calculator (2x2 & 3x3)</h3>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">Determinant, Inverse, Addition & Multiplication for 2x2 or 3x3 matrices.</p>
+        
+        <div style="display:flex; gap:12px; margin-bottom:12px;">
+          <!-- Matrix A -->
+          <div style="flex:1;">
+            <div style="font-weight:bold; margin-bottom:4px; font-size:0.85rem;">Matrix A (3x3):</div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:4px;">
+              <input type="number" id="a00" value="1" style="text-align:center; padding:4px;">
+              <input type="number" id="a01" value="2" style="text-align:center; padding:4px;">
+              <input type="number" id="a02" value="3" style="text-align:center; padding:4px;">
+              <input type="number" id="a10" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="a11" value="1" style="text-align:center; padding:4px;">
+              <input type="number" id="a12" value="4" style="text-align:center; padding:4px;">
+              <input type="number" id="a20" value="5" style="text-align:center; padding:4px;">
+              <input type="number" id="a21" value="6" style="text-align:center; padding:4px;">
+              <input type="number" id="a22" value="0" style="text-align:center; padding:4px;">
+            </div>
+          </div>
+          
+          <!-- Matrix B -->
+          <div style="flex:1;">
+            <div style="font-weight:bold; margin-bottom:4px; font-size:0.85rem;">Matrix B (3x3):</div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:4px;">
+              <input type="number" id="b00" value="1" style="text-align:center; padding:4px;">
+              <input type="number" id="b01" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b02" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b10" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b11" value="1" style="text-align:center; padding:4px;">
+              <input type="number" id="b12" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b20" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b21" value="0" style="text-align:center; padding:4px;">
+              <input type="number" id="b22" value="1" style="text-align:center; padding:4px;">
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+          <button class="calc-btn" onclick="calcMatrix('detA')">det(A)</button>
+          <button class="calc-btn" onclick="calcMatrix('invA')">A⁻¹ (Inverse)</button>
+          <button class="calc-btn" onclick="calcMatrix('add')">A + B</button>
+          <button class="calc-btn" onclick="calcMatrix('mult')">A × B</button>
+        </div>
+
+        <div class="chem-output" id="matrixOutput" style="white-space: pre-line;">Matrix calculation results will appear here...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 5: BIOLOGY & GENETICS LAB -->
+  <div class="view" id="viewBiology">
+    <div class="chem-container">
+      <div class="chem-card">
+        <h3>🧬 DNA to mRNA & Protein Transcriber</h3>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">Enter a DNA strand (e.g., TACGGC) to get mRNA, Codons, and Amino Acids.</p>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input type="text" id="dnaInput" value="TACGGC" placeholder="TACGGCAT..." style="direction:ltr; text-align:left; flex:1;">
+          <button class="calc-btn" onclick="transcribeDNA()">Transcribe</button>
+        </div>
+        <div class="chem-output" id="dnaOutput" style="white-space: pre-line;">Transcription results will appear here...</div>
+      </div>
+
+      <div class="chem-card">
+        <h3>🧬 Mendelian Genetics (Monohybrid Cross)</h3>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">Enter parent genotypes (e.g., Aa x Aa or BB x bb).</p>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input type="text" id="parent1" value="Aa" placeholder="Parent 1 (e.g. Aa)" style="direction:ltr; text-align:center; width:100px;">
+          <span style="align-self:center; font-weight:bold;">×</span>
+          <input type="text" id="parent2" value="Aa" placeholder="Parent 2 (e.g. Aa)" style="direction:ltr; text-align:center; width:100px;">
+          <button class="calc-btn" onclick="calcGenetics()" style="flex:1;">Calculate Cross</button>
+        </div>
+        <div class="chem-output" id="geneticsOutput" style="white-space: pre-line;">Genotypic and phenotypic ratios will appear here...</div>
+      </div>
+    </div>
+  </div>
+
   <!-- VIEW 4: COMPOUNDS & 3D VIEWER -->
   <div class="view" id="viewCompounds">
     <div class="chem-container">
@@ -515,50 +591,6 @@
       if (isInfoOpen) updateExactInfo();
     }
 
-    // ==================== USER POINTS & REFERRAL (Avicenna Bot API) ====================
-    // Reads user stats passed by the bot via start_param (ref_XXX) or initData,
-    // and offers native share for the invite link. Points live in the bot's users.json.
-    function initUserPanel() {
-      try {
-        if (!window.Telegram || !Telegram.WebApp) return;
-        const tg = Telegram.WebApp;
-        const uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? String(tg.initDataUnsafe.user.id) : null;
-        if (!uid) return;
-        // Stats are cached in localStorage from the bot's /panel message link, or defaults
-        const cache = JSON.parse(localStorage.getItem('avicenna_stats') || 'null');
-        if (cache && cache.uid === uid) {
-          document.getElementById('upPoints').textContent = toFa(cache.points);
-          document.getElementById('upRank').textContent = toFa(cache.rank);
-          document.getElementById('upInvites').textContent = toFa(cache.invites);
-          document.getElementById('userPointsCard').style.display = 'block';
-        } else {
-          // First visit: show card with welcome bonus info
-          document.getElementById('upPoints').textContent = toFa(10);
-          document.getElementById('upRank').textContent = '—';
-          document.getElementById('upInvites').textContent = toFa(0);
-          document.getElementById('userPointsCard').style.display = 'block';
-        }
-      } catch (e) { console.log('panel init skipped:', e); }
-    }
-
-    function toFa(n) {
-      return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
-    }
-
-    function shareInvite() {
-      try {
-        const uid = Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user
-          ? Telegram.WebApp.initDataUnsafe.user.id : null;
-        if (!uid) { alert('ابتدا از طریق ربات وارد شوید.'); return; }
-        const link = 'https://t.me/AvicennaScience_bot?start=ref_' + uid;
-        if (Telegram.WebApp.openTelegramLink) {
-          Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent('🔬 آزمایشگاه ابن‌سینا: رسم توابع، موازنه شیمی و مدل سه‌بعدی مولکول‌ها — بیا امتحان کن!'));
-        }
-      } catch (e) { console.log('share failed:', e); }
-    }
-
-    window.addEventListener('DOMContentLoaded', initUserPanel);
-
     let viewer3D = null;
 
     function switchView(viewName) {
@@ -572,6 +604,8 @@
         setTimeout(() => resizeCanvas(), 100);
       }
       if (viewName === 'balancer') document.getElementById('viewBalancer').classList.add('active');
+      if (viewName === 'biology') document.getElementById('viewBiology').classList.add('active');
+      if (viewName === 'matrix') document.getElementById('viewMatrix').classList.add('active');
       if (viewName === 'compounds') {
         document.getElementById('viewCompounds').classList.add('active');
         if (!viewer3D) {
@@ -588,9 +622,13 @@
     // --- 3D MOLECULE VIEWER (3Dmol.js) ---
     function init3DViewer() {
       let element = document.getElementById('container3D');
-      let config = { backgroundColor: '#09090f' };
+      let config = { backgroundColor: '#09090f', antialias: true };
       viewer3D = $3Dmol.createViewer(element, config);
       loadMolecule('H2O');
+      setTimeout(() => {
+        viewer3D.resize();
+        viewer3D.render();
+      }, 100);
     }
 
     const pubchemSMILES = {
@@ -1124,7 +1162,201 @@
 
         ctx.fillStyle = '#fab387';
         ctx.font = 'bold 11px monospace';
-        ctx.fillText(`(${hoverPoint.x.toFixed(2)}, ${hoverPoint.y.toFixed(2)})`, px + 14, py - 10);
+        let hoverText = `(${hoverPoint.x.toFixed(2)}, ${hoverPoint.y.toFixed(2)})`;
+        if (showDerivative && eq1.trim()) {
+          let mVal = derivative(eq1, hoverPoint.x);
+          if (mVal !== null) {
+            hoverText += ` | m: ${mVal.toFixed(2)}`;
+          }
+        }
+        ctx.fillText(hoverText, px + 14, py - 10);
+      }
+    }
+
+    // --- BIOLOGY & GENETICS ENGINE ---
+    const aminoAcidTable = {
+      "UUU": "Phe", "UUC": "Phe", "UUA": "Leu", "UUG": "Leu",
+      "UCU": "Ser", "UCC": "Ser", "UCA": "Ser", "UCG": "Ser",
+      "UAU": "Tyr", "UAC": "Tyr", "UAA": "Stop", "UAG": "Stop",
+      "UGU": "Cys", "UGC": "Cys", "UGA": "Stop", "UGG": "Trp",
+      "CUU": "Leu", "CUC": "Leu", "CUA": "Leu", "CUG": "Leu",
+      "CCU": "Pro", "CCC": "Pro", "CCA": "Pro", "CCG": "Pro",
+      "CAU": "His", "CAC": "His", "CAA": "Gln", "CAG": "Gln",
+      "CGU": "Arg", "CGC": "Arg", "CGA": "Arg", "CGG": "Arg",
+      "AUU": "Ile", "AUC": "Ile", "AUA": "Ile", "AUG": "Met (Start)",
+      "ACU": "Thr", "ACC": "Thr", "ACA": "Thr", "ACG": "Thr",
+      "AAU": "Asn", "AAC": "Asn", "AAA": "Lys", "AAG": "Lys",
+      "AGU": "Ser", "AGC": "Ser", "AGA": "Arg", "AGG": "Arg",
+      "GUU": "Val", "GUC": "Val", "GUA": "Val", "GUG": "Val",
+      "GCU": "Ala", "GCC": "Ala", "GCA": "Ala", "GCG": "Ala",
+      "GAU": "Asp", "GAC": "Asp", "GAA": "Glu", "GAG": "Glu",
+      "GGU": "Gly", "GGC": "Gly", "GGA": "Gly", "GGG": "Gly"
+    };
+
+    function transcribeDNA() {
+      let dna = document.getElementById('dnaInput').value.toUpperCase().replace(/[^ATCG]/g, '');
+      let out = document.getElementById('dnaOutput');
+      if (!dna) {
+        out.textContent = "Please enter a valid DNA sequence containing A, T, C, G.";
+        return;
+      }
+
+      // Transcribe DNA to mRNA (A->U, T->A, C->G, G->C)
+      let mrna = "";
+      for (let char of dna) {
+        if (char === 'A') mrna += 'U';
+        else if (char === 'T') mrna += 'A';
+        else if (char === 'G') mrna += 'C';
+        else if (char === 'C') mrna += 'G';
+      }
+
+      // Break into codons
+      let codons = [];
+      for (let i = 0; i < mrna.length; i += 3) {
+        let codon = mrna.substr(i, 3);
+        if (codon.length === 3) codons.push(codon);
+      }
+
+      let aminoAcids = codons.map(c => aminoAcidTable[c] || "Unknown");
+
+      out.innerHTML = `🧬 **DNA Input:** <code>${dna}</code>
+` +
+                      `📜 **mRNA Strand:** <code>${mrna}</code>
+` +
+                      `🔖 **Codons:** ${codons.join(' - ')}
+` +
+                      `🧪 **Amino Acids:** <b>${aminoAcids.join(' ➔ ')}</b>`;
+    }
+
+    function calcGenetics() {
+      let p1 = document.getElementById('parent1').value.trim();
+      let p2 = document.getElementById('parent2').value.trim();
+      let out = document.getElementById('geneticsOutput');
+
+      if (p1.length !== 1 && p1.length !== 2 || p2.length !== 1 && p2.length !== 2) {
+        out.textContent = "Please enter valid allele pairs like 'Aa' or 'BB'.";
+        return;
+      }
+
+      // Simple monohybrid cross for 1 gene (e.g., Aa x Aa)
+      let alleles1 = [p1[0], p1[p1.length - 1]];
+      let alleles2 = [p2[0], p2[p2.length - 1]];
+
+      let offspring = [];
+      for (let a1 of alleles1) {
+        for (let a2 of alleles2) {
+          // Sort alphabetically (e.g. aA -> Aa)
+          let comb = [a1, a2].sort((x, y) => x.localeCompare(y)).join('');
+          offspring.push(comb);
+        }
+      }
+
+      let counts = {};
+      offspring.forEach(o => counts[o] = (counts[o] || 0) + 1);
+
+      let resText = `🌱 **Parents:** ${p1} × ${p2}
+
+📊 **Offspring Genotypic Ratios (Out of 4):**
+`;
+      for (let [genotype, count] of Object.entries(counts)) {
+        let pct = (count / 4) * 100;
+        resText += `• <b>${genotype}</b>: ${count}/4 (${pct}%)
+`;
+      }
+
+      out.innerHTML = resText;
+    }
+
+    // --- MATRIX CALCULATOR ENGINE ---
+    function getMatrixValues(prefix) {
+      let m = [];
+      for (let r = 0; r < 3; r++) {
+        let row = [];
+        for (let c = 0; c < 3; c++) {
+          let val = parseFloat(document.getElementById(`${prefix}${r}${c}`).value) || 0;
+          row.push(val);
+        }
+        m.push(row);
+      }
+      return m;
+    }
+
+    function det3x3(m) {
+      return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+           - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+           + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    }
+
+    function formatMatrixHTML(m, title) {
+      let html = `<div style="margin-bottom:8px;"><b>${title}:</b></div>`;
+      html += `<div style="display:inline-block; border-left:3px solid var(--button-color); border-right:3px solid var(--button-color); padding:4px 12px; border-radius:6px; background:rgba(0,0,0,0.2);">`;
+      html += `<table style="border-collapse:collapse; text-align:center;">`;
+      for (let r = 0; r < 3; r++) {
+        html += `<tr>`;
+        for (let c = 0; c < 3; c++) {
+          let val = Math.round(m[r][c] * 100) / 100;
+          html += `<td style="padding:6px 12px; font-weight:bold; font-family:monospace; font-size:1rem;">${val}</td>`;
+        }
+        html += `</tr>`;
+      }
+      html += `</table></div>`;
+      return html;
+    }
+
+    function calcMatrix(op) {
+      let out = document.getElementById('matrixOutput');
+      let A = getMatrixValues('a');
+      let B = getMatrixValues('b');
+
+      if (op === 'detA') {
+        let d = det3x3(A);
+        out.innerHTML = `📐 <b>Determinant of Matrix A:</b>
+` +
+                        `<code>det(A) = ${d}</code>
+` +
+                        (d === 0 ? `⚠️ Matrix A is singular (no inverse exists).` : `✅ Matrix A is non-singular.`);
+      } else if (op === 'add') {
+        let C = [
+          [A[0][0]+B[0][0], A[0][1]+B[0][1], A[0][2]+B[0][2]],
+          [A[1][0]+B[1][0], A[1][1]+B[1][1], A[1][2]+B[1][2]],
+          [A[2][0]+B[2][0], A[2][1]+B[2][1], A[2][2]+B[2][2]]
+        ];
+        out.innerHTML = formatMatrixHTML(C, '➕ Matrix Addition (A + B)');
+      } else if (op === 'mult') {
+        let C = [[0,0,0],[0,0,0],[0,0,0]];
+        for (let r = 0; r < 3; r++) {
+          for (let c = 0; c < 3; c++) {
+            for (let k = 0; k < 3; k++) {
+              C[r][c] += A[r][k] * B[k][c];
+            }
+          }
+        }
+        out.innerHTML = formatMatrixHTML(C, '✖️ Matrix Multiplication (A × B)');
+      } else if (op === 'invA') {
+        let d = det3x3(A);
+        if (d === 0) {
+          out.innerHTML = `⚠️ <b>Inverse does not exist!</b> (det(A) = 0)`;
+          return;
+        }
+        // Adjugate matrix / det
+        let inv = [
+          [
+             (A[1][1]*A[2][2] - A[1][2]*A[2][1]) / d,
+            -(A[0][1]*A[2][2] - A[0][2]*A[2][1]) / d,
+             (A[0][1]*A[1][2] - A[0][2]*A[1][1]) / d
+          ],
+          [
+            -(A[1][0]*A[2][2] - A[1][2]*A[2][0]) / d,
+             (A[0][0]*A[2][2] - A[0][2]*A[2][0]) / d,
+            -(A[0][0]*A[1][2] - A[0][2]*A[1][0]) / d
+          ],
+          [
+             (A[1][0]*A[2][1] - A[1][1]*A[2][0]) / d,
+            -(A[0][0]*A[2][1] - A[0][1]*A[2][0]) / d,
+             (A[0][0]*A[1][1] - A[0][1]*A[1][0]) / d
+          ]
+        ];
+        out.innerHTML = formatMatrixHTML(inv, '🔄 Inverse Matrix (A⁻¹)');
       }
     }
 
