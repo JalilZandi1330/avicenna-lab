@@ -273,8 +273,8 @@
       <div class="menu-item" onclick="switchView('home')" id="mHome">🏠 صفحه اصلی</div>
       <div class="menu-item" onclick="switchView('math')" id="mMath">📈 رسم توابع (جئوجبرا)</div>
       <div class="menu-item" onclick="switchView('balancer')" id="mBal">🧪 موازنه شیمیایی</div>
-      <div class="menu-item" onclick="switchView('compounds')">🔬 ترکیبات و ساختار ۳بعدی</div>
-      <div class="menu-item" onclick="switchView('study')">📚 برنامه‌ریزی و مطالعه</div>
+      <div class="menu-item" onclick="switchView('compounds')" id="mComp">🔬 ترکیبات و ساختار ۳بعدی</div>
+      <div class="menu-item" onclick="switchView('study')" id="mStudy">📚 برنامه‌ریزی و مطالعه</div>
     </div>
   </div>
 
@@ -397,7 +397,7 @@
     </div>
   </div>
 
-  <!-- VIEW 5: STUDY & RANKING (NEW) -->
+  <!-- VIEW 5: STUDY ASSISTANT -->
   <div class="view" id="viewStudy">
     <div class="chem-container">
       <div class="chem-card">
@@ -1003,7 +1003,7 @@
       if (isTimerRunning) {
         clearInterval(timerInterval);
         isTimerRunning = false;
-        document.getElementById('timerStartBtn').textContent = 'شروع';
+        document.getElementById('timerStartBtn').textContent = t('studyStart');
       } else {
         isTimerRunning = true;
         document.getElementById('timerStartBtn').textContent = 'توقف';
@@ -1014,10 +1014,10 @@
           } else {
             clearInterval(timerInterval);
             isTimerRunning = false;
-            alert('زمان مطالعه پومودورو به پایان رسید! عالی بود 🎯');
+            alert(currentLang === 'fa' ? 'زمان مطالعه پومودورو به پایان رسید! عالی بود 🎯' : 'Pomodoro session complete! Great job 🎯');
             timeLeft = 25 * 60;
             updateTimerDisplay();
-            document.getElementById('timerStartBtn').textContent = 'شروع';
+            document.getElementById('timerStartBtn').textContent = t('studyStart');
           }
         }, 1000);
       }
@@ -1028,14 +1028,14 @@
       isTimerRunning = false;
       timeLeft = 25 * 60;
       updateTimerDisplay();
-      document.getElementById('timerStartBtn').textContent = 'شروع';
+      document.getElementById('timerStartBtn').textContent = t('studyStart');
     }
 
     function saveStudyLog() {
       let subject = document.getElementById('studySubject').value.trim();
       let minutes = parseInt(document.getElementById('studyMinutes').value);
       if (!subject || !minutes || minutes <= 0) {
-        alert('لطفاً نام درس و مدت زمان مطالعه را به درست وارد کنید.');
+        alert(currentLang === 'fa' ? 'لطفاً نام درس و مدت زمان مطالعه را به درست وارد کنید.' : 'Please enter a valid subject and duration.');
         return;
       }
       let logs = JSON.parse(localStorage.getItem('avicenna_study_logs') || '[]');
@@ -1045,24 +1045,26 @@
       loadStudyLogs();
       document.getElementById('studySubject').value = '';
       document.getElementById('studyMinutes').value = '';
-      alert('گزارش مطالعه با موفقیت ثبت شد و در امتیازات شما لحاظ گردید! 📈');
+      alert(currentLang === 'fa' ? 'گزارش مطالعه با موفقیت ثبت شد! 📈' : 'Study report saved! 📈');
     }
 
     function loadStudyLogs() {
       let logs = JSON.parse(localStorage.getItem('avicenna_study_logs') || '[]');
       let box = document.getElementById('logOutput');
+      if (!box) return;
       if (logs.length === 0) {
-        box.innerHTML = 'هنوز گزارشی ثبت نشده است. اولین ساعت مطالعه‌ات رو ثبت کن!';
+        box.innerHTML = currentLang === 'fa' ? 'هنوز گزارشی ثبت نشده است.' : 'No reports yet.';
         return;
       }
-      let html = '<b style="color:var(--button-color)">گزارش‌های اخیر شما:</b><br>';
+      let html = '<b style="color:var(--button-color)">' + (currentLang === 'fa' ? 'گزارش‌های اخیر شما:' : 'Recent Activity:') + '</b><br>';
       let totalMin = 0;
       logs.forEach(l => {
         totalMin += l.minutes;
-        html += `• ${l.date} — <b>${l.subject}</b>: ${l.minutes} دقیقه<br>`;
+        html += '• ' + l.date + ' — <b>' + l.subject + '</b>: ' + l.minutes + (currentLang === 'fa' ? ' دقیقه' : ' min') + '<br>';
       });
-      html += `<br>⏱️ <b>مجموع کل مطالعه ثبت‌شده:</b> ${totalMin} دقیقه`;
+      html += '<br>⏱️ <b>' + (currentLang === 'fa' ? 'مجموع کل مطالعه:' : 'Total Study:') + '</b> ' + totalMin + (currentLang === 'fa' ? ' دقیقه' : ' minutes');
       box.innerHTML = html;
     }
+  </script>
 </body>
 </html>
