@@ -323,11 +323,34 @@
   display: none; flex: 1; flex-direction: column; min-height: 0; overflow-y: auto;
   background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
   color: #f8fafc;
+  direction: rtl;
 }
 #viewPeriodic.active { display: flex; }
-#viewPeriodic header, #viewPeriodic .controls, #viewPeriodic .legend, #viewPeriodic .table-container, #viewPeriodic .details-section {
-  /* keep original layout */
+/* LTR island: جدول خودش LTR می‌مونه، بقیه RTL */
+#viewPeriodic .table-container { direction: ltr; }
+#viewPeriodic .element-card { direction: rtl; }
+#viewPeriodic .element-card .sym {
+  direction: ltr; unicode-bidi: isolate; text-align: center;
 }
+#viewPeriodic .element-card .num {
+  direction: ltr; unicode-bidi: isolate; text-align: left;
+}
+/* انگلیسی و فرمول‌ها LTR ایزوله */
+#viewPeriodic #elemEnName, #viewPeriodic #elemSymbol, #viewPeriodic #elemConfig, #viewPeriodic #elemMass {
+  direction: ltr; unicode-bidi: isolate; display: inline-block;
+}
+#viewPeriodic #elemConfig { text-align: left; font-family: ui-monospace, monospace; }
+#viewPeriodic .info-card, #viewPeriodic .mnemonic-box, #viewPeriodic .legend, #viewPeriodic .controls {
+  direction: rtl; text-align: right;
+}
+#viewPeriodic .controls .search-box input, #viewPeriodic .filter-select {
+  direction: rtl;
+}
+#viewPeriodic #groupInfo, #viewPeriodic #mnemonicText {
+  unicode-bidi: plaintext; /* فارسی+انگلیسی مخلوط خودکار درست میشه */
+}
+#viewPeriodic .info-item span { unicode-bidi: plaintext; }
+
 
     :root {
       --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
@@ -1684,7 +1707,7 @@
   </script>
 
   <!-- VIEW: PERIODIC TABLE (Konkorilife) -->
-  <div class="view" id="viewPeriodic">
+  <div class="view" id="viewPeriodic" dir="rtl" lang="fa">
 
 
   <header>
@@ -1740,12 +1763,12 @@
 
   <div class="details-section">
     <div class="info-card">
-      <h2>شناسنامه عنصر <span id="elemSymbol">-</span></h2>
+      <h2>شناسنامه عنصر <span id="elemSymbol" dir="ltr" style="unicode-bidi:isolate">-</span></h2>
       <div class="info-grid">
         <div class="info-item"><span>نام فارسی:</span><strong id="elemFaName">-</strong></div>
-        <div class="info-item"><span>نام انگلیسی:</span><strong id="elemEnName">-</strong></div>
+        <div class="info-item"><span>نام انگلیسی:</span><strong id="elemEnName" dir="ltr" style="unicode-bidi:isolate">-</strong></div>
         <div class="info-item"><span>عدد اتمی:</span><strong id="elemZ">-</strong></div>
-        <div class="info-item"><span>جرم اتمی:</span><strong id="elemMass">-</strong></div>
+        <div class="info-item"><span>جرم اتمی:</span><strong id="elemMass" dir="ltr" style="unicode-bidi:isolate">-</strong></div>
         <div class="info-item"><span>گروه / دوره:</span><strong id="elemGroupPeriod">-</strong></div>
         <div class="info-item"><span>الکترون ظرفیت:</span><strong id="elemValence">-</strong></div>
         <div class="info-item"><span>حالت ماده:</span><strong id="elemState">-</strong></div>
@@ -1758,7 +1781,7 @@
 
     <div class="info-card">
       <h2>آموزش کنکوری و رمز حفظی</h2>
-      <div id="groupInfo">یک عنصر را انتخاب کنید تا اطلاعات گروه و رمز حفظی آن نمایش داده شود.</div>
+      <div id="groupInfo" dir="auto">یک عنصر را انتخاب کنید تا اطلاعات گروه و رمز حفظی آن نمایش داده شود.</div>
       <div class="mnemonic-box" id="mnemonicContainer" style="display:none;">
         <strong>💡 رمز حفظی گروه/بخش:</strong>
         <p id="mnemonicText">-</p>
