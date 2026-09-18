@@ -2155,6 +2155,23 @@
 #viewPlanner .channel-box {grid-template-columns:1fr}
 #viewPlanner .qr-wrap img {width:120px;height:120px}
 </style>
+<style>
+/* === Planner Color Fixes === */
+#viewPlanner { color: #0f172a !important; background: #f6f8fb !important; }
+#viewPlanner .panel { background: #ffffff !important; color: #0f172a !important; }
+#viewPlanner th { background: #f8fafc !important; color: #1e293b !important; font-weight: 700 !important; }
+#viewPlanner td { color: #334155 !important; background: #ffffff !important; }
+#viewPlanner tr:nth-child(even) td { background: #fcfcfd !important; }
+#viewPlanner tr.done td { background: #f0fdf4 !important; color: #166534 !important; }
+#viewPlanner .note { background: #fff7f8 !important; color: #991b1b !important; }
+#viewPlanner .note.alt { background: #f8fafc !important; color: #1e293b !important; }
+#viewPlanner .note li { color: #475569 !important; }
+#viewPlanner .control { background: #ffffff !important; color: #0f172a !important; }
+#viewPlanner select, #viewPlanner option { background: #ffffff !important; color: #0f172a !important; }
+#viewPlanner .progress { background: #ffffff !important; color: #0f172a !important; }
+#viewPlanner .day-card { background: #ffffff !important; color: #0f172a !important; }
+#viewPlanner .card-head { background: #f8fafc !important; color: #0f172a !important; }
+</style>
 </head>
 <body>
   <div class="header">
@@ -11524,6 +11541,22 @@ document.querySelectorAll('#viewPlanner .tab').forEach(b=>b.onclick=()=>{documen
     </div>
 
     <!-- Study Techniques Accordion / Cards -->
+    
+    <!-- Stopwatch Card -->
+    <div style="background: var(--card-bg); border: 1px solid rgba(128,128,128,0.2); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 24px;">
+      <h3 style="margin-top: 0; font-size: 1.2rem; color: var(--button-color); margin-bottom: 15px;">⏱️ زمان‌سنج آزاد (Stopwatch)</h3>
+      <p style="font-size: 0.85rem; color: var(--hint-color); margin-bottom: 15px;">برای ثبت دقیق زمان تست‌زنی، حل تمرین یا زمان آزاد بدون محدودیت:</p>
+      
+      <div id="stopwatchDisplay" style="font-size: 2.8rem; font-weight: 900; text-align: center; margin: 15px 0; font-family: monospace; letter-spacing: 2px;">00:00:00</div>
+      
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="swToggleBtn" onclick="toggleStopwatch()" class="menu-btn" style="padding: 10px 24px; background: #3b82f6; color: #fff;">شروع زمان‌سنج</button>
+        <button onclick="lapStopwatch()" class="menu-btn" style="padding: 10px 20px; background: #8b5cf6; color: #fff;">ثبت رکورد (Lap)</button>
+        <button onclick="resetStopwatch()" class="menu-btn" style="padding: 10px 20px; background: #ef4444; color: #fff;">صفر کردن</button>
+      </div>
+      <div id="lapsContainer" style="margin-top: 15px; max-height: 120px; overflow-y: auto; font-size: 0.85rem; color: var(--hint-color); text-align: center;"></div>
+    </div>
+
     <div style="background: var(--card-bg); border: 1px solid rgba(128,128,128,0.2); border-radius: 20px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 24px;">
       <h3 style="margin-top: 0; font-size: 1.3rem; color: var(--button-color); margin-bottom: 15px;">📚 تکنیک‌های طلایی افزایش ساعت مطالعه و یادگیری</h3>
       
@@ -11656,6 +11689,53 @@ document.querySelectorAll('#viewPlanner .tab').forEach(b=>b.onclick=()=>{documen
       stats.minutes += 1;
       localStorage.setItem('avicenna_study_stats', JSON.stringify(stats));
       updateStatsUI();
+
+  // --- Stopwatch Logic ---
+  let swSeconds = 0;
+  let swInterval = null;
+  let swRunning = false;
+
+  function formatTime(secs) {
+    const hrs = Math.floor(secs / 3600);
+    const mins = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function toggleStopwatch() {
+    const btn = document.getElementById('swToggleBtn');
+    if (!swRunning) {
+      swRunning = true;
+      btn.textContent = 'توقف';
+      btn.style.background = '#f59e0b';
+      swInterval = setInterval(() => {
+        swSeconds++;
+        document.getElementById('stopwatchDisplay').textContent = formatTime(swSeconds);
+      }, 1000);
+    } else {
+      swRunning = false;
+      clearInterval(swInterval);
+      btn.textContent = 'ادامه';
+      btn.style.background = '#3b82f6';
+    }
+  }
+
+  function resetStopwatch() {
+    if (swRunning) toggleStopwatch();
+    swSeconds = 0;
+    document.getElementById('stopwatchDisplay').textContent = '00:00:00';
+    document.getElementById('lapsContainer').innerHTML = '';
+  }
+
+  function lapStopwatch() {
+    if (swSeconds === 0) return;
+    const container = document.getElementById('lapsContainer');
+    const lapDiv = document.createElement('div');
+    lapDiv.textContent = `رکورد ثبت‌شده: ${formatTime(swSeconds)}`;
+    lapDiv.style.margin = '4px 0';
+    container.prepend(lapDiv);
+  }
+
     }
   }
 
@@ -11673,6 +11753,53 @@ document.querySelectorAll('#viewPlanner .tab').forEach(b=>b.onclick=()=>{documen
     if (confirm('آمار مطالعه امروز پاک شود؟')) {
       localStorage.removeItem('avicenna_study_stats');
       updateStatsUI();
+
+  // --- Stopwatch Logic ---
+  let swSeconds = 0;
+  let swInterval = null;
+  let swRunning = false;
+
+  function formatTime(secs) {
+    const hrs = Math.floor(secs / 3600);
+    const mins = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function toggleStopwatch() {
+    const btn = document.getElementById('swToggleBtn');
+    if (!swRunning) {
+      swRunning = true;
+      btn.textContent = 'توقف';
+      btn.style.background = '#f59e0b';
+      swInterval = setInterval(() => {
+        swSeconds++;
+        document.getElementById('stopwatchDisplay').textContent = formatTime(swSeconds);
+      }, 1000);
+    } else {
+      swRunning = false;
+      clearInterval(swInterval);
+      btn.textContent = 'ادامه';
+      btn.style.background = '#3b82f6';
+    }
+  }
+
+  function resetStopwatch() {
+    if (swRunning) toggleStopwatch();
+    swSeconds = 0;
+    document.getElementById('stopwatchDisplay').textContent = '00:00:00';
+    document.getElementById('lapsContainer').innerHTML = '';
+  }
+
+  function lapStopwatch() {
+    if (swSeconds === 0) return;
+    const container = document.getElementById('lapsContainer');
+    const lapDiv = document.createElement('div');
+    lapDiv.textContent = `رکورد ثبت‌شده: ${formatTime(swSeconds)}`;
+    lapDiv.style.margin = '4px 0';
+    container.prepend(lapDiv);
+  }
+
     }
   }
 
@@ -11738,6 +11865,53 @@ document.querySelectorAll('#viewPlanner .tab').forEach(b=>b.onclick=()=>{documen
 
   // Init stats on load
   updateStatsUI();
+
+  // --- Stopwatch Logic ---
+  let swSeconds = 0;
+  let swInterval = null;
+  let swRunning = false;
+
+  function formatTime(secs) {
+    const hrs = Math.floor(secs / 3600);
+    const mins = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function toggleStopwatch() {
+    const btn = document.getElementById('swToggleBtn');
+    if (!swRunning) {
+      swRunning = true;
+      btn.textContent = 'توقف';
+      btn.style.background = '#f59e0b';
+      swInterval = setInterval(() => {
+        swSeconds++;
+        document.getElementById('stopwatchDisplay').textContent = formatTime(swSeconds);
+      }, 1000);
+    } else {
+      swRunning = false;
+      clearInterval(swInterval);
+      btn.textContent = 'ادامه';
+      btn.style.background = '#3b82f6';
+    }
+  }
+
+  function resetStopwatch() {
+    if (swRunning) toggleStopwatch();
+    swSeconds = 0;
+    document.getElementById('stopwatchDisplay').textContent = '00:00:00';
+    document.getElementById('lapsContainer').innerHTML = '';
+  }
+
+  function lapStopwatch() {
+    if (swSeconds === 0) return;
+    const container = document.getElementById('lapsContainer');
+    const lapDiv = document.createElement('div');
+    lapDiv.textContent = `رکورد ثبت‌شده: ${formatTime(swSeconds)}`;
+    lapDiv.style.margin = '4px 0';
+    container.prepend(lapDiv);
+  }
+
 </script>
 
 </body>
