@@ -2171,6 +2171,7 @@
       <div class="menu-item" onclick="switchView('periodic')">🧩 جدول تناوبی کنکوری لایف</div>
       <div class="menu-item" onclick="switchView('leitner')">📚 لایتنر هوشمند گلیا</div>
       <div class="menu-item" onclick="switchView('planner')">📅 برنامه عمومی‌ها (مهر)</div>
+      <div class="menu-item" onclick="switchView('studyHub')">🎯 مرکز تمرکز و مطالعه</div>
       <div class="menu-item" onclick="switchView('biology')">🧬 Biology & Genetics Lab</div>
       <div class="menu-item" onclick="switchView('matrix')">🔢 Matrix & Vector Lab</div>
     </div>
@@ -2195,6 +2196,10 @@
         <div class="feature-box" onclick="switchView('periodic')">
           <h3>🧩 جدول تناوبی هوشمند (کنکوری لایف)</h3>
           <p>جدول تعاملی با رمزهای حفظی، آرایش الکترونی و الکترون ظرفیت.</p>
+        </div>
+        <div class="feature-box" onclick="switchView('studyHub')">
+          <h3>🎯 مرکز تمرکز و تکنیک‌های مطالعه (Study Hub)</h3>
+          <p>تایمر پومودورو، نویز قهوه‌ای، تکنیک‌های فاینمن و ثبت آمار ساعت مطالعه.</p>
         </div>
         <div class="feature-box" onclick="switchView('planner')">
           <h3>📅 برنامه ماهانه عمومی‌ها (مهر)</h3>
@@ -2461,6 +2466,7 @@
       if (viewName === 'periodic') document.getElementById('viewPeriodic').classList.add('active');
       if (viewName === 'leitner') document.getElementById('viewLeitner').classList.add('active');
       if (viewName === 'planner') document.getElementById('viewPlanner').classList.add('active');
+      if (viewName === 'studyHub') document.getElementById('viewStudyHub').classList.add('active');
       if (viewName === 'compounds') {
         document.getElementById('viewCompounds').classList.add('active');
         if (!viewer3D) {
@@ -11465,6 +11471,274 @@ Object.values(filters).forEach(s=>s.onchange=renderVideo); document.getElementBy
 document.querySelectorAll('#viewPlanner .tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('#viewPlanner .tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');let v=b.dataset.tab==='video';document.getElementById('plan_videoView').classList.toggle('hidden',!v);document.getElementById('plan_selfView').classList.toggle('hidden',v);document.getElementById('plan_videoControls').classList.toggle('hidden',!v)});renderAll();
 
   </script>
+
+
+<!-- VIEW: STUDY HUB & FOCUS CENTER -->
+<div class="view" id="viewStudyHub">
+  <div class="study-hub-container" style="max-width: 1000px; margin: 0 auto; padding: 20px; direction: rtl; text-align: right;">
+    
+    <!-- Hero Banner -->
+    <div style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: #fff; padding: 24px; border-radius: 20px; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(59,130,246,0.3);">
+      <h2 style="font-size: 1.6rem; margin-bottom: 8px;">🎯 مرکز تمرکز و تکنیک‌های مطالعه (Study Hub)</h2>
+      <p style="opacity: 0.9; font-size: 0.95rem; line-height: 1.6;">ابزارهای علمی برای افزایش ساعت مطالعه، تمرکز عمیق، مدیریت زمان و تکنیک‌های یادگیری کنکوری.</p>
+    </div>
+
+    <!-- Grid Layout: Timer & White Noise -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px;">
+      
+      <!-- Pomodoro & Focus Timer Card -->
+      <div style="background: var(--card-bg); border: 1px solid rgba(128,128,128,0.2); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <h3 style="margin-top: 0; font-size: 1.2rem; color: var(--button-color); margin-bottom: 15px;">⏱️ تایمر تمرکز هوشمند</h3>
+        
+        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+          <button onclick="setTimerMode(25, 5, 'پومودورو (25/5)')" class="menu-btn" style="flex:1; padding: 8px;">پومودورو (25/5)</button>
+          <button onclick="setTimerMode(50, 10, 'سنگین (50/10)')" class="menu-btn" style="flex:1; padding: 8px; background: #10b981;">کنکوری (50/10)</button>
+          <button onclick="setTimerMode(15, 3, 'استراحت کوتاه (15/3)')" class="menu-btn" style="flex:1; padding: 8px; background: #f59e0b;">کوتاه (15/3)</button>
+        </div>
+
+        <div id="timerDisplay" style="font-size: 3.2rem; font-weight: 900; text-align: center; margin: 20px 0; font-family: monospace; letter-spacing: 2px;">25:00</div>
+        <div id="timerStatus" style="text-align: center; font-size: 0.9rem; color: var(--hint-color); margin-bottom: 15px;">وضعیت: آماده برای مطالعه 🚀</div>
+
+        <div style="display: flex; gap: 10px;">
+          <button id="timerToggleBtn" onclick="toggleTimer()" class="menu-btn" style="flex: 2; padding: 12px; font-size: 1rem; background: #10b981; color: #fff;">شروع تمرکز</button>
+          <button onclick="resetTimer()" class="menu-btn" style="flex: 1; padding: 12px; background: #ef4440; color: #fff;">بازنشانی</button>
+        </div>
+      </div>
+
+      <!-- White Noise & Focus Audio Card -->
+      <div style="background: var(--card-bg); border: 1px solid rgba(128,128,128,0.2); border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <h3 style="margin-top: 0; font-size: 1.2rem; color: var(--button-color); margin-bottom: 15px;">🎧 نویز سفید و صدای تمرکز</h3>
+        <p style="font-size: 0.88rem; color: var(--hint-color); margin-bottom: 15px;">برای حذف صداهای مزاحم محیط و ایجاد تمرکز مطلق عمیق:</p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <button onclick="toggleNoise('brown')" id="noiseBrownBtn" class="menu-btn" style="padding: 12px; text-align: right; background: rgba(128,128,128,0.1); color: var(--text-color); border: 1px solid rgba(128,128,128,0.2);">
+            <b>🔊 نویز قهوه‌ای (Brown Noise)</b><br><span style="font-size:0.75rem; opacity:0.8;">بهترین برای مطالعه عمیق و کاهش حواس‌پرتی</span>
+          </button>
+          <button onclick="toggleNoise('rain')" id="noiseRainBtn" class="menu-btn" style="padding: 12px; text-align: right; background: rgba(128,128,128,0.1); color: var(--text-color); border: 1px solid rgba(128,128,128,0.2);">
+            <b>🌧️ صدای باران ملایم</b><br><span style="font-size:0.75rem; opacity:0.8;">آرامش‌بخش و مناسب تست‌زنی طولانی</span>
+          </button>
+          <button onclick="stopAllNoise()" class="menu-btn" style="padding: 10px; background: #ef4440; color: #fff; font-weight: bold;">⏹️ قطع تمام صداها</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Study Techniques Accordion / Cards -->
+    <div style="background: var(--card-bg); border: 1px solid rgba(128,128,128,0.2); border-radius: 20px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 24px;">
+      <h3 style="margin-top: 0; font-size: 1.3rem; color: var(--button-color); margin-bottom: 15px;">📚 تکنیک‌های طلایی افزایش ساعت مطالعه و یادگیری</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+        
+        <div style="background: rgba(128,128,128,0.05); padding: 16px; border-radius: 14px; border-right: 4px solid #6366f1;">
+          <h4 style="margin: 0 0 8px 0; color: var(--text-color);">🧠 تکنیک فاینمن (Feynman)</h4>
+          <p style="font-size: 0.85rem; color: var(--hint-color); margin: 0; line-height: 1.6;">مبحثی که خواندی را با زبان ساده و مثل یک معلم به یک کودک توضیح بده. هر جا گیر کردی یعنی یادگیریت ناقص است.</p>
+        </div>
+
+        <div style="background: rgba(128,128,128,0.05); padding: 16px; border-radius: 14px; border-right: 4px solid #10b981;">
+          <h4 style="margin: 0 0 8px 0; color: var(--text-color);">🔄 بازیابی فعال (Active Recall)</h4>
+          <p style="font-size: 0.85rem; color: var(--hint-color); margin: 0; line-height: 1.6;">به جای روخوانی مکرر کتاب، کتاب را ببند و هر چه یادت مانده روی کاغذ بنویس یا برای خودت بازگو کن.</p>
+        </div>
+
+        <div style="background: rgba(128,128,128,0.05); padding: 16px; border-radius: 14px; border-right: 4px solid #f59e0b;">
+          <h4 style="margin: 0 0 8px 0; color: var(--text-color);">📊 قانون ۵۰ دقیقه کار + ۱۰ دقیقه استراحت</h4>
+          <p style="font-size: 0.85rem; color: var(--hint-color); margin: 0; line-height: 1.6;">برای کنکور، مغز به بازه‌های استاندارد نیاز دارد. در ۱۰ دقیقه استراحت مطلقاً از گوشی استفاده نکن تا دوپامین ترشح نشود.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Daily Study Log & Stats -->
+    <div style="background: var(--card-bg); border: 1px solid rgba(128,128,128,0.2); border-radius: 20px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+      <h3 style="margin-top: 0; font-size: 1.3rem; color: var(--button-color); margin-bottom: 15px;">📈 آمار مطالعه امروز شما</h3>
+      <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+        <div style="background: rgba(59,130,246,0.1); padding: 16px 24px; border-radius: 14px; text-align: center; flex: 1; min-width: 140px;">
+          <div style="font-size: 1.8rem; font-weight: 900; color: var(--button-color);" id="todayMinutes">0</div>
+          <div style="font-size: 0.85rem; color: var(--hint-color); margin-top: 4px;">دقیقه مطالعه امروز</div>
+        </div>
+        <div style="background: rgba(16,185,129,0.1); padding: 16px 24px; border-radius: 14px; text-align: center; flex: 1; min-width: 140px;">
+          <div style="font-size: 1.8rem; font-weight: 900; color: #10b981;" id="todaySessions">0</div>
+          <div style="font-size: 0.85rem; color: var(--hint-color); margin-top: 4px;">بازه تمرکز کامل</div>
+        </div>
+        <button onclick="resetStudyStats()" class="menu-btn" style="padding: 12px 20px; background: rgba(239,68,68,0.1); color: #ef4440; border: 1px solid rgba(239,68,68,0.2);">پاک کردن آمار امروز</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // --- Study Hub Timer & Audio Logic ---
+  let timerInterval = null;
+  let totalSeconds = 25 * 60;
+  let workDuration = 25 * 60;
+  let breakDuration = 5 * 60;
+  let isRunning = false;
+  let isWorkMode = true;
+  let modeName = 'پومودورو (25/5)';
+
+  function setTimerMode(workMins, breakMins, name) {
+    if (isRunning) {
+      if (!confirm('تایمر در حال اجراست. می‌خواهید تغییرش دهید؟')) return;
+      toggleTimer();
+    }
+    workDuration = workMins * 60;
+    breakDuration = breakMins * 60;
+    totalSeconds = workDuration;
+    isWorkMode = true;
+    modeName = name;
+    updateDisplay();
+    document.getElementById('timerStatus').textContent = `حالت: ${modeName} (مطالعه)`;
+  }
+
+  function updateDisplay() {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    document.getElementById('timerDisplay').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  function toggleTimer() {
+    const btn = document.getElementById('timerToggleBtn');
+    if (!isRunning) {
+      isRunning = true;
+      btn.textContent = 'توقف موقت';
+      btn.style.background = '#f59e0b';
+      timerInterval = setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          updateDisplay();
+          if (isWorkMode) {
+            addStudyMinute();
+          }
+        } else {
+          // Time's up!
+          if (isWorkMode) {
+            alert('🎉 آفرین! بازه مطالعه تمام شد. وقت استراحت است!');
+            isWorkMode = false;
+            totalSeconds = breakDuration;
+            document.getElementById('timerStatus').textContent = `حالت: ${modeName} (استراحت ☕)`;
+          } else {
+            alert('🔔 استراحت تمام شد! آماده برای بازه بعدی؟');
+            isWorkMode = true;
+            totalSeconds = workDuration;
+            document.getElementById('timerStatus').textContent = `حالت: ${modeName} (مطالعه 🚀)`;
+          }
+          updateDisplay();
+        }
+      }, 1000);
+    } else {
+      isRunning = false;
+      clearInterval(timerInterval);
+      btn.textContent = 'ادامه تمرکز';
+      btn.style.background = '#10b981';
+      document.getElementById('timerStatus').textContent = 'وضعیت: متوقف شده';
+    }
+  }
+
+  function resetTimer() {
+    if (isRunning) toggleTimer();
+    totalSeconds = workDuration;
+    isWorkMode = true;
+    updateDisplay();
+    document.getElementById('timerStatus').textContent = `حالت: ${modeName} (آماده)`;
+  }
+
+  // Study Stats in localStorage
+  function addStudyMinute() {
+    let stats = JSON.parse(localStorage.getItem('avicenna_study_stats') || '{"minutes":0, "sessions":0, "date": ""}');
+    let todayStr = new Date().toDateString();
+    if (stats.date !== todayStr) {
+      stats = { minutes: 0, sessions: 0, date: todayStr };
+    }
+    // every 60 seconds of actual work = 1 minute added
+    // To make it responsive for testing, we can count seconds or trigger session completion.
+    // Let's count every 60 seconds
+    if (totalSeconds % 60 === 0 && totalSeconds < workDuration) {
+      stats.minutes += 1;
+      localStorage.setItem('avicenna_study_stats', JSON.stringify(stats));
+      updateStatsUI();
+    }
+  }
+
+  function updateStatsUI() {
+    let stats = JSON.parse(localStorage.getItem('avicenna_study_stats') || '{"minutes":0, "sessions":0, "date": ""}');
+    let todayStr = new Date().toDateString();
+    if (stats.date !== todayStr) {
+      stats = { minutes: 0, sessions: 0, date: todayStr };
+    }
+    document.getElementById('todayMinutes').textContent = stats.minutes;
+    document.getElementById('todaySessions').textContent = Math.floor(stats.minutes / 25);
+  }
+
+  function resetStudyStats() {
+    if (confirm('آمار مطالعه امروز پاک شود؟')) {
+      localStorage.removeItem('avicenna_study_stats');
+      updateStatsUI();
+    }
+  }
+
+  // Web Audio API White Noise Generator
+  let audioCtx = null;
+  let noiseNode = null;
+
+  function toggleNoise(type) {
+    stopAllNoise();
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const bufferSize = 2 * audioCtx.sampleRate;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      
+      if (type === 'brown') {
+        // Brown noise generation
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          output[i] = (lastOut + (0.02 * white)) / 1.02;
+          lastOut = output[i];
+          output[i] *= 3.5; // gain correction
+        }
+      } else {
+        // Simple white noise with lowpass filter for rain simulation
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+      }
+
+      noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = noiseBuffer;
+      noiseNode.loop = true;
+
+      if (type === 'rain') {
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 1000;
+        noiseNode.connect(filter);
+        filter.connect(audioCtx.destination);
+      } else {
+        noiseNode.connect(audioCtx.destination);
+      }
+
+      noiseNode.start(0);
+      alert(type === 'brown' ? '🔊 نویز قهوه‌ای پخش شد.' : '🌧️ صدای باران پخش شد.');
+    } catch (e) {
+      alert('مرورگر شما از پخش صدا پشتیبانی نمی‌کند یا اجازه نداد.');
+    }
+  }
+
+  function stopAllNoise() {
+    if (noiseNode) {
+      try { noiseNode.stop(); } catch(e) {}
+      noiseNode = null;
+    }
+    if (audioCtx) {
+      try { audioCtx.close(); } catch(e) {}
+      audioCtx = null;
+    }
+  }
+
+  // Init stats on load
+  updateStatsUI();
+</script>
 
 </body>
 </html>
